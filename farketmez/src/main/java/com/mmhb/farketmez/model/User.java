@@ -2,8 +2,15 @@ package com.mmhb.farketmez.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
 
 @Entity
@@ -11,7 +18,10 @@ import lombok.Data;
 @Data
 public class User {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	private String username;
 	private String password;
 	private String nameSurname;
