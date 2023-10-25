@@ -26,12 +26,13 @@ public class User {
 
 	private String username;
 	private String password;
-	@Column(name = "name_surname")
-	private String nameSurname;
+	private String name;
+	private String surname;
 	private Integer age;
 	private Integer gender;
 	private String longitude;
 	private String latitude;
+	private String token;
 
 	@Column(name = "created_at")
 	private Date createdAt;
@@ -46,13 +47,16 @@ public class User {
 	@JoinColumn(name = "user_type_id")
 	private UserType userType;
 
-	public User(String username, String password, String nameSurname, int age, int gender, String longitude, String latitude) {
+	public User(String username, String password, String name, String surname, int age, int gender, String longitude,
+			String latitude, String token) {
 		this.username = username;
 		this.password = password;
-		this.nameSurname = nameSurname;
+		this.name = name;
+		this.surname = surname;
 		this.age = age;
 		this.gender = gender;
 		this.longitude = longitude;
 		this.latitude = latitude;
+		this.token = token;
 	}
 }

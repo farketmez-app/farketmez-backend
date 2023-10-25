@@ -33,19 +33,21 @@ public class UserController {
         return this.userService.getUserById(id);
     }
 
-    /*
-    example POST request to http://localhost:8080/users/save with body:
-    {
-     "username": "test",
-     "password": "test",
-     "nameSurname": "test",
-      "age":12,
-    "gender":1,
-     "longitude":"test",
-     "latitude":"test"
-     }
-
-     response: "User saved" || "Eksik ya da hatalı kullanıcı bilgileri. Lütfen tüm alanları doldurun."
+    /**
+     * example POST request to http://localhost:8080/users/save with body:
+     * {
+     *   "username": "test",
+     *   "password": "test",
+     *   "name": "test",
+     *   "surname": "test",
+     *   "age":12,
+     *   "gender":1,
+     *   "longitude":"test",
+     *   "latitude":"test",
+     *   "token":"test"
+     * }
+     * 
+     * response: "User saved" || "Missing or incorrect user information. Please fill in all fields"
      */
     @PostMapping(value = "save")
     public String saveUser(@RequestBody User user) {

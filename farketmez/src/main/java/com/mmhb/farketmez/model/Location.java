@@ -8,16 +8,18 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "user_types")
+@Table(name = "locations")
 @Data
-public class UserType {
+public class Location {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String type;
+	private String longitude;
+	private String latitude;
 
-	public UserType(String type) {
-		this.type = type;
+	public Location(String longitude, String latitude) {
+		this.longitude = longitude;
+		this.latitude = latitude;
 	}
 }
