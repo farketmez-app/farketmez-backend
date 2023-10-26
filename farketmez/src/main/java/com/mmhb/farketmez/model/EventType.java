@@ -8,16 +8,16 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "user_types")
+@Table(name = "event_types")
 @Data
-public class UserType {
+public class EventType {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String type;
+	private Integer type;
 
-	public UserType(String type) {
+	public EventType(Integer type) {
 		this.type = type;
 	}
 }
