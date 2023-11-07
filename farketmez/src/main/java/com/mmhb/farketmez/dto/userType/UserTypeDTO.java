@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserTypeDTO extends UserTypeCreateDTO {
-    long id;
+    Long id;
 }

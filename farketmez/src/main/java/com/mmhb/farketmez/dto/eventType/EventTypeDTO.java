@@ -6,5 +6,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventTypeDTO extends EventTypeCreateDTO {
-    long id;
+    Long id;
 }
