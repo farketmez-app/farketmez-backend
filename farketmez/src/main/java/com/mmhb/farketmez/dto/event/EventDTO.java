@@ -3,9 +3,9 @@ package com.mmhb.farketmez.dto.event;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EventDTO extends EventUpdateDTO {
-    Date deletedAt;
+    Timestamp deletedAt;
 }
