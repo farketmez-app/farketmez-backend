@@ -1,5 +1,6 @@
 package com.mmhb.farketmez.model;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -35,13 +36,13 @@ public class User {
 	private String token;
 
 	@Column(name = "created_at")
-	private Date createdAt;
+	private Timestamp createdAt;
 
 	@Column(name = "updated_at")
-	private Date updatedAt;
+	private Timestamp updatedAt;
 
 	@Column(name = "deleted_at")
-	private Date deletedAt;
+	private Timestamp deletedAt;
 
 	@ManyToOne
 	@JoinColumn(name = "user_type_id")
