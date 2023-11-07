@@ -1,7 +1,13 @@
 package com.mmhb.farketmez.dto.user;
 
 import com.mmhb.farketmez.model.UserType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 public class UserCreateDTO {
     String username;
     String password;
