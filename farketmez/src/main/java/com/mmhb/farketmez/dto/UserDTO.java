@@ -1,4 +1,4 @@
-package com.mmhb.farketmez.dto.user;
+package com.mmhb.farketmez.dto;
 
 import com.mmhb.farketmez.model.UserType;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,8 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class UserCreateDTO {
+public class UserDTO {
+    Long id;
     String username;
     String password;
     String name;
@@ -19,7 +20,8 @@ public class UserCreateDTO {
     Integer gender;
     String longitude;
     String latitude;
-    String token;
     UserType userType;
     Timestamp createdAt;
+    Timestamp updatedAt;
+    Timestamp deletedAt;
 }

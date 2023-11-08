@@ -17,7 +17,8 @@ public class EventType {
 
 	private Integer type;
 
-	public EventType(Integer type) {
+	public EventType(Long id, Integer type) {
+		this.id = id;
 		this.type = type;
 	}
 }

@@ -1,4 +1,4 @@
-package com.mmhb.farketmez.dto.event;
+package com.mmhb.farketmez.dto;
 
 import com.mmhb.farketmez.model.EventType;
 import com.mmhb.farketmez.model.Location;
@@ -12,14 +12,16 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class EventCreateDTO {
-    char isActive;
+public class EventDTO {
+    Long id;
+    Boolean isActive;
     String title;
     String description;
-    Timestamp date;
     BigDecimal averageRating;
+    Timestamp date;
     Timestamp createdAt;
-
+    Timestamp deletedAt;
+    Timestamp updatedAt;
 
     EventType eventType;
     Location location;

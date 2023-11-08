@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class SettingsDTO {
+	Long id;
 	String key;
 	String value;
 }

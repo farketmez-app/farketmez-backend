@@ -18,7 +18,8 @@ public class Location {
 	private String longitude;
 	private String latitude;
 
-	public Location(String longitude, String latitude) {
+	public Location(Long id, String longitude, String latitude) {
+		this.id = id;
 		this.longitude = longitude;
 		this.latitude = latitude;
 	}

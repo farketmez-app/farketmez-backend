@@ -1,10 +1,13 @@
-package com.mmhb.farketmez.dto.location;
+package com.mmhb.farketmez.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class LocationDTO extends LocationCreateDTO {
+@Data
+public class EventTypeDTO {
     Long id;
+    Integer type;
 }

@@ -17,7 +17,8 @@ public class UserType {
 
 	private String type;
 
-	public UserType(String type) {
+	public UserType(Long id, String type) {
+		this.id = id;
 		this.type = type;
 	}
 }

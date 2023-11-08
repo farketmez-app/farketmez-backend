@@ -1,10 +1,13 @@
-package com.mmhb.farketmez.dto.userInterest;
+package com.mmhb.farketmez.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserInterestDTO extends UserInterestCreateDTO {
+@Data
+public class InterestDTO {
     Long id;
+    String interestName;
 }

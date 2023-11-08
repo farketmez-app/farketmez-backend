@@ -18,19 +18,19 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "settings")
 public class Settings {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(name = "key", nullable = false, unique = true)
-	private String key;
+    @Column(name = "key", nullable = false, unique = true)
+    private String key;
 
-	@Column(name = "value")
-	private String value;
+    @Column(name = "value")
+    private String value;
 
-	@Column(name = "create_date")
-	private LocalDateTime createDate;
+    @Column(name = "create_date")
+    private LocalDateTime createDate;
 
-	@Column(name = "update_date")
-	private LocalDateTime updateDate;
+    @Column(name = "update_date")
+    private LocalDateTime updateDate;
 }

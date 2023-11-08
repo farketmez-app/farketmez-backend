@@ -27,7 +27,7 @@ public class Event {
 	private Long creatorId;
 
 	@Column(name = "is_active", length = 1)
-	private char isActive;
+	private Boolean isActive;
 
 	@Column(length = 50)
 	private String title;
@@ -58,8 +58,9 @@ public class Event {
 	@JoinColumn(name = "location_id", nullable = false, foreignKey = @ForeignKey(name = "fk_event_location"))
 	private Location location;
 
-	public Event(EventType eventType, Location location, Long creatorId, char isActive, String title,
+	public Event(Long id, EventType eventType, Location location, Long creatorId, Boolean isActive, String title,
 			String description, Timestamp date, BigDecimal averageRating) {
+		this.id = id;
 		this.eventType = eventType;
 		this.location = location;
 		this.creatorId = creatorId;
