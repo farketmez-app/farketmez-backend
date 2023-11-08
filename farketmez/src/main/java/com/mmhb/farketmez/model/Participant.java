@@ -8,11 +8,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
 @Entity
 @Table(name = "participants")
+@Data
+@AllArgsConstructor
 public class Participant {
 
 	@Id
@@ -32,11 +35,4 @@ public class Participant {
 	@Column(name = "comment")
 	private final String comment;
 
-	public Participant(Long id, Long userId, Long eventId, BigDecimal rating, String comment) {
-		this.id = id;
-		this.userId = userId;
-		this.eventId = eventId;
-		this.rating = rating;
-		this.comment = comment;
-	}
 }
