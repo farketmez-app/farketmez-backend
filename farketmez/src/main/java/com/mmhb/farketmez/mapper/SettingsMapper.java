@@ -8,11 +8,12 @@ public class SettingsMapper {
 	}
 
 	public static SettingsDTO toSettingsDto(Settings settings) {
-		return new SettingsDTO(settings.getKey(), settings.getValue());
+		return new SettingsDTO(settings.getId(), settings.getKey(), settings.getValue());
 	}
 
 	public static Settings fromSettingsDTO(SettingsDTO settingDto) {
 		Settings settings = new Settings();
+		settings.setId(settingDto.getId());
 		settings.setKey(settingDto.getKey());
 		settings.setValue(settingDto.getValue());
 		return settings;

@@ -6,10 +6,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "locations")
 @Data
+@NoArgsConstructor
 public class Location {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,7 +20,8 @@ public class Location {
 	private String longitude;
 	private String latitude;
 
-	public Location(String longitude, String latitude) {
+	public Location(Long id, String longitude, String latitude) {
+		this.id = id;
 		this.longitude = longitude;
 		this.latitude = latitude;
 	}

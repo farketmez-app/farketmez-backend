@@ -33,7 +33,6 @@ public class User {
 	private Integer gender;
 	private String longitude;
 	private String latitude;
-	private String token;
 
 	@Column(name = "created_at")
 	private Timestamp createdAt;
@@ -49,7 +48,7 @@ public class User {
 	private UserType userType;
 
 	public User(String username, String password, String name, String surname, int age, int gender, String longitude,
-			String latitude, String token) {
+			String latitude) {
 		this.username = username;
 		this.password = password;
 		this.name = name;
@@ -58,6 +57,18 @@ public class User {
 		this.gender = gender;
 		this.longitude = longitude;
 		this.latitude = latitude;
-		this.token = token;
+	}
+
+	public User(Long id, String username, String password, String name, String surname, int age, int gender, String longitude,
+				String latitude) {
+		this.id = id;
+		this.username = username;
+		this.password = password;
+		this.name = name;
+		this.surname = surname;
+		this.age = age;
+		this.gender = gender;
+		this.longitude = longitude;
+		this.latitude = latitude;
 	}
 }

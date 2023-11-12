@@ -6,11 +6,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @Table(name = "user_interests")
 @Entity
+@AllArgsConstructor
 public class UserInterest {
 
 	@Id
@@ -24,9 +26,4 @@ public class UserInterest {
 	@Column(name = "interest_id")
 	private final Long interestId;
 
-	public UserInterest(Long id, Long userId, Long interestId) {
-		this.id = id;
-		this.userId = userId;
-		this.interestId = interestId;
-	}
 }

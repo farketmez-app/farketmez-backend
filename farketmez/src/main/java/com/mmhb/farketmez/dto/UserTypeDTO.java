@@ -1,4 +1,4 @@
-package com.mmhb.farketmez.dto.participant;
+package com.mmhb.farketmez.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class ParticipantDTO extends ParticipantCreateDTO {
+@Data
+public class UserTypeDTO {
     Long id;
+    String type;
 }
