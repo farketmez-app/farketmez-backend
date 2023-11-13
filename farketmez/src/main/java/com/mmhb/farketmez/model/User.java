@@ -1,7 +1,6 @@
 package com.mmhb.farketmez.model;
 
 import java.sql.Timestamp;
-import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -59,8 +58,8 @@ public class User {
 		this.latitude = latitude;
 	}
 
-	public User(Long id, String username, String password, String name, String surname, int age, int gender, String longitude,
-				String latitude) {
+	public User(Long id, String username, String password, String name, String surname, int age, int gender,
+			String longitude, String latitude) {
 		this.id = id;
 		this.username = username;
 		this.password = password;

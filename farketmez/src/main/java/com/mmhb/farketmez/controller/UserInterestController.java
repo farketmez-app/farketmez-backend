@@ -6,11 +6,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mmhb.farketmez.model.UserInterest;
+import com.mmhb.farketmez.dto.UserInterestDTO;
 import com.mmhb.farketmez.service.UserInterestService;
 
 @RestController
@@ -23,38 +24,28 @@ public class UserInterestController {
 		this.userInterestService = userInterestService;
 	}
 
-	/*
-	 * Example GET request: http://localhost:8080/userinterests
-	 * 
-	 * Response: List of all user interests
-	 */
 	@GetMapping
-	public List<UserInterest> getAllUserInterests() {
+	public List<UserInterestDTO> getAllUserInterests() {
 		return userInterestService.findAll();
 	}
 
-	/**
-	 * Example POST request: http://localhost:8080/userinterests/save Request body:
-	 * { "interestName": "Sports" }
-	 * 
-	 * Response: User interest object or null if not saved
-	 */
-	@PostMapping("/save")
-	public UserInterest save(@RequestBody UserInterest interest) {
-
-		return userInterestService.save(interest);
-
+	@GetMapping("/{id}")
+	public UserInterestDTO getUserInterestById(@PathVariable Long id) {
+		return userInterestService.findById(id);
 	}
 
-	/*
-	 * Example DELETE request: http://localhost:8080/userinterests/1
-	 * 
-	 * Response: "User interest deleted" || "User interest not found"
-	 */
+	@PostMapping("/create")
+	public UserInterestDTO createUserInterest(@RequestBody UserInterestDTO userInterestDTO) {
+		return userInterestService.createUserInterest(userInterestDTO);
+	}
+
+	@PutMapping("/{id}")
+	public UserInterestDTO updateUserInterest(@PathVariable Long id, @RequestBody UserInterestDTO userInterestDTO) {
+		return userInterestService.updateUserInterest(id, userInterestDTO);
+	}
+
 	@DeleteMapping("/{id}")
-	public void delete(@PathVariable Long id) {
-
+	public void deleteUserInterest(@PathVariable Long id) {
 		userInterestService.deleteById(id);
-
 	}
 }
