@@ -2,9 +2,12 @@ package com.mmhb.farketmez.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.mmhb.farketmez.dto.EventTypeDTO;
+import com.mmhb.farketmez.mapper.EventTypeMapper;
 import com.mmhb.farketmez.model.EventType;
 import com.mmhb.farketmez.repository.EventTypeRepository;
 
@@ -16,21 +19,25 @@ public class EventTypeService {
 
 	private final EventTypeRepository eventTypeRepository;
 
-	public EventType createEventType(EventType eventType) {
-		return eventTypeRepository.save(eventType);
+	public EventTypeDTO createEventType(EventTypeDTO eventTypeDto) {
+		EventType eventType = EventTypeMapper.fromEventTypeDto(eventTypeDto);
+		eventType = eventTypeRepository.save(eventType);
+		return EventTypeMapper.toEventTypeDto(eventType);
 	}
 
-	public List<EventType> getAllEventTypes() {
-		return eventTypeRepository.findAll();
+	public List<EventTypeDTO> getAllEventTypes() {
+		return eventTypeRepository.findAll().stream().map(EventTypeMapper::toEventTypeDto).collect(Collectors.toList());
 	}
 
-	public Optional<EventType> getEventTypeById(Long id) {
-		return eventTypeRepository.findById(id);
+	public Optional<EventTypeDTO> getEventTypeById(Long id) {
+		return eventTypeRepository.findById(id).map(EventTypeMapper::toEventTypeDto);
 	}
 
-	public EventType updateEventType(EventType eventType) {
-		if (eventTypeRepository.existsById(eventType.getId())) {
-			return eventTypeRepository.save(eventType);
+	public EventTypeDTO updateEventType(EventTypeDTO eventTypeDto) {
+		if (eventTypeRepository.existsById(eventTypeDto.getId())) {
+			EventType eventType = EventTypeMapper.fromEventTypeDto(eventTypeDto);
+			eventType = eventTypeRepository.save(eventType);
+			return EventTypeMapper.toEventTypeDto(eventType);
 		}
 		return null;
 	}

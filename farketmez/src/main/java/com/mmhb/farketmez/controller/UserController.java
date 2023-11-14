@@ -1,68 +1,52 @@
 package com.mmhb.farketmez.controller;
 
-import com.mmhb.farketmez.model.User;
+import java.util.List;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.mmhb.farketmez.dto.UserDTO;
 import com.mmhb.farketmez.service.UserService;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/users")
 public class UserController {
-    private final UserService userService;
+	private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+	public UserController(UserService userService) {
+		this.userService = userService;
+	}
 
-    /*
-    example GET request to http://localhost:8080/users
+	@GetMapping
+	public List<UserDTO> getAllUsers() {
+		return userService.getAllUsers();
+	}
 
-    response: List of all users
-    */
-    @GetMapping
-    public Object getAllUsers() {
-        return this.userService.getAllUsers();
-    }
+	@GetMapping(value = "/{id}")
+	public UserDTO getUserById(@PathVariable Long id) {
+		return userService.getUserById(id);
+	}
 
-    /*
-    example GET request to http://localhost:8080/users/1
+	@PostMapping(value = "/create")
+	public UserDTO createUser(@RequestBody UserDTO userDTO) {
+		return userService.createUser(userDTO);
+	}
 
-    response: User with id 1
-    */
-    @GetMapping(value = "/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return this.userService.getUserById(id);
-    }
+	@PutMapping(value = "/{id}")
+	public UserDTO updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+		userDTO.setId(id);
+		return userService.updateUser(userDTO);
+	}
 
-    /**
-     * example POST request to http://localhost:8080/users/save with body:
-     * {
-     *   "username": "test",
-     *   "password": "test",
-     *   "name": "test",
-     *   "surname": "test",
-     *   "age":12,
-     *   "gender":1,
-     *   "longitude":"test",
-     *   "latitude":"test",
-     *   "token":"test"
-     * }
-     * 
-     * response: "User saved" || "Missing or incorrect user information. Please fill in all fields"
-     */
-    @PostMapping(value = "save")
-    public String saveUser(@RequestBody User user) {
-        return this.userService.saveUser(user);
-    }
-
-    /*
-    example DELETE request to http://localhost:8080/users/1
-
-    response: "User deleted" || "User not found"
-     */
-    @DeleteMapping(value = "/{id}")
-    public String deleteUser(@PathVariable Long id) {
-        return this.userService.deleteUser(id);
-    }
-
-
+	@DeleteMapping(value = "/{id}")
+	public String deleteUser(@PathVariable Long id) {
+		userService.deleteUser(id);
+		return "User deleted";
+	}
 }

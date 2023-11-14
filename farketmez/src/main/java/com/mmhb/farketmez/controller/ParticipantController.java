@@ -1,14 +1,18 @@
 package com.mmhb.farketmez.controller;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mmhb.farketmez.model.Participant;
+import com.mmhb.farketmez.dto.ParticipantDTO;
 import com.mmhb.farketmez.service.ParticipantService;
 
 @RestController
@@ -21,46 +25,32 @@ public class ParticipantController {
 		this.participantService = participantService;
 	}
 
-	/*
-	 * example GET request to http://localhost:8080/participants
-	 * 
-	 * response: List of all participants
-	 */
 	@GetMapping
-	public Object getAllParticipants() {
-		return this.participantService.getAllParticipants();
+	public List<ParticipantDTO> getAllParticipants() {
+		return participantService.getAllParticipants();
 	}
 
-	/*
-	 * example GET request to http://localhost:8080/participants/1
-	 * 
-	 * response: Participant with id 1
-	 */
 	@GetMapping(value = "/{id}")
-	public Participant getParticipantById(@PathVariable Long id) {
-		return this.participantService.getParticipantById(id).orElse(null);
+	public ParticipantDTO getParticipantById(@PathVariable Long id) {
+		Optional<ParticipantDTO> participantDTO = participantService.getParticipantById(id);
+		return participantDTO.orElse(null);
 	}
 
-	/**
-	 * example POST request to http://localhost:8080/participants/save with body: {
-	 * ...participant details... }
-	 * 
-	 * response: Participant object || null if not saved
-	 */
-	@PostMapping(value = "save")
-	public Participant saveParticipant(@RequestBody Participant participant) {
-		return this.participantService.createParticipant(participant);
+	@PostMapping(value = "/create")
+	public ParticipantDTO createParticipant(@RequestBody ParticipantDTO participantDTO) {
+		return participantService.createParticipant(participantDTO);
 	}
 
-	/*
-	 * example DELETE request to http://localhost:8080/participants/1
-	 * 
-	 * response: "Participant deleted" || "Participant not found"
-	 */
+	@PutMapping(value = "/{id}")
+	public ParticipantDTO updateParticipant(@PathVariable Long id, @RequestBody ParticipantDTO participantDTO) {
+		participantDTO.setId(id);
+		return participantService.updateParticipant(participantDTO);
+	}
+
 	@DeleteMapping(value = "/{id}")
 	public String deleteParticipant(@PathVariable Long id) {
-		if (this.participantService.getParticipantById(id).isPresent()) {
-			this.participantService.deleteParticipant(id);
+		if (participantService.getParticipantById(id).isPresent()) {
+			participantService.deleteParticipant(id);
 			return "Participant deleted";
 		}
 		return "Participant not found";
