@@ -2,6 +2,8 @@ package com.mmhb.farketmez.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,23 +27,40 @@ public class UserInterestController {
 	}
 
 	@GetMapping
-	public List<UserInterestDTO> getAllUserInterests() {
-		return userInterestService.findAll();
+	public ResponseEntity<List<UserInterestDTO>> getAllUserInterests() {
+		List<UserInterestDTO> userInterests = userInterestService.findAll();
+		return new ResponseEntity<>(userInterests, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
-	public UserInterestDTO getUserInterestById(@PathVariable Long id) {
-		return userInterestService.findById(id);
+	public ResponseEntity<UserInterestDTO> getUserInterestById(@PathVariable Long id) {
+		UserInterestDTO userInterestDTO = userInterestService.findById(id);
+		if (userInterestDTO != null) {
+			return new ResponseEntity<>(userInterestDTO, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
-	@PostMapping("/create")
-	public UserInterestDTO createUserInterest(@RequestBody UserInterestDTO userInterestDTO) {
-		return userInterestService.createUserInterest(userInterestDTO);
+	@PostMapping
+	public ResponseEntity<UserInterestDTO> createUserInterest(@RequestBody UserInterestDTO userInterestDTO) {
+		UserInterestDTO createdUserInterest = userInterestService.createUserInterest(userInterestDTO);
+		if (createdUserInterest != null) {
+			return new ResponseEntity<>(createdUserInterest, HttpStatus.CREATED);
+		} else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@PutMapping("/{id}")
-	public UserInterestDTO updateUserInterest(@PathVariable Long id, @RequestBody UserInterestDTO userInterestDTO) {
-		return userInterestService.updateUserInterest(id, userInterestDTO);
+	public ResponseEntity<UserInterestDTO> updateUserInterest(@PathVariable Long id,
+			@RequestBody UserInterestDTO userInterestDTO) {
+		UserInterestDTO updatedUserInterest = userInterestService.updateUserInterest(id, userInterestDTO);
+		if (updatedUserInterest != null) {
+			return new ResponseEntity<>(updatedUserInterest, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@DeleteMapping("/{id}")

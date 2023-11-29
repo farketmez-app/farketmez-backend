@@ -1,5 +1,9 @@
 package com.mmhb.farketmez.controller;
 
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,24 +27,35 @@ public class EventTypeController {
 	}
 
 	@GetMapping
-	public Object getAllEventTypes() {
-		return this.eventTypeService.getAllEventTypes();
+	public ResponseEntity<List<EventTypeDTO>> getAllEventTypes() {
+		List<EventTypeDTO> eventTypes = eventTypeService.getAllEventTypes();
+		return new ResponseEntity<>(eventTypes, HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/{id}")
-	public EventTypeDTO getEventTypeById(@PathVariable Long id) {
-		return eventTypeService.getEventTypeById(id).orElse(null);
+	@GetMapping("/{id}")
+	public ResponseEntity<EventTypeDTO> getEventTypeById(@PathVariable Long id) {
+		return eventTypeService.getEventTypeById(id).map(eventType -> new ResponseEntity<>(eventType, HttpStatus.OK))
+				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	@PostMapping
-	public EventTypeDTO addEventType(@RequestBody EventTypeDTO eventTypeDto) {
-		return eventTypeService.createEventType(eventTypeDto);
+	public ResponseEntity<EventTypeDTO> createEventType(@RequestBody EventTypeDTO eventTypeDto) {
+		EventTypeDTO createdEventType = eventTypeService.createEventType(eventTypeDto);
+		if (createdEventType != null) {
+			return new ResponseEntity<>(createdEventType, HttpStatus.CREATED);
+		} else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
-	@PutMapping(value = "/{id}")
-	public EventTypeDTO updateEventType(@PathVariable Long id, @RequestBody EventTypeDTO eventTypeDto) {
-		eventTypeDto.setId(id);
-		return eventTypeService.updateEventType(eventTypeDto);
+	@PutMapping
+	public ResponseEntity<EventTypeDTO> updateEventType(@RequestBody EventTypeDTO eventTypeDto) {
+		EventTypeDTO updatedEventType = eventTypeService.updateEventType(eventTypeDto);
+		if (updatedEventType != null) {
+			return new ResponseEntity<>(updatedEventType, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@DeleteMapping(value = "/{id}")

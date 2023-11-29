@@ -32,9 +32,8 @@ public class UserTypeService {
 		return userTypeRepository.findById(id).map(UserTypeMapper::toUserTypeDto).orElse(null);
 	}
 
-	public UserTypeDTO updateUserType(Long id, UserTypeDTO userTypeDTO) {
-		if (userTypeRepository.existsById(id)) {
-			userTypeDTO.setId(id);
+	public UserTypeDTO updateUserType(UserTypeDTO userTypeDTO) {
+		if (userTypeRepository.existsById(userTypeDTO.getId())) {
 			UserType userType = UserTypeMapper.fromUserTypeDto(userTypeDTO);
 			UserType updatedUserType = userTypeRepository.save(userType);
 			return UserTypeMapper.toUserTypeDto(updatedUserType);

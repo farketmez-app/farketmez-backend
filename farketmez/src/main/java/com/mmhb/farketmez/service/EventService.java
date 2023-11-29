@@ -19,7 +19,7 @@ public class EventService {
 
 	private final EventRepository eventRepository;
 
-	public EventDTO addEvent(EventDTO eventDto) {
+	public EventDTO createEvent(EventDTO eventDto) {
 		Event event = EventMapper.fromEventDto(eventDto);
 		event = eventRepository.save(event);
 		return EventMapper.toEventDto(event);
