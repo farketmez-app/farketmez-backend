@@ -2,6 +2,8 @@ package com.mmhb.farketmez.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,23 +27,35 @@ public class EventController {
 	}
 
 	@PostMapping
-	public EventDTO addEvent(@RequestBody EventDTO eventDto) {
-		return eventService.addEvent(eventDto);
+	public ResponseEntity<EventDTO> createEvent(@RequestBody EventDTO eventDto) {
+		EventDTO createdEvent = eventService.createEvent(eventDto);
+		if (createdEvent != null) {
+			return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
+		} else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@GetMapping
-	public List<EventDTO> getAllEvents() {
-		return eventService.getAllEvents();
+	public ResponseEntity<List<EventDTO>> getAllEvents() {
+		List<EventDTO> events = eventService.getAllEvents();
+		return new ResponseEntity<>(events, HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/{id}")
-	public EventDTO getEventById(@PathVariable Long id) {
-		return eventService.getEventById(id).orElse(null);
+	@GetMapping("/{id}")
+	public ResponseEntity<EventDTO> getEventById(@PathVariable Long id) {
+		return eventService.getEventById(id).map(event -> new ResponseEntity<>(event, HttpStatus.OK))
+				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	@PutMapping
-	public EventDTO updateEvent(@RequestBody EventDTO eventDto) {
-		return eventService.updateEvent(eventDto);
+	public ResponseEntity<EventDTO> updateEvent(@RequestBody EventDTO eventDto) {
+		EventDTO updatedEvent = eventService.updateEvent(eventDto);
+		if (updatedEvent != null) {
+			return new ResponseEntity<>(updatedEvent, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@DeleteMapping(value = "/{id}")

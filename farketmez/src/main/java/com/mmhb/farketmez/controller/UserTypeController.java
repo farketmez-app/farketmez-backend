@@ -2,6 +2,8 @@ package com.mmhb.farketmez.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,23 +27,39 @@ public class UserTypeController {
 	}
 
 	@GetMapping
-	public List<UserTypeDTO> getAllUserTypes() {
-		return userTypeService.getAllUserTypes();
+	public ResponseEntity<List<UserTypeDTO>> getAllUserTypes() {
+		List<UserTypeDTO> userTypes = userTypeService.getAllUserTypes();
+		return new ResponseEntity<>(userTypes, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
-	public UserTypeDTO getUserTypeById(@PathVariable Long id) {
-		return userTypeService.getUserTypeById(id);
+	public ResponseEntity<UserTypeDTO> getUserTypeById(@PathVariable Long id) {
+		UserTypeDTO userTypeDTO = userTypeService.getUserTypeById(id);
+		if (userTypeDTO != null) {
+			return new ResponseEntity<>(userTypeDTO, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
-	@PostMapping("/create")
-	public UserTypeDTO createUserType(@RequestBody UserTypeDTO userTypeDTO) {
-		return userTypeService.createUserType(userTypeDTO);
+	@PostMapping
+	public ResponseEntity<UserTypeDTO> createUserType(@RequestBody UserTypeDTO userTypeDTO) {
+		UserTypeDTO createdUserType = userTypeService.createUserType(userTypeDTO);
+		if (createdUserType != null) {
+			return new ResponseEntity<>(createdUserType, HttpStatus.CREATED);
+		} else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
-	@PutMapping("/{id}")
-	public UserTypeDTO updateUserType(@PathVariable Long id, @RequestBody UserTypeDTO userTypeDTO) {
-		return userTypeService.updateUserType(id, userTypeDTO);
+	@PutMapping
+	public ResponseEntity<UserTypeDTO> updateUserType(@RequestBody UserTypeDTO userTypeDTO) {
+		UserTypeDTO updatedUserType = userTypeService.updateUserType(userTypeDTO);
+		if (updatedUserType != null) {
+			return new ResponseEntity<>(updatedUserType, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@DeleteMapping("/{id}")

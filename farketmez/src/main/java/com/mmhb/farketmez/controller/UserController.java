@@ -2,6 +2,8 @@ package com.mmhb.farketmez.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,24 +26,39 @@ public class UserController {
 	}
 
 	@GetMapping
-	public List<UserDTO> getAllUsers() {
-		return userService.getAllUsers();
+	public ResponseEntity<List<UserDTO>> getAllUsers() {
+		List<UserDTO> users = userService.getAllUsers();
+		return new ResponseEntity<>(users, HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/{id}")
-	public UserDTO getUserById(@PathVariable Long id) {
-		return userService.getUserById(id);
+	@GetMapping("/{id}")
+	public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
+		UserDTO userDTO = userService.getUserById(id);
+		if (userDTO != null) {
+			return new ResponseEntity<>(userDTO, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
-	@PostMapping(value = "/create")
-	public UserDTO createUser(@RequestBody UserDTO userDTO) {
-		return userService.createUser(userDTO);
+	@PostMapping
+	public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
+		UserDTO createdUser = userService.createUser(userDTO);
+		if (createdUser != null) {
+			return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+		} else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
-	@PutMapping(value = "/{id}")
-	public UserDTO updateUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
-		userDTO.setId(id);
-		return userService.updateUser(userDTO);
+	@PutMapping
+	public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO) {
+		UserDTO updatedUser = userService.updateUser(userDTO);
+		if (updatedUser != null) {
+			return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@DeleteMapping(value = "/{id}")

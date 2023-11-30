@@ -1,8 +1,9 @@
 package com.mmhb.farketmez.controller;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,25 +27,36 @@ public class ParticipantController {
 	}
 
 	@GetMapping
-	public List<ParticipantDTO> getAllParticipants() {
-		return participantService.getAllParticipants();
+	public ResponseEntity<List<ParticipantDTO>> getAllParticipants() {
+		List<ParticipantDTO> participants = participantService.getAllParticipants();
+		return new ResponseEntity<>(participants, HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/{id}")
-	public ParticipantDTO getParticipantById(@PathVariable Long id) {
-		Optional<ParticipantDTO> participantDTO = participantService.getParticipantById(id);
-		return participantDTO.orElse(null);
+	@GetMapping("/{id}")
+	public ResponseEntity<ParticipantDTO> getParticipantById(@PathVariable Long id) {
+		return participantService.getParticipantById(id)
+				.map(participant -> new ResponseEntity<>(participant, HttpStatus.OK))
+				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
-	@PostMapping(value = "/create")
-	public ParticipantDTO createParticipant(@RequestBody ParticipantDTO participantDTO) {
-		return participantService.createParticipant(participantDTO);
+	@PostMapping
+	public ResponseEntity<ParticipantDTO> createParticipant(@RequestBody ParticipantDTO participantDTO) {
+		ParticipantDTO createdParticipant = participantService.createParticipant(participantDTO);
+		if (createdParticipant != null) {
+			return new ResponseEntity<>(createdParticipant, HttpStatus.CREATED);
+		} else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
-	@PutMapping(value = "/{id}")
-	public ParticipantDTO updateParticipant(@PathVariable Long id, @RequestBody ParticipantDTO participantDTO) {
-		participantDTO.setId(id);
-		return participantService.updateParticipant(participantDTO);
+	@PutMapping
+	public ResponseEntity<ParticipantDTO> updateParticipant(@RequestBody ParticipantDTO participantDTO) {
+		ParticipantDTO updatedParticipant = participantService.updateParticipant(participantDTO);
+		if (updatedParticipant != null) {
+			return new ResponseEntity<>(updatedParticipant, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@DeleteMapping(value = "/{id}")

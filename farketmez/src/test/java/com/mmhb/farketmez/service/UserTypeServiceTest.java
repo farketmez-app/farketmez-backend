@@ -74,10 +74,10 @@ class UserTypeServiceTest {
 	void givenUserTypeDetails_whenUpdatingUserType_thenShouldReturnUpdatedUserType() {
 		UserTypeDTO userTypeDTOToUpdate = new UserTypeDTO(1L, "Updated Type");
 		UserType updatedUserType = UserTypeMapper.fromUserTypeDto(userTypeDTOToUpdate);
-		when(userTypeRepository.existsById(any(Long.class))).thenReturn(true);
+		when(userTypeRepository.existsById(userTypeDTOToUpdate.getId())).thenReturn(true);
 		when(userTypeRepository.save(any(UserType.class))).thenReturn(updatedUserType);
 
-		UserTypeDTO actual = userTypeService.updateUserType(userTypeDTOToUpdate.getId(), userTypeDTOToUpdate);
+		UserTypeDTO actual = userTypeService.updateUserType(userTypeDTOToUpdate);
 
 		assertNotNull(actual);
 		assertEquals(userTypeDTOToUpdate.getType(), actual.getType());
