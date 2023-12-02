@@ -1,6 +1,7 @@
 package com.mmhb.farketmez.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mmhb.farketmez.dto.EventDTO;
+import com.mmhb.farketmez.mapper.EventMapper;
+import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.service.EventService;
 
 @RestController
@@ -28,38 +31,49 @@ public class EventController {
 
 	@PostMapping
 	public ResponseEntity<EventDTO> createEvent(@RequestBody EventDTO eventDto) {
-		EventDTO createdEvent = eventService.createEvent(eventDto);
-		if (createdEvent != null) {
-			return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
+		Event event = EventMapper.fromEventDto(eventDto);
+		Event createdEvent = eventService.createEvent(event);
+		EventDTO createdEventDto = EventMapper.toEventDto(createdEvent);
+		return new ResponseEntity<>(createdEventDto, HttpStatus.CREATED);
 	}
 
 	@GetMapping
 	public ResponseEntity<List<EventDTO>> getAllEvents() {
-		List<EventDTO> events = eventService.getAllEvents();
+		List<EventDTO> events = eventService.getAllEvents().stream().map(EventMapper::toEventDto)
+				.collect(Collectors.toList());
 		return new ResponseEntity<>(events, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<EventDTO> getEventById(@PathVariable Long id) {
-		return eventService.getEventById(id).map(event -> new ResponseEntity<>(event, HttpStatus.OK))
-				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-	}
-
-	@PutMapping
-	public ResponseEntity<EventDTO> updateEvent(@RequestBody EventDTO eventDto) {
-		EventDTO updatedEvent = eventService.updateEvent(eventDto);
-		if (updatedEvent != null) {
-			return new ResponseEntity<>(updatedEvent, HttpStatus.OK);
+		Event event = eventService.getEventById(id);
+		if (event != null) {
+			EventDTO eventDto = EventMapper.toEventDto(event);
+			return new ResponseEntity<>(eventDto, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
-	@DeleteMapping(value = "/{id}")
-	public void deleteEvent(@PathVariable Long id) {
-		eventService.deleteEvent(id);
+	@PutMapping
+	public ResponseEntity<EventDTO> updateEvent(@RequestBody EventDTO eventDto) {
+		Event event = EventMapper.fromEventDto(eventDto);
+		Event updatedEvent = eventService.updateEvent(event);
+		if (updatedEvent != null) {
+			EventDTO updatedEventDto = EventMapper.toEventDto(updatedEvent);
+			return new ResponseEntity<>(updatedEventDto, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteEvent(@PathVariable Long id) {
+		try {
+			eventService.deleteEvent(id);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 }

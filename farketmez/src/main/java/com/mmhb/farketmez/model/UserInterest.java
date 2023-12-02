@@ -21,9 +21,9 @@ public class UserInterest {
 	private final Long id;
 
 	@Column(name = "user_id")
-	private final Long userId;
+	private Long userId;
 
 	@Column(name = "interest_id")
-	private final Long interestId;
+	private Long interestId;
 
 }

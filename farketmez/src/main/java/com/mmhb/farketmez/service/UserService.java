@@ -1,15 +1,14 @@
 package com.mmhb.farketmez.service;
 
+import java.sql.Timestamp;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.mmhb.farketmez.dto.UserDTO;
-import com.mmhb.farketmez.mapper.UserMapper;
 import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -17,29 +16,48 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 	private final UserRepository userRepository;
 
-	public UserDTO createUser(UserDTO userDTO) {
-		User user = UserMapper.fromUserDto(userDTO);
-		User savedUser = userRepository.save(user);
-		return UserMapper.toUserDto(savedUser);
-	}
-
-	public List<UserDTO> getAllUsers() {
-		return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
-	}
-
-	public UserDTO getUserById(Long id) {
-		return userRepository.findById(id).map(UserMapper::toUserDto).orElse(null);
-	}
-
-	public UserDTO updateUser(UserDTO userDTO) {
-		if (userRepository.existsById(userDTO.getId())) {
-			User user = UserMapper.fromUserDto(userDTO);
-			User updatedUser = userRepository.save(user);
-			return UserMapper.toUserDto(updatedUser);
+	@Transactional
+	public User createUser(User user) {
+		if (user.getUsername() == null || user.getUsername().isEmpty() || user.getPassword() == null
+				|| user.getPassword().isEmpty() || user.getName() == null || user.getName().isEmpty()
+				|| user.getSurname() == null || user.getSurname().isEmpty() || user.getAge() == null
+				|| user.getGender() == null || user.getLongitude() == null || user.getLongitude().isEmpty()
+				|| user.getLatitude() == null || user.getLatitude().isEmpty()) {
+			throw new IllegalArgumentException(
+					"Missing or incorrect user information for creation. Please fill in all fields.");
 		}
-		return null;
+
+		user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+		return userRepository.save(user);
 	}
 
+	public List<User> getAllUsers() {
+		return userRepository.findAll();
+	}
+
+	public User getUserById(Long id) {
+		return userRepository.findById(id).orElse(null);
+	}
+
+	@Transactional
+	public User updateUser(User user) {
+		if (user.getId() == null || user.getUsername() == null || user.getUsername().isEmpty() || user.getName() == null
+				|| user.getName().isEmpty() || user.getSurname() == null || user.getSurname().isEmpty()
+				|| user.getAge() == null || user.getGender() == null || user.getLongitude() == null
+				|| user.getLongitude().isEmpty() || user.getLatitude() == null || user.getLatitude().isEmpty()) {
+			throw new IllegalArgumentException(
+					"Missing or incorrect user information for update. Please provide a valid user id and all necessary fields.");
+		}
+
+		if (!userRepository.existsById(user.getId())) {
+			throw new IllegalArgumentException("User not found with id: " + user.getId());
+		}
+
+		user.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+		return userRepository.save(user);
+	}
+
+	@Transactional
 	public void deleteUser(Long id) {
 		userRepository.deleteById(id);
 	}

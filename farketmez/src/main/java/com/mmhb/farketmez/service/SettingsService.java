@@ -7,8 +7,6 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.mmhb.farketmez.dto.SettingsDTO;
-import com.mmhb.farketmez.mapper.SettingsMapper;
 import com.mmhb.farketmez.model.Settings;
 import com.mmhb.farketmez.repository.SettingsRepository;
 
@@ -21,24 +19,31 @@ public class SettingsService {
 	private final SettingsRepository settingsRepository;
 
 	@Transactional(readOnly = true)
-	public SettingsDTO getSettings(String key) throws EntityNotFoundException {
+	public Settings getSettings(String key) throws EntityNotFoundException {
 		Settings settings = settingsRepository.findByKey(key);
 		if (settings == null) {
 			throw new EntityNotFoundException("Setting with key " + key + " not found.");
 		}
-		return SettingsMapper.toSettingsDto(settings);
+		return settings;
 	}
 
 	@Transactional
-	public SettingsDTO updateSettings(String key, SettingsDTO settingsDto) {
+	public Settings updateSettings(String key, Settings settingsUpdate) {
 		Settings settings = settingsRepository.findByKey(key);
-		if (settings != null) {
-			settings.setValue(settingsDto.getValue());
-			settings.setUpdateDate(LocalDateTime.now());
-			Settings updatedSettings = settingsRepository.save(settings);
-			return SettingsMapper.toSettingsDto(updatedSettings);
-		} else {
+		if (settings == null) {
 			throw new EntityNotFoundException("Setting with key " + key + " not found.");
+		}
+
+		validateSettingsUpdate(settingsUpdate);
+
+		settings.setValue(settingsUpdate.getValue());
+		settings.setUpdateDate(LocalDateTime.now());
+		return settingsRepository.save(settings);
+	}
+
+	private void validateSettingsUpdate(Settings settings) {
+		if (settings.getValue() == null || settings.getValue().isEmpty()) {
+			throw new IllegalArgumentException("Value for settings cannot be null or empty.");
 		}
 	}
 }

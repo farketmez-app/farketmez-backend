@@ -1,6 +1,7 @@
 package com.mmhb.farketmez.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mmhb.farketmez.dto.UserTypeDTO;
+import com.mmhb.farketmez.mapper.UserTypeMapper;
+import com.mmhb.farketmez.model.UserType;
 import com.mmhb.farketmez.service.UserTypeService;
 
 @RestController
@@ -28,14 +31,17 @@ public class UserTypeController {
 
 	@GetMapping
 	public ResponseEntity<List<UserTypeDTO>> getAllUserTypes() {
-		List<UserTypeDTO> userTypes = userTypeService.getAllUserTypes();
+		List<UserTypeDTO> userTypes = userTypeService.getAllUserTypes().stream().map(UserTypeMapper::toUserTypeDto)
+				.collect(Collectors.toList());
+		;
 		return new ResponseEntity<>(userTypes, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<UserTypeDTO> getUserTypeById(@PathVariable Long id) {
-		UserTypeDTO userTypeDTO = userTypeService.getUserTypeById(id);
-		if (userTypeDTO != null) {
+		UserType userType = userTypeService.getUserTypeById(id);
+		if (userType != null) {
+			UserTypeDTO userTypeDTO = UserTypeMapper.toUserTypeDto(userType);
 			return new ResponseEntity<>(userTypeDTO, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -44,19 +50,17 @@ public class UserTypeController {
 
 	@PostMapping
 	public ResponseEntity<UserTypeDTO> createUserType(@RequestBody UserTypeDTO userTypeDTO) {
-		UserTypeDTO createdUserType = userTypeService.createUserType(userTypeDTO);
-		if (createdUserType != null) {
-			return new ResponseEntity<>(createdUserType, HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
+		UserType userType = UserTypeMapper.fromUserTypeDto(userTypeDTO);
+		UserType createdUserType = userTypeService.createUserType(userType);
+		return new ResponseEntity<>(UserTypeMapper.toUserTypeDto(createdUserType), HttpStatus.CREATED);
 	}
 
 	@PutMapping
 	public ResponseEntity<UserTypeDTO> updateUserType(@RequestBody UserTypeDTO userTypeDTO) {
-		UserTypeDTO updatedUserType = userTypeService.updateUserType(userTypeDTO);
+		UserType userType = UserTypeMapper.fromUserTypeDto(userTypeDTO);
+		UserType updatedUserType = userTypeService.updateUserType(userType);
 		if (updatedUserType != null) {
-			return new ResponseEntity<>(updatedUserType, HttpStatus.OK);
+			return new ResponseEntity<>(UserTypeMapper.toUserTypeDto(updatedUserType), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}

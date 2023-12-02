@@ -1,6 +1,7 @@
 package com.mmhb.farketmez.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mmhb.farketmez.dto.UserDTO;
+import com.mmhb.farketmez.mapper.UserMapper;
+import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.service.UserService;
 
 @RestController
@@ -27,14 +30,16 @@ public class UserController {
 
 	@GetMapping
 	public ResponseEntity<List<UserDTO>> getAllUsers() {
-		List<UserDTO> users = userService.getAllUsers();
+		List<UserDTO> users = userService.getAllUsers().stream().map(UserMapper::toUserDto)
+				.collect(Collectors.toList());
 		return new ResponseEntity<>(users, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<UserDTO> getUserById(@PathVariable Long id) {
-		UserDTO userDTO = userService.getUserById(id);
-		if (userDTO != null) {
+		User user = userService.getUserById(id);
+		if (user != null) {
+			UserDTO userDTO = UserMapper.toUserDto(user);
 			return new ResponseEntity<>(userDTO, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -43,27 +48,29 @@ public class UserController {
 
 	@PostMapping
 	public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
-		UserDTO createdUser = userService.createUser(userDTO);
-		if (createdUser != null) {
-			return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
+		User user = UserMapper.fromUserDto(userDTO);
+		User createdUser = userService.createUser(user);
+		return new ResponseEntity<>(UserMapper.toUserDto(createdUser), HttpStatus.CREATED);
 	}
 
 	@PutMapping
 	public ResponseEntity<UserDTO> updateUser(@RequestBody UserDTO userDTO) {
-		UserDTO updatedUser = userService.updateUser(userDTO);
+		User user = UserMapper.fromUserDto(userDTO);
+		User updatedUser = userService.updateUser(user);
 		if (updatedUser != null) {
-			return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+			return new ResponseEntity<>(UserMapper.toUserDto(updatedUser), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
-	@DeleteMapping(value = "/{id}")
-	public String deleteUser(@PathVariable Long id) {
-		userService.deleteUser(id);
-		return "User deleted";
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+		try {
+			userService.deleteUser(id);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 }
