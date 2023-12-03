@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.mmhb.farketmez.dto.SettingsDTO;
 import com.mmhb.farketmez.model.Settings;
 import com.mmhb.farketmez.repository.SettingsRepository;
 
@@ -33,12 +32,12 @@ class SettingsServiceTest {
 	}
 
 	@Test
-	void whenGettingExistingSettings_thenShouldReturnSettingsDto() {
+	void whenGettingExistingSettings_thenShouldReturnSettings() {
 		String key = "sampleKey";
 		Settings settings = new Settings(1L, key, "value", LocalDateTime.now(), LocalDateTime.now());
 		when(settingsRepository.findByKey(key)).thenReturn(settings);
 
-		SettingsDTO actual = settingsService.getSettings(key);
+		Settings actual = settingsService.getSettings(key);
 
 		assertNotNull(actual);
 		assertEquals(settings.getValue(), actual.getValue());
@@ -53,28 +52,27 @@ class SettingsServiceTest {
 	}
 
 	@Test
-	void whenUpdatingExistingSettings_thenShouldReturnUpdatedSettingsDto() {
+	void whenUpdatingExistingSettings_thenShouldReturnUpdatedSettings() {
 		String key = "sampleKey";
 		Settings existingSettings = new Settings(1L, key, "oldValue", LocalDateTime.now(), LocalDateTime.now());
 		when(settingsRepository.findByKey(key)).thenReturn(existingSettings);
 
-		SettingsDTO updatedSettingsDto = new SettingsDTO(1L, key, "newValue");
 		Settings updatedSettings = new Settings(1L, key, "newValue", existingSettings.getCreateDate(),
 				LocalDateTime.now());
 		when(settingsRepository.save(any(Settings.class))).thenReturn(updatedSettings);
 
-		SettingsDTO actual = settingsService.updateSettings(key, updatedSettingsDto);
+		Settings actual = settingsService.updateSettings(key, updatedSettings);
 
 		assertNotNull(actual);
-		assertEquals(updatedSettingsDto.getValue(), actual.getValue());
+		assertEquals(updatedSettings.getValue(), actual.getValue());
 	}
 
 	@Test
 	void whenUpdatingNonExistingSettings_thenShouldThrowEntityNotFoundException() {
 		String key = "nonExistingKey";
-		SettingsDTO settingsDtoToUpdate = new SettingsDTO(null, key, "newValue");
+		Settings settingsToUpdate = new Settings(null, key, "newValue", null, null);
 		when(settingsRepository.findByKey(key)).thenReturn(null);
 
-		assertThrows(EntityNotFoundException.class, () -> settingsService.updateSettings(key, settingsDtoToUpdate));
+		assertThrows(EntityNotFoundException.class, () -> settingsService.updateSettings(key, settingsToUpdate));
 	}
 }

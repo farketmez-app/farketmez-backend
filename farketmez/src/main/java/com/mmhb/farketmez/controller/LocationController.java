@@ -1,6 +1,7 @@
 package com.mmhb.farketmez.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mmhb.farketmez.dto.LocationDTO;
+import com.mmhb.farketmez.mapper.LocationMapper;
+import com.mmhb.farketmez.model.Location;
 import com.mmhb.farketmez.service.LocationService;
 
 import lombok.AllArgsConstructor;
@@ -27,42 +30,49 @@ public class LocationController {
 
 	@GetMapping
 	public ResponseEntity<List<LocationDTO>> getAllLocations() {
-		List<LocationDTO> locations = locationService.getAllLocations();
+		List<LocationDTO> locations = locationService.getAllLocations().stream().map(LocationMapper::toLocationDto)
+				.collect(Collectors.toList());
 		return new ResponseEntity<>(locations, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<LocationDTO> getLocationById(@PathVariable Long id) {
-		return locationService.getLocationById(id).map(location -> new ResponseEntity<>(location, HttpStatus.OK))
-				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-	}
-
-	@PostMapping
-	public ResponseEntity<LocationDTO> createLocation(@RequestBody LocationDTO locationDTO) {
-		LocationDTO createdLocation = locationService.createLocation(locationDTO);
-		if (createdLocation != null) {
-			return new ResponseEntity<>(createdLocation, HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-	}
-
-	@PutMapping
-	public ResponseEntity<LocationDTO> updateLocation(@RequestBody LocationDTO locationDTO) {
-		LocationDTO updatedLocation = locationService.updateLocation(locationDTO);
-		if (updatedLocation != null) {
-			return new ResponseEntity<>(updatedLocation, HttpStatus.OK);
+		Location location = locationService.getLocationById(id);
+		if (location != null) {
+			LocationDTO locationDTO = LocationMapper.toLocationDto(location);
+			return new ResponseEntity<>(locationDTO, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
-	@DeleteMapping(value = "/{id}")
-	public String deleteLocation(@PathVariable Long id) {
-		if (locationService.getLocationById(id).isPresent()) {
-			locationService.deleteLocation(id);
-			return "Location deleted";
+	@PostMapping
+	public ResponseEntity<LocationDTO> createLocation(@RequestBody LocationDTO locationDTO) {
+		Location location = LocationMapper.fromLocationDto(locationDTO);
+		Location createdLocation = locationService.createLocation(location);
+		LocationDTO createdLocationDTO = LocationMapper.toLocationDto(createdLocation);
+		return new ResponseEntity<>(createdLocationDTO, HttpStatus.CREATED);
+	}
+
+	@PutMapping
+	public ResponseEntity<LocationDTO> updateLocation(@RequestBody LocationDTO locationDTO) {
+		Location location = LocationMapper.fromLocationDto(locationDTO);
+		Location updatedLocation = locationService.updateLocation(location);
+		if (updatedLocation != null) {
+			LocationDTO updatedLocationDTO = LocationMapper.toLocationDto(updatedLocation);
+			return new ResponseEntity<>(updatedLocationDTO, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return "Location not found";
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteLocation(@PathVariable Long id) {
+		try {
+			locationService.deleteLocation(id);
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 }

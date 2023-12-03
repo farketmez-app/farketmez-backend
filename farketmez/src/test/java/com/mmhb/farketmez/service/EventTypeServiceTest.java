@@ -17,8 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.mmhb.farketmez.dto.EventTypeDTO;
-import com.mmhb.farketmez.mapper.EventTypeMapper;
 import com.mmhb.farketmez.model.EventType;
 import com.mmhb.farketmez.repository.EventTypeRepository;
 
@@ -36,12 +34,11 @@ class EventTypeServiceTest {
 	}
 
 	@Test
-	void should_cwhenCreatingEventType_thenShouldReturnSavedEventTypereate_event_type() {
-		EventTypeDTO eventTypeToSave = new EventTypeDTO(null, 1);
-		EventType savedEventType = EventTypeMapper.fromEventTypeDto(eventTypeToSave);
-		when(eventTypeRepository.save(any(EventType.class))).thenReturn(savedEventType);
+	void whenCreatingEventType_thenShouldReturnSavedEventType() {
+		EventType eventTypeToSave = new EventType(null, 1);
+		when(eventTypeRepository.save(any(EventType.class))).thenReturn(eventTypeToSave);
 
-		EventTypeDTO actual = eventTypeService.createEventType(eventTypeToSave);
+		EventType actual = eventTypeService.createEventType(eventTypeToSave);
 
 		assertNotNull(actual);
 		assertEquals(eventTypeToSave.getType(), actual.getType());
@@ -52,19 +49,19 @@ class EventTypeServiceTest {
 		List<EventType> eventTypes = Arrays.asList(new EventType(1L, 1), new EventType(2L, 2));
 		when(eventTypeRepository.findAll()).thenReturn(eventTypes);
 
-		List<EventTypeDTO> eventTypeDTOs = eventTypeService.getAllEventTypes();
+		List<EventType> actual = eventTypeService.getAllEventTypes();
 
-		assertNotNull(eventTypeDTOs);
-		assertEquals(2, eventTypeDTOs.size());
+		assertNotNull(actual);
+		assertEquals(2, actual.size());
 	}
 
 	@Test
 	void givenEventTypeId_whenRetrievingEventType_thenShouldReturnEventType() {
 		Long eventTypeId = 1L;
-		Optional<EventType> eventType = Optional.of(new EventType(eventTypeId, 1));
-		when(eventTypeRepository.findById(eventTypeId)).thenReturn(eventType);
+		EventType eventType = new EventType(eventTypeId, 1);
+		when(eventTypeRepository.findById(eventTypeId)).thenReturn(Optional.of(eventType));
 
-		Optional<EventTypeDTO> actual = eventTypeService.getEventTypeById(eventTypeId);
+		Optional<EventType> actual = eventTypeService.getEventTypeById(eventTypeId);
 
 		assertNotNull(actual);
 		assertTrue(actual.isPresent());
@@ -73,12 +70,11 @@ class EventTypeServiceTest {
 
 	@Test
 	void givenEventTypeDetails_whenUpdatingEventType_thenShouldReturnUpdatedEventType() {
-		EventTypeDTO eventTypeToUpdate = new EventTypeDTO(1L, 2);
-		EventType updatedEventType = EventTypeMapper.fromEventTypeDto(eventTypeToUpdate);
-		when(eventTypeRepository.existsById(any(Long.class))).thenReturn(true);
-		when(eventTypeRepository.save(any(EventType.class))).thenReturn(updatedEventType);
+		EventType eventTypeToUpdate = new EventType(1L, 2);
+		when(eventTypeRepository.findById(eventTypeToUpdate.getId())).thenReturn(Optional.of(eventTypeToUpdate));
+		when(eventTypeRepository.save(any(EventType.class))).thenReturn(eventTypeToUpdate);
 
-		EventTypeDTO actual = eventTypeService.updateEventType(eventTypeToUpdate);
+		EventType actual = eventTypeService.updateEventType(eventTypeToUpdate);
 
 		assertNotNull(actual);
 		assertEquals(eventTypeToUpdate.getType(), actual.getType());
