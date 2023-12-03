@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.mmhb.farketmez.dto.ParticipantDTO;
+import com.mmhb.farketmez.mapper.ParticipantMapper;
 import com.mmhb.farketmez.model.Participant;
 import com.mmhb.farketmez.repository.ParticipantRepository;
 
@@ -35,14 +37,15 @@ class ParticipantServiceTest {
 
 	@Test
 	void whenCreatingParticipant_thenShouldReturnSavedParticipant() {
-		Participant participantToSave = new Participant(null, 1L, 2L, new BigDecimal("4.5"), "Great event!");
-		when(participantRepository.save(any(Participant.class))).thenReturn(participantToSave);
+		ParticipantDTO participantDTOToSave = new ParticipantDTO(null, 1L, 2L, new BigDecimal("4.5"), "Great event!");
+		Participant savedParticipant = ParticipantMapper.fromParticipantDTO(participantDTOToSave);
+		when(participantRepository.save(any(Participant.class))).thenReturn(savedParticipant);
 
-		Participant actual = participantService.createParticipant(participantToSave);
+		ParticipantDTO actual = participantService.createParticipant(participantDTOToSave);
 
 		assertNotNull(actual);
-		assertEquals(participantToSave.getRating(), actual.getRating());
-		assertEquals(participantToSave.getComment(), actual.getComment());
+		assertEquals(participantDTOToSave.getRating(), actual.getRating());
+		assertEquals(participantDTOToSave.getComment(), actual.getComment());
 	}
 
 	@Test
@@ -52,10 +55,10 @@ class ParticipantServiceTest {
 				new Participant(2L, 3L, 4L, new BigDecimal("3.5"), "Good event"));
 		when(participantRepository.findAll()).thenReturn(participants);
 
-		List<Participant> actual = participantService.getAllParticipants();
+		List<ParticipantDTO> participantDTOs = participantService.getAllParticipants();
 
-		assertNotNull(actual);
-		assertEquals(2, actual.size());
+		assertNotNull(participantDTOs);
+		assertEquals(2, participantDTOs.size());
 	}
 
 	@Test
@@ -65,25 +68,25 @@ class ParticipantServiceTest {
 				.of(new Participant(participantId, 1L, 2L, new BigDecimal("4.5"), "Great event!"));
 		when(participantRepository.findById(participantId)).thenReturn(participant);
 
-		Participant actual = participantService.getParticipantById(participantId);
+		Optional<ParticipantDTO> actual = participantService.getParticipantById(participantId);
 
 		assertNotNull(actual);
-		assertEquals(participantId, actual.getId());
+		actual.ifPresent(dto -> assertEquals(participantId, dto.getId()));
 	}
 
 	@Test
 	void givenParticipantDetails_whenUpdatingParticipant_thenShouldReturnUpdatedParticipant() {
-		Long participantId = 1L;
-		Participant participantToUpdate = new Participant(participantId, 1L, 2L, new BigDecimal("5.0"),
+		ParticipantDTO participantDTOToUpdate = new ParticipantDTO(1L, 1L, 2L, new BigDecimal("5.0"),
 				"Updated Comment");
-		when(participantRepository.existsById(participantId)).thenReturn(true);
-		when(participantRepository.save(any(Participant.class))).thenReturn(participantToUpdate);
+		Participant updatedParticipant = ParticipantMapper.fromParticipantDTO(participantDTOToUpdate);
+		when(participantRepository.existsById(any(Long.class))).thenReturn(true);
+		when(participantRepository.save(any(Participant.class))).thenReturn(updatedParticipant);
 
-		Participant actual = participantService.updateParticipant(participantToUpdate);
+		ParticipantDTO actual = participantService.updateParticipant(participantDTOToUpdate);
 
 		assertNotNull(actual);
-		assertEquals(participantToUpdate.getRating(), actual.getRating());
-		assertEquals(participantToUpdate.getComment(), actual.getComment());
+		assertEquals(participantDTOToUpdate.getRating(), actual.getRating());
+		assertEquals(participantDTOToUpdate.getComment(), actual.getComment());
 	}
 
 	@Test

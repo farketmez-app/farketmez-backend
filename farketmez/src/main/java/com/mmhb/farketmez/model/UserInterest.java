@@ -18,12 +18,12 @@ public class UserInterest {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
-	private final Long id;
+	private Long id;
 
 	@Column(name = "user_id")
-	private final Long userId;
+	private Long userId;
 
 	@Column(name = "interest_id")
-	private final Long interestId;
+	private Long interestId;
 
 }

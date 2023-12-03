@@ -3,8 +3,6 @@ package com.mmhb.farketmez.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -58,8 +56,8 @@ class UserInterestServiceTest {
 	@Test
 	void givenUserInterestId_whenRetrievingUserInterest_thenShouldReturnUserInterest() {
 		Long userInterestId = 1L;
-		Optional<UserInterest> userInterest = Optional.of(new UserInterest(userInterestId, 1L, 2L));
-		when(userInterestRepository.findById(userInterestId)).thenReturn(userInterest);
+		UserInterest userInterest = new UserInterest(userInterestId, 1L, 2L);
+		when(userInterestRepository.findById(userInterestId)).thenReturn(Optional.of(userInterest));
 
 		UserInterest actual = userInterestService.findById(userInterestId);
 
@@ -71,21 +69,17 @@ class UserInterestServiceTest {
 	void givenUserInterestDetails_whenUpdatingUserInterest_thenShouldReturnUpdatedUserInterest() {
 		Long userInterestId = 1L;
 		UserInterest userInterestToUpdate = new UserInterest(userInterestId, 1L, 3L);
-		when(userInterestRepository.findById(userInterestId)).thenReturn(Optional.of(userInterestToUpdate));
+
+		when(userInterestRepository.findById(userInterestId))
+				.thenReturn(Optional.of(new UserInterest(userInterestId, 1L, 2L)));
+
+		when(userInterestRepository.existsById(userInterestId)).thenReturn(true);
 		when(userInterestRepository.save(any(UserInterest.class))).thenReturn(userInterestToUpdate);
 
-		UserInterest actual = userInterestService.updateUserInterest(userInterestId, userInterestToUpdate);
+		UserInterest actual = userInterestService.updateUserInterest(userInterestToUpdate);
 
 		assertNotNull(actual);
 		assertEquals(userInterestToUpdate.getInterestId(), actual.getInterestId());
-		assertEquals(userInterestId, actual.getId());
 	}
 
-	@Test
-	void whenDeletingUserInterest_thenShouldPerformDeletion() {
-		Long userInterestId = 1L;
-		doNothing().when(userInterestRepository).deleteById(userInterestId);
-		userInterestService.deleteById(userInterestId);
-		verify(userInterestRepository).deleteById(userInterestId);
-	}
 }

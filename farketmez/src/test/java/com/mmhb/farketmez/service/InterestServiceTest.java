@@ -16,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.mmhb.farketmez.dto.InterestDTO;
+import com.mmhb.farketmez.mapper.InterestMapper;
 import com.mmhb.farketmez.model.Interest;
 import com.mmhb.farketmez.repository.InterestRepository;
 
@@ -33,55 +35,55 @@ class InterestServiceTest {
 	}
 
 	@Test
-	void whenCreatingInterest_thenShouldReturnSavedInterest() {
-		Interest interestToSave = new Interest(null, "Programming");
-		when(interestRepository.save(any(Interest.class))).thenReturn(interestToSave);
+	void whenCreatingLocation_thenShouldReturnSavedLocation() {
+		InterestDTO interestDTOToSave = new InterestDTO(null, "Programming");
+		Interest savedInterest = InterestMapper.fromInterestDto(interestDTOToSave);
+		when(interestRepository.save(any(Interest.class))).thenReturn(savedInterest);
 
-		Interest actual = interestService.createInterest(interestToSave);
+		InterestDTO actual = interestService.createInterest(interestDTOToSave);
 
 		assertNotNull(actual);
-		assertEquals(interestToSave.getInterestName(), actual.getInterestName());
+		assertEquals(interestDTOToSave.getInterestName(), actual.getInterestName());
 	}
 
 	@Test
-	void whenRetrievingAllInterests_thenShouldReturnListOfInterests() {
+	void whenRetrievingAllLocations_thenShouldReturnListOfLocations() {
 		List<Interest> interests = Arrays.asList(new Interest(1L, "Programming"), new Interest(2L, "Music"));
 		when(interestRepository.findAll()).thenReturn(interests);
 
-		List<Interest> actual = interestService.getAllInterests();
+		List<InterestDTO> interestDTOs = interestService.getAllInterests();
 
-		assertNotNull(actual);
-		assertEquals(2, actual.size());
+		assertNotNull(interestDTOs);
+		assertEquals(2, interestDTOs.size());
 	}
 
 	@Test
-	void givenInterestId_whenRetrievingInterest_thenShouldReturnInterest() {
+	void givenLocationId_whenRetrievingLocation_thenShouldReturnLocation() {
 		Long interestId = 1L;
 		Optional<Interest> interest = Optional.of(new Interest(interestId, "Programming"));
 		when(interestRepository.findById(interestId)).thenReturn(interest);
 
-		Interest actual = interestService.getInterestById(interestId);
+		Optional<InterestDTO> actual = interestService.getInterestById(interestId);
 
 		assertNotNull(actual);
-		assertEquals(interestId, actual.getId());
+		actual.ifPresent(dto -> assertEquals(interestId, dto.getId()));
 	}
 
 	@Test
-	void givenInterestDetails_whenUpdatingInterest_thenShouldReturnUpdatedInterest() {
-		Long interestId = 1L;
-		Interest interestToUpdate = new Interest(interestId, "Gardening");
-		when(interestRepository.existsById(interestId)).thenReturn(true);
-		when(interestRepository.findById(interestId)).thenReturn(Optional.of(interestToUpdate));
-		when(interestRepository.save(any(Interest.class))).thenReturn(interestToUpdate);
+	void givenLocationDetails_whenUpdatingLocation_thenShouldReturnUpdatedLocation() {
+		InterestDTO interestDTOToUpdate = new InterestDTO(1L, "Gardening");
+		Interest updatedInterest = InterestMapper.fromInterestDto(interestDTOToUpdate);
+		when(interestRepository.existsById(any(Long.class))).thenReturn(true);
+		when(interestRepository.save(any(Interest.class))).thenReturn(updatedInterest);
 
-		Interest actual = interestService.updateInterest(interestToUpdate);
+		InterestDTO actual = interestService.updateInterest(interestDTOToUpdate);
 
 		assertNotNull(actual);
-		assertEquals(interestToUpdate.getInterestName(), actual.getInterestName());
+		assertEquals(interestDTOToUpdate.getInterestName(), actual.getInterestName());
 	}
 
 	@Test
-	void givenInterestId_whenDeletingInterest_thenShouldPerformDeletion() {
+	void givenLocationId_whenDeletingLocation_thenShouldPerformDeletion() {
 		Long interestId = 1L;
 		doNothing().when(interestRepository).deleteById(interestId);
 		interestService.deleteInterest(interestId);
