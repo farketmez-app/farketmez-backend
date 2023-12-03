@@ -22,13 +22,11 @@ public class UserService {
 				|| user.getPassword().isEmpty() || user.getName() == null || user.getName().isEmpty()
 				|| user.getSurname() == null || user.getSurname().isEmpty() || user.getAge() == null
 				|| user.getGender() == null || user.getLongitude() == null || user.getLongitude().isEmpty()
-				|| user.getLatitude() == null || user.getLatitude().isEmpty()) {
-			throw new IllegalArgumentException(
-					"Missing or incorrect user information for creation. Please fill in all fields.");
+				|| user.getLatitude() == null || user.getLatitude().isEmpty() || user.getMail() == null
+				|| user.getMail().isEmpty()) {
+			throw new IllegalArgumentException("Missing or incorrect user information. Please fill in all fields.");
 		}
-
-		user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-		return userRepository.save(user);
+		return null;
 	}
 
 	public List<User> getAllUsers() {
@@ -41,12 +39,13 @@ public class UserService {
 
 	@Transactional
 	public User updateUser(User user) {
-		if (user.getId() == null || user.getUsername() == null || user.getUsername().isEmpty() || user.getName() == null
-				|| user.getName().isEmpty() || user.getSurname() == null || user.getSurname().isEmpty()
-				|| user.getAge() == null || user.getGender() == null || user.getLongitude() == null
-				|| user.getLongitude().isEmpty() || user.getLatitude() == null || user.getLatitude().isEmpty()) {
-			throw new IllegalArgumentException(
-					"Missing or incorrect user information for update. Please provide a valid user id and all necessary fields.");
+		if (user.getUsername() == null || user.getUsername().isEmpty() || user.getPassword() == null
+				|| user.getPassword().isEmpty() || user.getName() == null || user.getName().isEmpty()
+				|| user.getSurname() == null || user.getSurname().isEmpty() || user.getAge() == null
+				|| user.getGender() == null || user.getLongitude() == null || user.getLongitude().isEmpty()
+				|| user.getLatitude() == null || user.getLatitude().isEmpty() || user.getMail() == null
+				|| user.getMail().isEmpty()) {
+			throw new IllegalArgumentException("Missing or incorrect user information. Please fill in all fields.");
 		}
 
 		if (!userRepository.existsById(user.getId())) {

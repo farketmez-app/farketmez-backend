@@ -15,18 +15,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mmhb.farketmez.dto.UserDTO;
+import com.mmhb.farketmez.dto.UserLoginDto;
 import com.mmhb.farketmez.mapper.UserMapper;
 import com.mmhb.farketmez.model.User;
+import com.mmhb.farketmez.service.AuthenticationService;
 import com.mmhb.farketmez.service.UserService;
+import com.mmhb.farketmez.util.JwtUtil;
+
+import lombok.AllArgsConstructor;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping(value = "/users")
 public class UserController {
 	private final UserService userService;
-
-	public UserController(UserService userService) {
-		this.userService = userService;
-	}
+	private final AuthenticationService authenticationService;
+	private final JwtUtil jwtUtil;
 
 	@GetMapping
 	public ResponseEntity<List<UserDTO>> getAllUsers() {
@@ -72,5 +76,16 @@ public class UserController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+	}
+
+	@PostMapping("/login")
+	public ResponseEntity<String> login(@RequestBody UserLoginDto userLoginDto) {
+		User authenticatedUser = authenticationService.authenticateUser(userLoginDto.getMail(),
+				userLoginDto.getPassword());
+		if (authenticatedUser != null) {
+			String token = jwtUtil.generateToken(authenticatedUser);
+			return ResponseEntity.ok(token);
+		}
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 }

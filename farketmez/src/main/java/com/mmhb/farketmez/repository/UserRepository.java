@@ -7,4 +7,5 @@ import com.mmhb.farketmez.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+	User findByMail(String mail);
 }

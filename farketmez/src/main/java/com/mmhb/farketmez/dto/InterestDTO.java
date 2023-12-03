@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class InterestDTO {
-    Long id;
-    String interestName;
+	private Long id;
+	private String interestName;
 }

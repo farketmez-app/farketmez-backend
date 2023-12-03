@@ -1,13 +1,16 @@
 package com.mmhb.farketmez.service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.mmhb.farketmez.dto.InterestDTO;
+import com.mmhb.farketmez.mapper.InterestMapper;
 import com.mmhb.farketmez.model.Interest;
 import com.mmhb.farketmez.repository.InterestRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -16,42 +19,29 @@ public class InterestService {
 
 	private final InterestRepository interestRepository;
 
-	@Transactional
-	public Interest createInterest(Interest interest) {
-		if (interest.getInterestName() == null || interest.getInterestName().isEmpty()) {
-			throw new IllegalArgumentException("Interest name is required.");
+	public InterestDTO createInterest(InterestDTO interestDTO) {
+		Interest interest = InterestMapper.fromInterestDto(interestDTO);
+		Interest savedInterest = interestRepository.save(interest);
+		return InterestMapper.toInterestDto(savedInterest);
+	}
+
+	public List<InterestDTO> getAllInterests() {
+		return interestRepository.findAll().stream().map(InterestMapper::toInterestDto).collect(Collectors.toList());
+	}
+
+	public Optional<InterestDTO> getInterestById(Long id) {
+		return interestRepository.findById(id).map(InterestMapper::toInterestDto);
+	}
+
+	public InterestDTO updateInterest(InterestDTO interestDTO) {
+		if (interestRepository.existsById(interestDTO.getId())) {
+			Interest interest = InterestMapper.fromInterestDto(interestDTO);
+			Interest updatedInterest = interestRepository.save(interest);
+			return InterestMapper.toInterestDto(updatedInterest);
 		}
-
-		return interestRepository.save(interest);
+		return null;
 	}
 
-	public List<Interest> getAllInterests() {
-		return interestRepository.findAll();
-	}
-
-	public Interest getInterestById(Long id) {
-		return interestRepository.findById(id).orElse(null);
-	}
-
-	@Transactional
-	public Interest updateInterest(Interest interest) {
-		if (interest.getId() == null || !interestRepository.existsById(interest.getId())) {
-			throw new IllegalArgumentException("Interest not found with id: " + interest.getId());
-		}
-
-		if (interest.getInterestName() == null || interest.getInterestName().isEmpty()) {
-			throw new IllegalArgumentException("Interest name is required for update.");
-		}
-
-		Interest existingInterest = interestRepository.findById(interest.getId())
-				.orElseThrow(() -> new IllegalArgumentException("Interest not found with id: " + interest.getId()));
-
-		existingInterest.setInterestName(interest.getInterestName());
-
-		return interestRepository.save(existingInterest);
-	}
-
-	@Transactional
 	public void deleteInterest(Long id) {
 		interestRepository.deleteById(id);
 	}

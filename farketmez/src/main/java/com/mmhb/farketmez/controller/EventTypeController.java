@@ -16,15 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mmhb.farketmez.dto.EventTypeDTO;
 import com.mmhb.farketmez.service.EventTypeService;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping(value = "/eventtypes")
 public class EventTypeController {
 
 	private final EventTypeService eventTypeService;
-
-	public EventTypeController(EventTypeService eventTypeService) {
-		this.eventTypeService = eventTypeService;
-	}
 
 	@GetMapping
 	public ResponseEntity<List<EventTypeDTO>> getAllEventTypes() {
