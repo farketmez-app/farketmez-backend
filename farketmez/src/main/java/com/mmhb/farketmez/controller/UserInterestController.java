@@ -1,6 +1,7 @@
 package com.mmhb.farketmez.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mmhb.farketmez.dto.UserInterestDTO;
+import com.mmhb.farketmez.mapper.UserInterestMapper;
+import com.mmhb.farketmez.model.UserInterest;
 import com.mmhb.farketmez.service.UserInterestService;
 
 @RestController
-@RequestMapping(value = "/userinterests")
+@RequestMapping("/userinterests")
 public class UserInterestController {
-
 	private final UserInterestService userInterestService;
 
 	public UserInterestController(UserInterestService userInterestService) {
@@ -28,14 +30,16 @@ public class UserInterestController {
 
 	@GetMapping
 	public ResponseEntity<List<UserInterestDTO>> getAllUserInterests() {
-		List<UserInterestDTO> userInterests = userInterestService.findAll();
+		List<UserInterestDTO> userInterests = userInterestService.findAll().stream()
+				.map(UserInterestMapper::toUserInterestDto).collect(Collectors.toList());
 		return new ResponseEntity<>(userInterests, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<UserInterestDTO> getUserInterestById(@PathVariable Long id) {
-		UserInterestDTO userInterestDTO = userInterestService.findById(id);
-		if (userInterestDTO != null) {
+		UserInterest userInterest = userInterestService.findById(id);
+		if (userInterest != null) {
+			UserInterestDTO userInterestDTO = UserInterestMapper.toUserInterestDto(userInterest);
 			return new ResponseEntity<>(userInterestDTO, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -44,27 +48,26 @@ public class UserInterestController {
 
 	@PostMapping
 	public ResponseEntity<UserInterestDTO> createUserInterest(@RequestBody UserInterestDTO userInterestDTO) {
-		UserInterestDTO createdUserInterest = userInterestService.createUserInterest(userInterestDTO);
-		if (createdUserInterest != null) {
-			return new ResponseEntity<>(createdUserInterest, HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
+		UserInterest userInterest = UserInterestMapper.fromUserInterestDto(userInterestDTO);
+		UserInterest createdUserInterest = userInterestService.createUserInterest(userInterest);
+		return new ResponseEntity<>(UserInterestMapper.toUserInterestDto(createdUserInterest), HttpStatus.CREATED);
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<UserInterestDTO> updateUserInterest(@PathVariable Long id,
 			@RequestBody UserInterestDTO userInterestDTO) {
-		UserInterestDTO updatedUserInterest = userInterestService.updateUserInterest(id, userInterestDTO);
+		UserInterest userInterest = UserInterestMapper.fromUserInterestDto(userInterestDTO);
+		UserInterest updatedUserInterest = userInterestService.updateUserInterest(id, userInterest);
 		if (updatedUserInterest != null) {
-			return new ResponseEntity<>(updatedUserInterest, HttpStatus.OK);
+			return new ResponseEntity<>(UserInterestMapper.toUserInterestDto(updatedUserInterest), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@DeleteMapping("/{id}")
-	public void deleteUserInterest(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteUserInterest(@PathVariable Long id) {
 		userInterestService.deleteById(id);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }

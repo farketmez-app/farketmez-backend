@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mmhb.farketmez.dto.ParticipantDTO;
+import com.mmhb.farketmez.model.Participant;
 import com.mmhb.farketmez.service.ParticipantService;
 
 @RestController
@@ -27,31 +27,30 @@ public class ParticipantController {
 	}
 
 	@GetMapping
-	public ResponseEntity<List<ParticipantDTO>> getAllParticipants() {
-		List<ParticipantDTO> participants = participantService.getAllParticipants();
+	public ResponseEntity<List<Participant>> getAllParticipants() {
+		List<Participant> participants = participantService.getAllParticipants();
 		return new ResponseEntity<>(participants, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<ParticipantDTO> getParticipantById(@PathVariable Long id) {
-		return participantService.getParticipantById(id)
-				.map(participant -> new ResponseEntity<>(participant, HttpStatus.OK))
-				.orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-	}
-
-	@PostMapping
-	public ResponseEntity<ParticipantDTO> createParticipant(@RequestBody ParticipantDTO participantDTO) {
-		ParticipantDTO createdParticipant = participantService.createParticipant(participantDTO);
-		if (createdParticipant != null) {
-			return new ResponseEntity<>(createdParticipant, HttpStatus.CREATED);
+	public ResponseEntity<Participant> getParticipantById(@PathVariable Long id) {
+		Participant participant = participantService.getParticipantById(id);
+		if (participant != null) {
+			return new ResponseEntity<>(participant, HttpStatus.OK);
 		} else {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
+	@PostMapping
+	public ResponseEntity<Participant> createParticipant(@RequestBody Participant participant) {
+		Participant createdParticipant = participantService.createParticipant(participant);
+		return new ResponseEntity<>(createdParticipant, HttpStatus.CREATED);
+	}
+
 	@PutMapping
-	public ResponseEntity<ParticipantDTO> updateParticipant(@RequestBody ParticipantDTO participantDTO) {
-		ParticipantDTO updatedParticipant = participantService.updateParticipant(participantDTO);
+	public ResponseEntity<Participant> updateParticipant(@RequestBody Participant participant) {
+		Participant updatedParticipant = participantService.updateParticipant(participant);
 		if (updatedParticipant != null) {
 			return new ResponseEntity<>(updatedParticipant, HttpStatus.OK);
 		} else {
@@ -59,12 +58,13 @@ public class ParticipantController {
 		}
 	}
 
-	@DeleteMapping(value = "/{id}")
-	public String deleteParticipant(@PathVariable Long id) {
-		if (participantService.getParticipantById(id).isPresent()) {
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteParticipant(@PathVariable Long id) {
+		try {
 			participantService.deleteParticipant(id);
-			return "Participant deleted";
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
-		return "Participant not found";
 	}
 }

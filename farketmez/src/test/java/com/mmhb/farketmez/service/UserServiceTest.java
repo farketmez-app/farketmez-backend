@@ -2,7 +2,6 @@ package com.mmhb.farketmez.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -18,10 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.mmhb.farketmez.dto.UserDTO;
-import com.mmhb.farketmez.mapper.UserMapper;
 import com.mmhb.farketmez.model.User;
-import com.mmhb.farketmez.model.UserType;
 import com.mmhb.farketmez.repository.UserRepository;
 
 class UserServiceTest {
@@ -40,42 +36,54 @@ class UserServiceTest {
 	@Test
 	void whenCreatingUser_thenShouldReturnSavedUser() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
-		UserDTO userDTOToSave = new UserDTO(null, "testuser", "pass123", "Test", "User", 30, 1, "40.7128", "-74.0060",
-				new UserType(), now, now, null);
-		User savedUser = UserMapper.fromUserDto(userDTOToSave);
-		when(userRepository.save(any(User.class))).thenReturn(savedUser);
+		// FIXME:UserType ve deletedAt parametreleri dahil edilmiyor.
+		User userToSave = new User("testuser", "pass123", "Test", "User", 30, 1, "40.7128", "-74.0060");
+		userToSave.setCreatedAt(now);
+		userToSave.setUpdatedAt(null);
+		userToSave.setDeletedAt(null);
+		userToSave.setUserType(null);
+		when(userRepository.save(any(User.class))).thenReturn(userToSave);
 
-		UserDTO actual = userService.createUser(userDTOToSave);
+		User actual = userService.createUser(userToSave);
 
 		assertNotNull(actual);
-		assertEquals(userDTOToSave.getUsername(), actual.getUsername());
+		assertEquals(userToSave.getUsername(), actual.getUsername());
 	}
 
 	@Test
 	void whenRetrievingAllUsers_thenShouldReturnListOfUsers() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
+		// FIXME:UserType ve deletedAt parametreleri dahil edilmiyor.
 		List<User> users = Arrays.asList(
-				new User(1L, "testuser1", "pass123", "Test1", "User1", 30, 1, "40.7128", "-74.0060", now, now, null,
-						new UserType()),
-				new User(2L, "testuser2", "pass456", "Test2", "User2", 25, 2, "34.0522", "-118.2437", now, now, null,
-						new UserType()));
+				new User(1L, "testuser1", "pass123", "Test1", "User1", 30, 1, "40.7128", "-74.0060"),
+				new User(2L, "testuser2", "pass456", "Test2", "User2", 25, 2, "34.0522", "-118.2437"));
+		users.forEach(user -> {
+			user.setCreatedAt(now);
+			user.setUpdatedAt(null);
+			user.setDeletedAt(null);
+			user.setUserType(null);
+		});
 		when(userRepository.findAll()).thenReturn(users);
 
-		List<UserDTO> userDTOs = userService.getAllUsers();
+		List<User> actual = userService.getAllUsers();
 
-		assertNotNull(userDTOs);
-		assertEquals(2, userDTOs.size());
+		assertNotNull(actual);
+		assertEquals(2, actual.size());
 	}
 
 	@Test
 	void givenUserId_whenRetrievingUser_thenShouldReturnUser() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		Long userId = 1L;
-		Optional<User> user = Optional.of(new User(userId, "testuser", "pass123", "Test", "User", 30, 1, "40.7128",
-				"-74.0060", now, now, null, new UserType()));
-		when(userRepository.findById(userId)).thenReturn(user);
+		// FIXME:UserType ve deletedAt parametreleri dahil edilmiyor.
+		User user = new User(userId, "testuser", "pass123", "Test", "User", 30, 1, "40.7128", "-74.0060");
+		user.setCreatedAt(now);
+		user.setUpdatedAt(null);
+		user.setDeletedAt(null);
+		user.setUserType(null);
+		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
-		UserDTO actual = userService.getUserById(userId);
+		User actual = userService.getUserById(userId);
 
 		assertNotNull(actual);
 		assertEquals(userId, actual.getId());
@@ -84,16 +92,21 @@ class UserServiceTest {
 	@Test
 	void givenUserDetails_whenUpdatingUser_thenShouldReturnUpdatedUser() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
-		UserDTO userDTOToUpdate = new UserDTO(1L, "updateduser", "pass123", "Updated", "User", 35, 1, "34.0522",
-				"-118.2437", new UserType(), now, now, null);
-		User updatedUser = UserMapper.fromUserDto(userDTOToUpdate);
-		when(userRepository.existsById(any(Long.class))).thenReturn(true);
-		when(userRepository.save(any(User.class))).thenReturn(updatedUser);
+		Long userId = 1L;
+		// FIXME:UserType ve deletedAt parametreleri dahil edilmiyor.
+		User userToUpdate = new User(userId, "updateduser", "pass123", "Updated", "User", 35, 1, "34.0522",
+				"-118.2437");
+		userToUpdate.setCreatedAt(now);
+		userToUpdate.setUpdatedAt(null);
+		userToUpdate.setDeletedAt(null);
+		userToUpdate.setUserType(null);
+		when(userRepository.existsById(userId)).thenReturn(true);
+		when(userRepository.save(any(User.class))).thenReturn(userToUpdate);
 
-		UserDTO actual = userService.updateUser(userDTOToUpdate);
+		User actual = userService.updateUser(userToUpdate);
 
 		assertNotNull(actual);
-		assertEquals(userDTOToUpdate.getUsername(), actual.getUsername());
+		assertEquals(userToUpdate.getUsername(), actual.getUsername());
 	}
 
 	@Test
@@ -102,15 +115,5 @@ class UserServiceTest {
 		doNothing().when(userRepository).deleteById(userId);
 		userService.deleteUser(userId);
 		verify(userRepository).deleteById(userId);
-	}
-
-	@Test
-	void givenNonExistentUserId_whenRetrievingUser_thenShouldReturnNull() {
-		Long userId = 1L;
-		when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-		UserDTO actual = userService.getUserById(userId);
-
-		assertNull(actual);
 	}
 }

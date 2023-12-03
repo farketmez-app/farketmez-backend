@@ -3,6 +3,8 @@ package com.mmhb.farketmez.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -14,8 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.mmhb.farketmez.dto.UserInterestDTO;
-import com.mmhb.farketmez.mapper.UserInterestMapper;
 import com.mmhb.farketmez.model.UserInterest;
 import com.mmhb.farketmez.repository.UserInterestRepository;
 
@@ -34,15 +34,14 @@ class UserInterestServiceTest {
 
 	@Test
 	void whenCreatingUserInterest_thenShouldReturnSavedUserInterest() {
-		UserInterestDTO userInterestDTOToSave = new UserInterestDTO(null, 1L, 2L);
-		UserInterest savedUserInterest = UserInterestMapper.fromUserInterest(userInterestDTOToSave);
-		when(userInterestRepository.save(any(UserInterest.class))).thenReturn(savedUserInterest);
+		UserInterest userInterestToSave = new UserInterest(null, 1L, 2L);
+		when(userInterestRepository.save(any(UserInterest.class))).thenReturn(userInterestToSave);
 
-		UserInterestDTO actual = userInterestService.createUserInterest(userInterestDTOToSave);
+		UserInterest actual = userInterestService.createUserInterest(userInterestToSave);
 
 		assertNotNull(actual);
-		assertEquals(userInterestDTOToSave.getUserId(), actual.getUserId());
-		assertEquals(userInterestDTOToSave.getInterestId(), actual.getInterestId());
+		assertEquals(userInterestToSave.getUserId(), actual.getUserId());
+		assertEquals(userInterestToSave.getInterestId(), actual.getInterestId());
 	}
 
 	@Test
@@ -50,10 +49,10 @@ class UserInterestServiceTest {
 		List<UserInterest> userInterests = Arrays.asList(new UserInterest(1L, 1L, 2L), new UserInterest(2L, 2L, 3L));
 		when(userInterestRepository.findAll()).thenReturn(userInterests);
 
-		List<UserInterestDTO> userInterestDTOs = userInterestService.findAll();
+		List<UserInterest> actual = userInterestService.findAll();
 
-		assertNotNull(userInterestDTOs);
-		assertEquals(2, userInterestDTOs.size());
+		assertNotNull(actual);
+		assertEquals(2, actual.size());
 	}
 
 	@Test
@@ -62,7 +61,7 @@ class UserInterestServiceTest {
 		Optional<UserInterest> userInterest = Optional.of(new UserInterest(userInterestId, 1L, 2L));
 		when(userInterestRepository.findById(userInterestId)).thenReturn(userInterest);
 
-		UserInterestDTO actual = userInterestService.findById(userInterestId);
+		UserInterest actual = userInterestService.findById(userInterestId);
 
 		assertNotNull(actual);
 		assertEquals(userInterestId, actual.getId());
@@ -71,15 +70,22 @@ class UserInterestServiceTest {
 	@Test
 	void givenUserInterestDetails_whenUpdatingUserInterest_thenShouldReturnUpdatedUserInterest() {
 		Long userInterestId = 1L;
-		UserInterestDTO userInterestDTOToUpdate = new UserInterestDTO(userInterestId, 1L, 3L);
-		UserInterest updatedUserInterest = new UserInterest(userInterestId, 1L, 3L);
-		when(userInterestRepository.existsById(userInterestId)).thenReturn(true);
-		when(userInterestRepository.save(any(UserInterest.class))).thenReturn(updatedUserInterest);
+		UserInterest userInterestToUpdate = new UserInterest(userInterestId, 1L, 3L);
+		when(userInterestRepository.findById(userInterestId)).thenReturn(Optional.of(userInterestToUpdate));
+		when(userInterestRepository.save(any(UserInterest.class))).thenReturn(userInterestToUpdate);
 
-		UserInterestDTO actual = userInterestService.updateUserInterest(userInterestId, userInterestDTOToUpdate);
+		UserInterest actual = userInterestService.updateUserInterest(userInterestId, userInterestToUpdate);
 
 		assertNotNull(actual);
-		assertEquals(userInterestDTOToUpdate.getInterestId(), actual.getInterestId());
+		assertEquals(userInterestToUpdate.getInterestId(), actual.getInterestId());
 		assertEquals(userInterestId, actual.getId());
+	}
+
+	@Test
+	void whenDeletingUserInterest_thenShouldPerformDeletion() {
+		Long userInterestId = 1L;
+		doNothing().when(userInterestRepository).deleteById(userInterestId);
+		userInterestService.deleteById(userInterestId);
+		verify(userInterestRepository).deleteById(userInterestId);
 	}
 }
