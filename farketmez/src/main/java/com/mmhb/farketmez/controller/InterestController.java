@@ -19,15 +19,14 @@ import com.mmhb.farketmez.mapper.InterestMapper;
 import com.mmhb.farketmez.model.Interest;
 import com.mmhb.farketmez.service.InterestService;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping(value = "/interests")
 public class InterestController {
 
 	private final InterestService interestService;
-
-	public InterestController(InterestService interestService) {
-		this.interestService = interestService;
-	}
 
 	@GetMapping
 	public ResponseEntity<List<InterestDTO>> getAllInterests() {

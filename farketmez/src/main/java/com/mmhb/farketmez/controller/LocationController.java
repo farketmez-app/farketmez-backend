@@ -19,15 +19,14 @@ import com.mmhb.farketmez.mapper.LocationMapper;
 import com.mmhb.farketmez.model.Location;
 import com.mmhb.farketmez.service.LocationService;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping(value = "/locations")
 public class LocationController {
 
 	private final LocationService locationService;
-
-	public LocationController(LocationService locationService) {
-		this.locationService = locationService;
-	}
 
 	@GetMapping
 	public ResponseEntity<List<LocationDTO>> getAllLocations() {

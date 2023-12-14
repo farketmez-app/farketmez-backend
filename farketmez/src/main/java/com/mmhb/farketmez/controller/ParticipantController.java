@@ -16,15 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mmhb.farketmez.model.Participant;
 import com.mmhb.farketmez.service.ParticipantService;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping(value = "/participants")
 public class ParticipantController {
 
 	private final ParticipantService participantService;
-
-	public ParticipantController(ParticipantService participantService) {
-		this.participantService = participantService;
-	}
 
 	@GetMapping
 	public ResponseEntity<List<Participant>> getAllParticipants() {

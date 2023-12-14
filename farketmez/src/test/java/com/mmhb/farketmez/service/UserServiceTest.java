@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.mmhb.farketmez.model.User;
+import com.mmhb.farketmez.model.UserType;
 import com.mmhb.farketmez.repository.UserRepository;
 
 class UserServiceTest {
@@ -36,33 +37,25 @@ class UserServiceTest {
 	@Test
 	void whenCreatingUser_thenShouldReturnSavedUser() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
-		// FIXME:UserType ve deletedAt parametreleri dahil edilmiyor.
-		User userToSave = new User("testuser", "pass123", "Test", "User", 30, 1, "40.7128", "-74.0060");
-		userToSave.setCreatedAt(now);
-		userToSave.setUpdatedAt(null);
-		userToSave.setDeletedAt(null);
-		userToSave.setUserType(null);
+		User userToSave = new User("testuser", "pass123", "Test", "User", 30, 1, "40.7128", "-74.0060", "test@mail.com",
+				now, null, null, new UserType());
 		when(userRepository.save(any(User.class))).thenReturn(userToSave);
 
 		User actual = userService.createUser(userToSave);
 
 		assertNotNull(actual);
 		assertEquals(userToSave.getUsername(), actual.getUsername());
+		assertEquals(userToSave.getMail(), actual.getMail());
 	}
 
 	@Test
 	void whenRetrievingAllUsers_thenShouldReturnListOfUsers() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
-		// FIXME:UserType ve deletedAt parametreleri dahil edilmiyor.
 		List<User> users = Arrays.asList(
-				new User(1L, "testuser1", "pass123", "Test1", "User1", 30, 1, "40.7128", "-74.0060"),
-				new User(2L, "testuser2", "pass456", "Test2", "User2", 25, 2, "34.0522", "-118.2437"));
-		users.forEach(user -> {
-			user.setCreatedAt(now);
-			user.setUpdatedAt(null);
-			user.setDeletedAt(null);
-			user.setUserType(null);
-		});
+				new User(1L, "testuser1", "pass123", "Test1", "User1", 30, 1, "40.7128", "-74.0060", "test1@mail.com",
+						now, null, null, new UserType()),
+				new User(2L, "testuser2", "pass456", "Test2", "User2", 25, 2, "34.0522", "-118.2437", "test2@mail.com",
+						now, null, null, new UserType()));
 		when(userRepository.findAll()).thenReturn(users);
 
 		List<User> actual = userService.getAllUsers();
@@ -75,12 +68,8 @@ class UserServiceTest {
 	void givenUserId_whenRetrievingUser_thenShouldReturnUser() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		Long userId = 1L;
-		// FIXME:UserType ve deletedAt parametreleri dahil edilmiyor.
-		User user = new User(userId, "testuser", "pass123", "Test", "User", 30, 1, "40.7128", "-74.0060");
-		user.setCreatedAt(now);
-		user.setUpdatedAt(null);
-		user.setDeletedAt(null);
-		user.setUserType(null);
+		User user = new User(userId, "testuser", "pass123", "Test", "User", 30, 1, "40.7128", "-74.0060",
+				"test@mail.com", now, null, null, new UserType());
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
 		User actual = userService.getUserById(userId);
@@ -93,13 +82,8 @@ class UserServiceTest {
 	void givenUserDetails_whenUpdatingUser_thenShouldReturnUpdatedUser() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		Long userId = 1L;
-		// FIXME:UserType ve deletedAt parametreleri dahil edilmiyor.
-		User userToUpdate = new User(userId, "updateduser", "pass123", "Updated", "User", 35, 1, "34.0522",
-				"-118.2437");
-		userToUpdate.setCreatedAt(now);
-		userToUpdate.setUpdatedAt(null);
-		userToUpdate.setDeletedAt(null);
-		userToUpdate.setUserType(null);
+		User userToUpdate = new User(userId, "updateduser", "pass123", "Updated", "User", 35, 1, "34.0522", "-118.2437",
+				"update@mail.com", null, now, null, new UserType());
 		when(userRepository.existsById(userId)).thenReturn(true);
 		when(userRepository.save(any(User.class))).thenReturn(userToUpdate);
 
@@ -107,6 +91,7 @@ class UserServiceTest {
 
 		assertNotNull(actual);
 		assertEquals(userToUpdate.getUsername(), actual.getUsername());
+		assertEquals(userToUpdate.getMail(), actual.getMail());
 	}
 
 	@Test

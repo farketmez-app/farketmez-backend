@@ -2,12 +2,10 @@ package com.mmhb.farketmez.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import com.mmhb.farketmez.dto.EventTypeDTO;
-import com.mmhb.farketmez.mapper.EventTypeMapper;
 import com.mmhb.farketmez.model.EventType;
 import com.mmhb.farketmez.repository.EventTypeRepository;
 
@@ -19,27 +17,29 @@ public class EventTypeService {
 
 	private final EventTypeRepository eventTypeRepository;
 
-	public EventTypeDTO createEventType(EventTypeDTO eventTypeDto) {
-		EventType eventType = EventTypeMapper.fromEventTypeDto(eventTypeDto);
-		eventType = eventTypeRepository.save(eventType);
-		return EventTypeMapper.toEventTypeDto(eventType);
-	}
-
-	public List<EventTypeDTO> getAllEventTypes() {
-		return eventTypeRepository.findAll().stream().map(EventTypeMapper::toEventTypeDto).collect(Collectors.toList());
-	}
-
-	public Optional<EventTypeDTO> getEventTypeById(Long id) {
-		return eventTypeRepository.findById(id).map(EventTypeMapper::toEventTypeDto);
-	}
-
-	public EventTypeDTO updateEventType(EventTypeDTO eventTypeDto) {
-		if (eventTypeRepository.existsById(eventTypeDto.getId())) {
-			EventType eventType = EventTypeMapper.fromEventTypeDto(eventTypeDto);
-			eventType = eventTypeRepository.save(eventType);
-			return EventTypeMapper.toEventTypeDto(eventType);
+	public EventType createEventType(EventType eventType) {
+		if (eventType.getType() == null || !StringUtils.hasText(eventType.getType().toString())) {
+			throw new IllegalArgumentException("EventType type is required and cannot be null or empty.");
 		}
-		return null;
+		return eventTypeRepository.save(eventType);
+	}
+
+	public List<EventType> getAllEventTypes() {
+		return eventTypeRepository.findAll();
+	}
+
+	public Optional<EventType> getEventTypeById(Long id) {
+		return eventTypeRepository.findById(id);
+	}
+
+	public EventType updateEventType(EventType updatedEventType) {
+		if (updatedEventType.getType() == null || !StringUtils.hasText(updatedEventType.getType().toString())) {
+			throw new IllegalArgumentException("EventType type is required and cannot be null or empty.");
+		}
+		return eventTypeRepository.findById(updatedEventType.getId()).map(eventType -> {
+			eventType.setType(updatedEventType.getType());
+			return eventTypeRepository.save(eventType);
+		}).orElse(null);
 	}
 
 	public void deleteEventType(Long id) {

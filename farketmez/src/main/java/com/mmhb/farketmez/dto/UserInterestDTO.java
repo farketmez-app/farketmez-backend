@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 public class UserInterestDTO {
-    Long id;
-    Long userId;
-    Long interestId;
+	private Long id;
+	private Long userId;
+	private Long interestId;
 }

@@ -19,15 +19,14 @@ import com.mmhb.farketmez.mapper.EventMapper;
 import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.service.EventService;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping(value = "/events")
 public class EventController {
 
 	private final EventService eventService;
-
-	public EventController(EventService eventService) {
-		this.eventService = eventService;
-	}
 
 	@PostMapping
 	public ResponseEntity<EventDTO> createEvent(@RequestBody EventDTO eventDto) {

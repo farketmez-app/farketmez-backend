@@ -23,7 +23,7 @@ public class ParticipantService {
 			throw new IllegalArgumentException(
 					"Missing required fields. User ID, Event ID, and Rating must be provided.");
 		}
-		// FIXME: Puanlama için rating değeri 0 ile 5 aralığında olarka kabul edilmiştir
+		// FIXME: Puanlama için rating değeri 0 ile 5 aralığında olarak kabul edilmiştir
 		// ileride ihtiyaca göre değiştirilmelidir.
 		if (participant.getRating().compareTo(BigDecimal.ZERO) < 0
 				|| participant.getRating().compareTo(new BigDecimal("5")) > 0) {

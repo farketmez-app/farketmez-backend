@@ -19,20 +19,21 @@ import com.mmhb.farketmez.mapper.UserInterestMapper;
 import com.mmhb.farketmez.model.UserInterest;
 import com.mmhb.farketmez.service.UserInterestService;
 
-@RestController
-@RequestMapping("/userinterests")
-public class UserInterestController {
-	private final UserInterestService userInterestService;
+import lombok.AllArgsConstructor;
 
-	public UserInterestController(UserInterestService userInterestService) {
-		this.userInterestService = userInterestService;
-	}
+@AllArgsConstructor
+@RestController
+@RequestMapping(value = "/userinterests")
+public class UserInterestController {
+
+	private final UserInterestService userInterestService;
 
 	@GetMapping
 	public ResponseEntity<List<UserInterestDTO>> getAllUserInterests() {
-		List<UserInterestDTO> userInterests = userInterestService.findAll().stream()
-				.map(UserInterestMapper::toUserInterestDto).collect(Collectors.toList());
-		return new ResponseEntity<>(userInterests, HttpStatus.OK);
+		List<UserInterest> userInterests = userInterestService.findAll();
+		List<UserInterestDTO> userInterestDTOs = userInterests.stream().map(UserInterestMapper::toUserInterestDto)
+				.collect(Collectors.toList());
+		return new ResponseEntity<>(userInterestDTOs, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
@@ -53,11 +54,12 @@ public class UserInterestController {
 		return new ResponseEntity<>(UserInterestMapper.toUserInterestDto(createdUserInterest), HttpStatus.CREATED);
 	}
 
-	@PutMapping("/{id}")
+	@PutMapping
 	public ResponseEntity<UserInterestDTO> updateUserInterest(@PathVariable Long id,
 			@RequestBody UserInterestDTO userInterestDTO) {
+		userInterestDTO.setId(id);
 		UserInterest userInterest = UserInterestMapper.fromUserInterestDto(userInterestDTO);
-		UserInterest updatedUserInterest = userInterestService.updateUserInterest(id, userInterest);
+		UserInterest updatedUserInterest = userInterestService.updateUserInterest(userInterest);
 		if (updatedUserInterest != null) {
 			return new ResponseEntity<>(UserInterestMapper.toUserInterestDto(updatedUserInterest), HttpStatus.OK);
 		} else {

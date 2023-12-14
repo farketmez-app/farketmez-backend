@@ -19,15 +19,14 @@ import com.mmhb.farketmez.mapper.UserTypeMapper;
 import com.mmhb.farketmez.model.UserType;
 import com.mmhb.farketmez.service.UserTypeService;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping(value = "/usertypes")
 public class UserTypeController {
 
 	private final UserTypeService userTypeService;
-
-	public UserTypeController(UserTypeService userTypeService) {
-		this.userTypeService = userTypeService;
-	}
 
 	@GetMapping
 	public ResponseEntity<List<UserTypeDTO>> getAllUserTypes() {

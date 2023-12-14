@@ -33,18 +33,19 @@ public class UserInterestService {
 				.orElseThrow(() -> new EntityNotFoundException("UserInterest not found with id: " + id));
 	}
 
-	public UserInterest updateUserInterest(Long id, UserInterest userInterestDetails) {
-		UserInterest userInterest = userInterestRepository.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException("UserInterest not found with id: " + id));
-
-		if (userInterestDetails.getUserId() == null || userInterestDetails.getInterestId() == null) {
-			throw new IllegalArgumentException("Both User ID and Interest ID must be provided.");
+	public UserInterest updateUserInterest(UserInterest userInterestDetails) {
+		if (userInterestDetails.getId() == null || userInterestDetails.getUserId() == null
+				|| userInterestDetails.getInterestId() == null) {
+			throw new IllegalArgumentException("ID, User ID, and Interest ID must all be provided.");
 		}
 
-		userInterest.setUserId(userInterestDetails.getUserId());
-		userInterest.setInterestId(userInterestDetails.getInterestId());
+		UserInterest existingUserInterest = userInterestRepository.findById(userInterestDetails.getId()).orElseThrow(
+				() -> new EntityNotFoundException("UserInterest not found with id: " + userInterestDetails.getId()));
 
-		return userInterestRepository.save(userInterest);
+		existingUserInterest.setUserId(userInterestDetails.getUserId());
+		existingUserInterest.setInterestId(userInterestDetails.getInterestId());
+
+		return userInterestRepository.save(existingUserInterest);
 	}
 
 	public void deleteById(Long id) {
