@@ -1,5 +1,6 @@
 package com.mmhb.farketmez.service;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,20 +15,29 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.mmhb.farketmez.model.Interest;
 import com.mmhb.farketmez.model.UserInterest;
+import com.mmhb.farketmez.repository.InterestRepository;
 import com.mmhb.farketmez.repository.UserInterestRepository;
+import com.mmhb.farketmez.repository.UserRepository;
 
 class UserInterestServiceTest {
 
 	@Mock
 	private UserInterestRepository userInterestRepository;
 
+	@Mock
+	private UserRepository userRepository;
+
+	@Mock
+	private InterestRepository interestRepository;
+
 	private UserInterestService userInterestService;
 
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		userInterestService = new UserInterestService(userInterestRepository);
+		userInterestService = new UserInterestService(userInterestRepository, userRepository, interestRepository);
 	}
 
 	@Test
@@ -80,6 +90,26 @@ class UserInterestServiceTest {
 
 		assertNotNull(actual);
 		assertEquals(userInterestToUpdate.getInterestId(), actual.getInterestId());
+	}
+
+	@Test
+	void findInterestsByUserId_WhenUserExistsAndHasInterests_ShouldReturnInterests() {
+		Long userId = 1L;
+		Interest interest1 = new Interest(1L, "Interest 1");
+		Interest interest2 = new Interest(2L, "Interest 2");
+		UserInterest userInterest1 = new UserInterest(1L, userId, 1L);
+		UserInterest userInterest2 = new UserInterest(2L, userId, 2L);
+
+		when(userRepository.existsById(userId)).thenReturn(true);
+		when(userInterestRepository.findByUserId(userId)).thenReturn(Arrays.asList(userInterest1, userInterest2));
+		when(userInterestRepository.findInterestsByUserId(userId)).thenReturn(Arrays.asList(interest1, interest2));
+
+		List<Interest> interests = userInterestService.findInterestsByUserId(userId);
+
+		assertNotNull(interests);
+		assertEquals(2, interests.size());
+		assertTrue(interests.contains(interest1));
+		assertTrue(interests.contains(interest2));
 	}
 
 }
