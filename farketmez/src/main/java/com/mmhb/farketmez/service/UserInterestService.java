@@ -6,8 +6,11 @@ import javax.persistence.EntityNotFoundException;
 
 import org.springframework.stereotype.Service;
 
+import com.mmhb.farketmez.model.Interest;
 import com.mmhb.farketmez.model.UserInterest;
+import com.mmhb.farketmez.repository.InterestRepository;
 import com.mmhb.farketmez.repository.UserInterestRepository;
+import com.mmhb.farketmez.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 public class UserInterestService {
 
 	private final UserInterestRepository userInterestRepository;
+	private final UserRepository userRepository;
+	private final InterestRepository interestRepository;
 
 	public UserInterest createUserInterest(UserInterest userInterest) {
 		if (userInterest.getUserId() == null || userInterest.getInterestId() == null) {
@@ -50,6 +55,19 @@ public class UserInterestService {
 
 	public void deleteById(Long id) {
 		userInterestRepository.deleteById(id);
+	}
+
+	public List<Interest> findInterestsByUserId(Long userId) {
+		boolean isUserExists = userRepository.existsById(userId);
+		if (!isUserExists) {
+			throw new EntityNotFoundException("User not found with id: " + userId);
+		}
+
+		List<UserInterest> userInterests = userInterestRepository.findByUserId(userId);
+		if (userInterests.isEmpty()) {
+			throw new EntityNotFoundException("No interests found for user id: " + userId);
+		}
+		return userInterestRepository.findInterestsByUserId(userId);
 	}
 
 }

@@ -14,11 +14,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mmhb.farketmez.dto.InterestDTO;
 import com.mmhb.farketmez.dto.UserInterestDTO;
+import com.mmhb.farketmez.mapper.InterestMapper;
 import com.mmhb.farketmez.mapper.UserInterestMapper;
+import com.mmhb.farketmez.model.Interest;
 import com.mmhb.farketmez.model.UserInterest;
 import com.mmhb.farketmez.service.UserInterestService;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -71,5 +75,17 @@ public class UserInterestController {
 	public ResponseEntity<Void> deleteUserInterest(@PathVariable Long id) {
 		userInterestService.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@GetMapping("/{userId}/interests")
+	public ResponseEntity<List<InterestDTO>> getUserInterests(@PathVariable Long userId) {
+		try {
+			List<Interest> interests = userInterestService.findInterestsByUserId(userId);
+			List<InterestDTO> interestDTOs = interests.stream().map(InterestMapper::toInterestDto)
+					.collect(Collectors.toList());
+			return new ResponseEntity<>(interestDTOs, HttpStatus.OK);
+		} catch (EntityNotFoundException e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 }
