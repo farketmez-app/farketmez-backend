@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mmhb.farketmez.dto.UserDTO;
 import com.mmhb.farketmez.dto.UserLoginDto;
 import com.mmhb.farketmez.mapper.UserMapper;
+import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.service.AuthenticationService;
+import com.mmhb.farketmez.service.ParticipantService;
 import com.mmhb.farketmez.service.UserService;
 import com.mmhb.farketmez.util.JwtUtil;
 
@@ -31,6 +33,7 @@ public class UserController {
 	private final UserService userService;
 	private final AuthenticationService authenticationService;
 	private final JwtUtil jwtUtil;
+	private final ParticipantService participantService; // ParticipantService ekleniyor
 
 	@GetMapping
 	public ResponseEntity<List<UserDTO>> getAllUsers() {
@@ -87,5 +90,11 @@ public class UserController {
 			return ResponseEntity.ok(token);
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+	}
+
+	@GetMapping("/{userId}/events")
+	public ResponseEntity<List<Event>> getUserEvents(@PathVariable Long userId) {
+		List<Event> events = participantService.getEventsByUser(userId);
+		return ResponseEntity.ok(events);
 	}
 }

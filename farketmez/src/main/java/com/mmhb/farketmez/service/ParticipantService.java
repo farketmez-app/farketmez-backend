@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.Participant;
 import com.mmhb.farketmez.repository.ParticipantRepository;
 
@@ -62,6 +63,10 @@ public class ParticipantService {
 	@Transactional
 	public void deleteParticipant(Long id) {
 		participantRepository.deleteById(id);
+	}
+
+	public List<Event> getEventsByUser(Long userId) {
+		return participantRepository.findEventsByUserId(userId);
 	}
 
 }

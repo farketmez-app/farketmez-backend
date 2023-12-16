@@ -20,18 +20,18 @@ public class Participant {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
-	private final Long id;
+	private Long id;
 
 	@Column(name = "user_id")
-	private final Long userId;
+	private Long userId;
 
 	@Column(name = "event_id")
-	private final Long eventId;
+	private Long eventId;
 
 	@Column(name = "rating")
-	private final BigDecimal rating;
+	private BigDecimal rating;
 
 	@Column(name = "comment")
-	private final String comment;
+	private String comment;
 
 }
