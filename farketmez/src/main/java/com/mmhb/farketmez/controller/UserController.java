@@ -33,7 +33,7 @@ public class UserController {
 	private final UserService userService;
 	private final AuthenticationService authenticationService;
 	private final JwtUtil jwtUtil;
-	private final ParticipantService participantService; // ParticipantService ekleniyor
+	private final ParticipantService participantService;
 
 	@GetMapping
 	public ResponseEntity<List<UserDTO>> getAllUsers() {
