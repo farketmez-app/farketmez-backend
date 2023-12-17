@@ -56,10 +56,6 @@ public class Event {
 	private User user;
 
 	@ManyToOne
-	@JoinColumn(name = "event_id", nullable = false)
-	private Event event;
-
-	@ManyToOne
 	@JoinColumn(name = "location_id", nullable = false)
 	private Location location;
 
@@ -73,6 +69,16 @@ public class Event {
 		this.eventType = eventType;
 		this.location = location;
 		this.creatorId = creatorId;
+		this.isActive = isActive;
+		this.title = title;
+		this.description = description;
+		this.date = date;
+		this.averageRating = averageRating;
+	}
+
+	public Event(Long id, Boolean isActive, String title, String description, Timestamp date,
+			BigDecimal averageRating) {
+		this.id = id;
 		this.isActive = isActive;
 		this.title = title;
 		this.description = description;

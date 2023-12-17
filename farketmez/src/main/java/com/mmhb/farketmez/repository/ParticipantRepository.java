@@ -11,6 +11,6 @@ import com.mmhb.farketmez.model.Participant;
 
 @Repository
 public interface ParticipantRepository extends JpaRepository<Participant, Long> {
-	@Query("SELECT e FROM Participant p JOIN p.event e WHERE p.user.id = ?1")
+	@Query("SELECT e FROM Participant p JOIN p.event e WHERE p.userId = ?1")
 	List<Event> findEventsByUserId(Long userId);
 }

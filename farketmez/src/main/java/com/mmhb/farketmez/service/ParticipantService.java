@@ -20,9 +20,8 @@ public class ParticipantService {
 
 	@Transactional
 	public Participant createParticipant(Participant participant) {
-		if (participant.getUserId() == null || participant.getEventId() == null || participant.getRating() == null) {
-			throw new IllegalArgumentException(
-					"Missing required fields. User ID, Event ID, and Rating must be provided.");
+		if (participant.getUserId() == null || participant.getRating() == null || participant.getEvent() == null) {
+			throw new IllegalArgumentException("Missing required fields. User ID, Rating, and Event must be provided.");
 		}
 		// FIXME: Puanlama için rating değeri 0 ile 5 aralığında olarak kabul edilmiştir
 		// ileride ihtiyaca göre değiştirilmelidir.
@@ -47,9 +46,8 @@ public class ParticipantService {
 			throw new IllegalArgumentException("Participant not found with id: " + participant.getId());
 		}
 
-		if (participant.getUserId() == null || participant.getEventId() == null || participant.getRating() == null) {
-			throw new IllegalArgumentException(
-					"Missing required fields. User ID, Event ID, and Rating must be provided.");
+		if (participant.getUserId() == null || participant.getRating() == null || participant.getEvent() == null) {
+			throw new IllegalArgumentException("Missing required fields. User ID, Rating, and Event must be provided.");
 		}
 		// FIXME: Puanlama için rating değeri 0 ile 5 aralığında olarka kabul edilmiştir
 		// ileride ihtiyaca göre değiştirilmelidir.

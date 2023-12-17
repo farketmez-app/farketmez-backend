@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ParticipantDTO {
 	private Long id;
 	private Long userId;
-	private Long eventId;
 	private BigDecimal rating;
 	private String comment;
+	private Long eventId;
 }
