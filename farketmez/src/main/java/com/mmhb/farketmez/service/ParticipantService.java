@@ -1,6 +1,7 @@
 package com.mmhb.farketmez.service;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -77,7 +78,10 @@ public class ParticipantService {
 		User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
 		Event event = eventRepository.findById(eventId)
 				.orElseThrow(() -> new IllegalArgumentException("Event not found"));
-
+		// Etkinliği oylayabilmek için bitmesi şartı aranmaktadır.
+		if (event.getDate().after(new Timestamp(System.currentTimeMillis()))) {
+			throw new IllegalStateException("Cannot rate an ongoing event.");
+		}
 		Participant participant = new Participant();
 		participant.setUser(user);
 		participant.setEvent(event);
@@ -91,6 +95,14 @@ public class ParticipantService {
 	public void editEventRate(Long userId, Long eventId, BigDecimal rating, String comment) {
 		Participant participant = participantRepository.findByUserIdAndEventId(userId, eventId)
 				.orElseThrow(() -> new IllegalArgumentException("Rating not found"));
+
+		Event event = eventRepository.findById(eventId)
+				.orElseThrow(() -> new IllegalArgumentException("Event not found"));
+
+		// Etkinliği oylayabilmek için bitmesi şartı aranmaktadır.
+		if (event.getDate().after(new Timestamp(System.currentTimeMillis()))) {
+			throw new IllegalStateException("Cannot edit rating for an ongoing event.");
+		}
 
 		participant.setRating(rating);
 		participant.setComment(comment);

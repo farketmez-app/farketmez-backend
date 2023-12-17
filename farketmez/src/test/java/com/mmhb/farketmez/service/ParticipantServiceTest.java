@@ -149,4 +149,27 @@ class ParticipantServiceTest {
 		assertEquals(expectedEvents.size(), actualEvents.size());
 		assertEquals(expectedEvents, actualEvents);
 	}
+
+	@Test
+	void whenRatingEvent_thenShouldSaveParticipantWithRating() {
+		UserType userType = new UserType();
+		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
+				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, userType);
+
+		EventType eventType = new EventType();
+		Location location = new Location();
+		Event pastEvent = new Event(2L, eventType, location, 1L, true, "Past Event", "Description",
+				new Timestamp(System.currentTimeMillis() - 100000), new BigDecimal("4.5"));
+
+		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+		when(eventRepository.findById(2L)).thenReturn(Optional.of(pastEvent));
+
+		BigDecimal rating = new BigDecimal("4.5");
+		String comment = "Great event!";
+
+		participantService.rateEvent(1L, 2L, rating, comment);
+
+		Participant expectedParticipant = new Participant(null, testUser, pastEvent, rating, comment);
+		verify(participantRepository).save(expectedParticipant);
+	}
 }
