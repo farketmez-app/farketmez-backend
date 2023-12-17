@@ -19,27 +19,48 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.mmhb.farketmez.model.Event;
+import com.mmhb.farketmez.model.EventType;
+import com.mmhb.farketmez.model.Location;
 import com.mmhb.farketmez.model.Participant;
+import com.mmhb.farketmez.model.User;
+import com.mmhb.farketmez.model.UserType;
+import com.mmhb.farketmez.repository.EventRepository;
 import com.mmhb.farketmez.repository.ParticipantRepository;
+import com.mmhb.farketmez.repository.UserRepository;
 
 class ParticipantServiceTest {
 
 	@Mock
 	private ParticipantRepository participantRepository;
 
+	@Mock
+	private UserRepository userRepository;
+
+	@Mock
+	private EventRepository eventRepository;
+
 	private ParticipantService participantService;
 
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		participantService = new ParticipantService(participantRepository);
+		participantService = new ParticipantService(participantRepository, userRepository, eventRepository);
 	}
 
 	@Test
 	void whenCreatingParticipant_thenShouldReturnSavedParticipant() {
-		Event testEvent = new Event(2L, true, "Test Event", "Description", new Timestamp(System.currentTimeMillis()),
-				new BigDecimal("4.5"));
-		Participant participantToSave = new Participant(null, 1L, new BigDecimal("4.5"), "Great event!", testEvent);
+		UserType userType = new UserType();
+		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
+				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, userType);
+		EventType eventType = new EventType();
+		Location location = new Location();
+		Long creatorId = 1L;
+		Event testEvent = new Event(2L, eventType, location, creatorId, true, "Test Event", "Description",
+				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+		when(eventRepository.findById(2L)).thenReturn(Optional.of(testEvent));
+		Participant participantToSave = new Participant(null, testUser, testEvent, new BigDecimal("4.5"),
+				"Great event!");
 		when(participantRepository.save(any(Participant.class))).thenReturn(participantToSave);
 
 		Participant actual = participantService.createParticipant(participantToSave);
@@ -51,15 +72,17 @@ class ParticipantServiceTest {
 
 	@Test
 	void whenRetrievingAllParticipants_thenShouldReturnListOfParticipants() {
-		Event event = new Event(1L, true, "Event Title", "Description", new Timestamp(System.currentTimeMillis()),
-				new BigDecimal("4.5"));
+		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
+				"email@example.com", null, null, null, new UserType());
+		Event event = new Event(1L, new EventType(), new Location(), 1L, true, "Event Title", "Description",
+				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+
 		List<Participant> participants = Arrays.asList(
-				new Participant(1L, 1L, new BigDecimal("4.5"), "Great event!", event),
-				new Participant(2L, 1L, new BigDecimal("3.5"), "Good event", event));
+				new Participant(1L, testUser, event, new BigDecimal("4.5"), "Great event!"),
+				new Participant(2L, testUser, event, new BigDecimal("3.5"), "Good event"));
+
 		when(participantRepository.findAll()).thenReturn(participants);
-
 		List<Participant> actual = participantService.getAllParticipants();
-
 		assertNotNull(actual);
 		assertEquals(2, actual.size());
 	}
@@ -67,26 +90,31 @@ class ParticipantServiceTest {
 	@Test
 	void givenParticipantId_whenRetrievingParticipant_thenShouldReturnParticipant() {
 		Long participantId = 1L;
-		Event event = new Event(2L, true, "Test Event", "Description", new Timestamp(System.currentTimeMillis()),
-				new BigDecimal("4.5"));
-		Participant participantToFind = new Participant(participantId, 1L, new BigDecimal("4.5"), "Great event!",
-				event);
-		Optional<Participant> participant = Optional.of(participantToFind);
-		when(participantRepository.findById(participantId)).thenReturn(participant);
+		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
+				"email@example.com", null, null, null, new UserType());
+		Event testEvent = new Event(2L, new EventType(), new Location(), 1L, true, "Test Event", "Description",
+				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+
+		Participant participantToFind = new Participant(participantId, testUser, testEvent, new BigDecimal("4.5"),
+				"Great event!");
+		when(participantRepository.findById(participantId)).thenReturn(Optional.of(participantToFind));
 
 		Participant actual = participantService.getParticipantById(participantId);
 
 		assertNotNull(actual);
-		assertEquals(participantId, actual.getId());
+		assertEquals(participantToFind.getId(), actual.getId());
 	}
 
 	@Test
 	void givenParticipantDetails_whenUpdatingParticipant_thenShouldReturnUpdatedParticipant() {
 		Long participantId = 1L;
-		Event event = new Event(2L, true, "Updated Event", "Updated Description",
+		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
+				"email@example.com", null, null, null, new UserType());
+		Event event = new Event(2L, new EventType(), new Location(), 1L, true, "Updated Event", "Updated Description",
 				new Timestamp(System.currentTimeMillis()), new BigDecimal("5.0"));
-		Participant participantToUpdate = new Participant(participantId, 1L, new BigDecimal("5.0"), "Updated Comment",
-				event);
+
+		Participant participantToUpdate = new Participant(participantId, testUser, event, new BigDecimal("5.0"),
+				"Updated Comment");
 		when(participantRepository.existsById(participantId)).thenReturn(true);
 		when(participantRepository.save(any(Participant.class))).thenReturn(participantToUpdate);
 

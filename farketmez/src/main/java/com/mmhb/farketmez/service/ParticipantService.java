@@ -7,7 +7,10 @@ import org.springframework.stereotype.Service;
 
 import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.Participant;
+import com.mmhb.farketmez.model.User;
+import com.mmhb.farketmez.repository.EventRepository;
 import com.mmhb.farketmez.repository.ParticipantRepository;
+import com.mmhb.farketmez.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +20,13 @@ import lombok.RequiredArgsConstructor;
 public class ParticipantService {
 
 	private final ParticipantRepository participantRepository;
+	private final UserRepository userRepository;
+	private final EventRepository eventRepository;
 
 	@Transactional
 	public Participant createParticipant(Participant participant) {
-		if (participant.getUserId() == null || participant.getRating() == null || participant.getEvent() == null) {
-			throw new IllegalArgumentException("Missing required fields. User ID, Rating, and Event must be provided.");
+		if (participant.getUser() == null || participant.getRating() == null || participant.getEvent() == null) {
+			throw new IllegalArgumentException("Missing required fields. User, Rating, and Event must be provided.");
 		}
 		// FIXME: Puanlama için rating değeri 0 ile 5 aralığında olarak kabul edilmiştir
 		// ileride ihtiyaca göre değiştirilmelidir.
@@ -46,7 +51,7 @@ public class ParticipantService {
 			throw new IllegalArgumentException("Participant not found with id: " + participant.getId());
 		}
 
-		if (participant.getUserId() == null || participant.getRating() == null || participant.getEvent() == null) {
+		if (participant.getUser() == null || participant.getRating() == null || participant.getEvent() == null) {
 			throw new IllegalArgumentException("Missing required fields. User ID, Rating, and Event must be provided.");
 		}
 		// FIXME: Puanlama için rating değeri 0 ile 5 aralığında olarka kabul edilmiştir
@@ -65,6 +70,32 @@ public class ParticipantService {
 
 	public List<Event> getEventsByUser(Long userId) {
 		return participantRepository.findEventsByUserId(userId);
+	}
+
+	@Transactional
+	public void rateEvent(Long userId, Long eventId, BigDecimal rating, String comment) {
+		User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+		Event event = eventRepository.findById(eventId)
+				.orElseThrow(() -> new IllegalArgumentException("Event not found"));
+
+		Participant participant = new Participant();
+		participant.setUser(user);
+		participant.setEvent(event);
+		participant.setRating(rating);
+		participant.setComment(comment);
+
+		participantRepository.save(participant);
+	}
+
+	@Transactional
+	public void editEventRate(Long userId, Long eventId, BigDecimal rating, String comment) {
+		Participant participant = participantRepository.findByUserIdAndEventId(userId, eventId)
+				.orElseThrow(() -> new IllegalArgumentException("Rating not found"));
+
+		participant.setRating(rating);
+		participant.setComment(comment);
+
+		participantRepository.save(participant);
 	}
 
 }

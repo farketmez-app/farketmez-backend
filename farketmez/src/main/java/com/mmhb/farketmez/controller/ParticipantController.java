@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mmhb.farketmez.dto.RateRequest;
 import com.mmhb.farketmez.model.Participant;
 import com.mmhb.farketmez.service.ParticipantService;
 
@@ -66,4 +67,19 @@ public class ParticipantController {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
+
+	@PostMapping("/events/rate")
+	public ResponseEntity<?> rateEvent(@RequestBody RateRequest rateRequest) {
+		participantService.rateEvent(rateRequest.getUserId(), rateRequest.getEventId(), rateRequest.getRate(),
+				rateRequest.getComment());
+		return ResponseEntity.ok().build();
+	}
+
+	@PutMapping("/events/rate")
+	public ResponseEntity<?> editEventRate(@RequestBody RateRequest rateRequest) {
+		participantService.editEventRate(rateRequest.getUserId(), rateRequest.getEventId(), rateRequest.getRate(),
+				rateRequest.getComment());
+		return ResponseEntity.ok().build();
+	}
+
 }

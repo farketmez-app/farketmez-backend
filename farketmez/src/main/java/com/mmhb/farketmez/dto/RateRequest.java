@@ -9,10 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ParticipantDTO {
-	private Long id;
-	private UserDTO user;
-	private BigDecimal rating;
+public class RateRequest {
+	private Long userId;
+	private Long eventId;
+	private BigDecimal rate;
 	private String comment;
-	private EventDTO event;
 }

@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mmhb.farketmez.dto.EventDTO;
 import com.mmhb.farketmez.dto.UserDTO;
 import com.mmhb.farketmez.dto.UserLoginDto;
+import com.mmhb.farketmez.mapper.EventMapper;
 import com.mmhb.farketmez.mapper.UserMapper;
 import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.User;
@@ -93,8 +95,9 @@ public class UserController {
 	}
 
 	@GetMapping("/{userId}/events")
-	public ResponseEntity<List<Event>> getUserEvents(@PathVariable Long userId) {
+	public ResponseEntity<List<EventDTO>> getUserEvents(@PathVariable Long userId) {
 		List<Event> events = participantService.getEventsByUser(userId);
-		return ResponseEntity.ok(events);
+		List<EventDTO> eventDTOs = events.stream().map(EventMapper::toEventDto).collect(Collectors.toList());
+		return ResponseEntity.ok(eventDTOs);
 	}
 }
