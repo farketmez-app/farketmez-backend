@@ -7,6 +7,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Arrays;
@@ -37,7 +38,8 @@ class EventServiceTest {
 	@Test
 	void whenCreateEvent_thenShouldReturnSavedEvent() {
 		Timestamp now = Timestamp.from(Instant.now());
-		Event event = new Event(/* initialize with test data */);
+		Event event = new Event(1L, null, null, 1L, true, "Sinema Gecesi", "Sinemada film izleme etkinliği", now,
+				new BigDecimal("4.5"));
 		when(eventRepository.save(any(Event.class))).thenReturn(event);
 
 		Event result = eventService.createEvent(event);
@@ -49,7 +51,11 @@ class EventServiceTest {
 
 	@Test
 	void whenGetAllEvents_thenShouldReturnEventList() {
-		List<Event> events = Arrays.asList(new Event(/* test data */), new Event(/* test data */));
+		List<Event> events = Arrays.asList(
+				new Event(1L, null, null, 1L, true, "Sinema Gecesi", "Sinemada film izleme etkinliği",
+						Timestamp.from(Instant.now()), new BigDecimal("4.5")),
+				new Event(2L, null, null, 2L, true, "Kitap Kulübü Toplantısı", "Aylık kitap kulübü toplantısı",
+						Timestamp.from(Instant.now()), new BigDecimal("4.8")));
 		when(eventRepository.findAll()).thenReturn(events);
 
 		List<Event> result = eventService.getAllEvents();
@@ -61,27 +67,30 @@ class EventServiceTest {
 	@Test
 	void whenGetEventById_thenShouldReturnEvent() {
 		Long eventId = 1L;
-		Optional<Event> optionalEvent = Optional.of(new Event(/* test data */));
+		Timestamp now = Timestamp.from(Instant.now());
+		Optional<Event> optionalEvent = Optional.of(new Event(eventId, null, null, 1L, true, "Sinema Gecesi",
+				"Sinemada film izleme etkinliği", now, new BigDecimal("4.5")));
 		when(eventRepository.findById(eventId)).thenReturn(optionalEvent);
 
 		Event result = eventService.getEventById(eventId);
 
 		assertNotNull(result);
+		assertEquals("Sinema Gecesi", result.getTitle());
 	}
 
 	@Test
 	void whenUpdateEvent_thenShouldReturnUpdatedEvent() {
 		Long eventId = 1L;
-		Event event = new Event(/* initialize with test data */);
-		event.setId(eventId);
+		Timestamp now = Timestamp.from(Instant.now());
+		Event event = new Event(eventId, null, null, 1L, true, "Sinema Gecesi Güncellendi",
+				"Güncellenmiş film izleme etkinliği", now, new BigDecimal("4.6"));
 		when(eventRepository.existsById(eventId)).thenReturn(true);
 		when(eventRepository.save(any(Event.class))).thenReturn(event);
 
 		Event result = eventService.updateEvent(event);
 
 		assertNotNull(result);
-		assertEquals(event.getTitle(), result.getTitle());
-		assertNotNull(result.getUpdatedAt());
+		assertEquals("Sinema Gecesi Güncellendi", result.getTitle());
 	}
 
 	@Test

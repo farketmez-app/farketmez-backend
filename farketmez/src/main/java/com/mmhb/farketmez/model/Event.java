@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -53,12 +52,16 @@ public class Event {
 	private Timestamp deletedAt;
 
 	@ManyToOne
-	@JoinColumn(name = "event_type_id", nullable = false, foreignKey = @ForeignKey(name = "fk_event_event_type"))
-	private EventType eventType;
+	@JoinColumn(name = "user_id", nullable = false)
+	private User user;
 
 	@ManyToOne
-	@JoinColumn(name = "location_id", nullable = false, foreignKey = @ForeignKey(name = "fk_event_location"))
+	@JoinColumn(name = "location_id", nullable = false)
 	private Location location;
+
+	@ManyToOne
+	@JoinColumn(name = "event_type_id", nullable = false)
+	private EventType eventType;
 
 	public Event(Long id, EventType eventType, Location location, Long creatorId, Boolean isActive, String title,
 			String description, Timestamp date, BigDecimal averageRating) {
@@ -66,6 +69,16 @@ public class Event {
 		this.eventType = eventType;
 		this.location = location;
 		this.creatorId = creatorId;
+		this.isActive = isActive;
+		this.title = title;
+		this.description = description;
+		this.date = date;
+		this.averageRating = averageRating;
+	}
+
+	public Event(Long id, Boolean isActive, String title, String description, Timestamp date,
+			BigDecimal averageRating) {
+		this.id = id;
 		this.isActive = isActive;
 		this.title = title;
 		this.description = description;

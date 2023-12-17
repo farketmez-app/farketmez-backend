@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,18 +22,19 @@ public class Participant {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
-	private final Long id;
+	private Long id;
 
 	@Column(name = "user_id")
-	private final Long userId;
-
-	@Column(name = "event_id")
-	private final Long eventId;
+	private Long userId;
 
 	@Column(name = "rating")
-	private final BigDecimal rating;
+	private BigDecimal rating;
 
 	@Column(name = "comment")
-	private final String comment;
+	private String comment;
+
+	@ManyToOne
+	@JoinColumn(name = "event_id", nullable = false)
+	private Event event;
 
 }
