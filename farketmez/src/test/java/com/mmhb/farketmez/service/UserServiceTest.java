@@ -3,6 +3,7 @@ package com.mmhb.farketmez.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.model.UserType;
@@ -26,26 +28,33 @@ class UserServiceTest {
 	@Mock
 	private UserRepository userRepository;
 
+	@Mock
+	private PasswordEncoder passwordEncoder;
+
 	private UserService userService;
 
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		userService = new UserService(userRepository);
+		userService = new UserService(userRepository, passwordEncoder);
 	}
 
 	@Test
-	void whenCreatingUser_thenShouldReturnSavedUser() {
-		Timestamp now = new Timestamp(System.currentTimeMillis());
-		User userToSave = new User("testuser", "pass123", "Test", "User", 30, 1, "40.7128", "-74.0060", "test@mail.com",
-				now, null, null, new UserType());
-		when(userRepository.save(any(User.class))).thenReturn(userToSave);
+	void whenCreateUser_thenShouldReturnSavedUser() {
+		User userToSave = new User(null, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
+				"mail@example.com", null, null, null, null);
+		String encodedPassword = "encodedPassword";
+		User savedUser = new User(1L, "username", encodedPassword, "Name", "Surname", 25, 1, "longitude", "latitude",
+				"mail@example.com", null, null, null, null);
+
+		when(passwordEncoder.encode(userToSave.getPassword())).thenReturn(encodedPassword);
+		when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
 		User actual = userService.createUser(userToSave);
 
 		assertNotNull(actual);
-		assertEquals(userToSave.getUsername(), actual.getUsername());
-		assertEquals(userToSave.getMail(), actual.getMail());
+		assertEquals(savedUser.getId(), actual.getId());
+		assertEquals(encodedPassword, actual.getPassword());
 	}
 
 	@Test
@@ -80,18 +89,28 @@ class UserServiceTest {
 
 	@Test
 	void givenUserDetails_whenUpdatingUser_thenShouldReturnUpdatedUser() {
-		Timestamp now = new Timestamp(System.currentTimeMillis());
 		Long userId = 1L;
-		User userToUpdate = new User(userId, "updateduser", "pass123", "Updated", "User", 35, 1, "34.0522", "-118.2437",
-				"update@mail.com", null, now, null, new UserType());
+		User existingUser = new User(userId, "olduser", "oldpass", "OldName", "OldSurname", 30, 1, "40.7128",
+				"-74.0060", "old@mail.com", null, null, null, new UserType());
+		User userToUpdate = new User(userId, "updateduser", "newpass", "Updated", "User", 35, 1, "34.0522", "-118.2437",
+				"update@mail.com", null, null, null, new UserType());
+		String encodedPassword = "encodedPassword";
+
+		when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
+		when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> encodedPassword);
 		when(userRepository.existsById(userId)).thenReturn(true);
-		when(userRepository.save(any(User.class))).thenReturn(userToUpdate);
+
+		User updatedUser = new User(userId, "updateduser", encodedPassword, "Updated", "User", 35, 1, "34.0522",
+				"-118.2437", "update@mail.com", null, null, null, new UserType());
+		when(userRepository.save(any(User.class))).thenReturn(updatedUser);
 
 		User actual = userService.updateUser(userToUpdate);
 
 		assertNotNull(actual);
-		assertEquals(userToUpdate.getUsername(), actual.getUsername());
-		assertEquals(userToUpdate.getMail(), actual.getMail());
+		assertEquals(updatedUser.getUsername(), actual.getUsername());
+		assertEquals(updatedUser.getMail(), actual.getMail());
+		assertEquals(encodedPassword, actual.getPassword()); // Kontrol edilen şifre sabitlenmiş "encodedPassword" bu
+																// kısım sabit kalsın diye bu şekilde verilmiştir.
 	}
 
 	@Test
