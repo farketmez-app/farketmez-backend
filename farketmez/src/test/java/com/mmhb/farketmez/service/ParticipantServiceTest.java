@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.Participant;
 import com.mmhb.farketmez.repository.ParticipantRepository;
 
@@ -92,5 +94,25 @@ class ParticipantServiceTest {
 		doNothing().when(participantRepository).deleteById(participantId);
 		participantService.deleteParticipant(participantId);
 		verify(participantRepository).deleteById(participantId);
+	}
+
+	@Test
+	void whenGetEventsByUser_thenShouldReturnListOfEvents() {
+		Long userId = 1L;
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+
+		Event event1 = new Event(1L, null, null, userId, true, "Sinemaya Gitmek", "Film izlemek için sinemaya gitmek.",
+				now, new BigDecimal("4.2"));
+		Event event2 = new Event(2L, null, null, userId, true, "Kitap Okuma Kulübü", "Kitap okuma etkinliği.", now,
+				new BigDecimal("4.8"));
+
+		List<Event> expectedEvents = Arrays.asList(event1, event2);
+
+		when(participantRepository.findEventsByUserId(userId)).thenReturn(expectedEvents);
+
+		List<Event> actualEvents = participantService.getEventsByUser(userId);
+
+		assertEquals(expectedEvents.size(), actualEvents.size());
+		assertEquals(expectedEvents, actualEvents);
 	}
 }
