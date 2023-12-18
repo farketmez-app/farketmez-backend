@@ -37,6 +37,14 @@ public class EventService {
 		return eventRepository.findById(id).orElse(null);
 	}
 
+	public List<Event> getEventsByCreatorId(Long id) {
+		return eventRepository.findEventsByCreatorId(id);
+	}
+
+	public List<Event> getPublicEvents(){
+		return eventRepository.findEventsByIsActiveFalse();
+	}
+
 	@Transactional
 	public Event updateEvent(Event event) {
 		if (event.getId() == null || !eventRepository.existsById(event.getId())) {

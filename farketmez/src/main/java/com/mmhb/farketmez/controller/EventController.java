@@ -54,6 +54,17 @@ public class EventController {
 		}
 	}
 
+	@GetMapping("/public")
+	public ResponseEntity<List<EventDTO>> getPublicEvents(){
+		List<Event> events = eventService.getPublicEvents();
+		if(!events.isEmpty()){
+			List<EventDTO> eventDTOS = events.stream().map(EventMapper::toEventDto).toList();
+			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
+		}
+
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+
 	@PutMapping
 	public ResponseEntity<EventDTO> updateEvent(@RequestBody EventDTO eventDto) {
 		Event event = EventMapper.fromEventDto(eventDto);

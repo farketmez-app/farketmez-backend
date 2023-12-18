@@ -3,6 +3,8 @@ package com.mmhb.farketmez.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.mmhb.farketmez.service.EventService;
+import com.mmhb.farketmez.util.HarvesineDistanceUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -36,6 +38,7 @@ public class UserController {
 	private final AuthenticationService authenticationService;
 	private final JwtUtil jwtUtil;
 	private final ParticipantService participantService;
+	private final EventService eventService;
 
 	@GetMapping
 	public ResponseEntity<List<UserDTO>> getAllUsers() {
@@ -94,10 +97,63 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 
+	@GetMapping("/{userId}/all")
+	public ResponseEntity<List<EventDTO>> getAllEventsById(@PathVariable Long userId){
+		List<Event> events = eventService.getEventsByCreatorId(userId);
+		if(!events.isEmpty()){
+			List<EventDTO> eventDTOS = eventService.getAllEvents().stream().map(EventMapper::toEventDto).toList();
+			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+
 	@GetMapping("/{userId}/events")
 	public ResponseEntity<List<EventDTO>> getUserEvents(@PathVariable Long userId) {
 		List<Event> events = participantService.getEventsByUser(userId);
 		List<EventDTO> eventDTOs = events.stream().map(EventMapper::toEventDto).collect(Collectors.toList());
 		return ResponseEntity.ok(eventDTOs);
+	}
+
+	@GetMapping("/{userId}/nearme")
+	public ResponseEntity<List<EventDTO>> getNearEvents(@PathVariable Long userId){
+		List<Event> events = eventService.getPublicEvents();
+		User user = userService.getUserById(userId);
+
+		if (user != null && user.getLatitude() != null && user.getLongitude() != null) {
+			Double latitude = Double.parseDouble(user.getLatitude());
+			Double longitude = Double.parseDouble(user.getLongitude());
+
+			HarvesineDistanceUtil.BoundingBox boundingBox = HarvesineDistanceUtil.calculateBoundingBox(latitude, longitude, 0.5);
+
+			if (!events.isEmpty()) {
+				List<EventDTO> eventDTOS = events.stream()
+						.filter(c -> c.getIsActive())
+						.filter(c -> c.getLocation() != null && c.getLocation().getLatitude() != null &&
+								c.getLocation().getLongitude() != null)
+						.filter(c -> {
+							try {
+								double eventLatitude = Double.parseDouble(c.getLocation().getLatitude());
+								double eventLongitude = Double.parseDouble(c.getLocation().getLongitude());
+
+								return eventLatitude > boundingBox.getMinLatitude() &&
+										eventLatitude < boundingBox.getMaxLatitude() &&
+										eventLongitude > boundingBox.getMinLongitude() &&
+										eventLongitude < boundingBox.getMaxLongitude();
+							} catch (NumberFormatException e) {
+								return false;
+							}
+						})
+						.map(EventMapper::toEventDto)
+						.toList();
+
+				if(!eventDTOS.isEmpty()){
+					return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
+				}
+
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		}
+
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 }

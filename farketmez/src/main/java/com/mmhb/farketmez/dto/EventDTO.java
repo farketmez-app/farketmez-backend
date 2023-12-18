@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class EventDTO {
 	private Long id;
 	private Boolean isActive;
+	private Boolean isPrivate;
 	private String title;
 	private String description;
 	private BigDecimal averageRating;

@@ -30,6 +30,9 @@ public class Event {
 	@Column(name = "is_active", length = 1)
 	private Boolean isActive;
 
+	@Column(name = "is_private", length = 1)
+	private Boolean isPrivate;
+
 	@Column(length = 50)
 	private String title;
 
@@ -63,13 +66,14 @@ public class Event {
 	@JoinColumn(name = "event_type_id", nullable = false)
 	private EventType eventType;
 
-	public Event(Long id, EventType eventType, Location location, Long creatorId, Boolean isActive, String title,
+	public Event(Long id, EventType eventType, Location location, Long creatorId, Boolean isActive, Boolean isPrivate, String title,
 			String description, Timestamp date, BigDecimal averageRating) {
 		this.id = id;
 		this.eventType = eventType;
 		this.location = location;
 		this.creatorId = creatorId;
 		this.isActive = isActive;
+		this.isPrivate = isPrivate;
 		this.title = title;
 		this.description = description;
 		this.date = date;
