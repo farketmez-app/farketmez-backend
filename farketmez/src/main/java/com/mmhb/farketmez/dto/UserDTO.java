@@ -16,14 +16,15 @@ public class UserDTO {
 	private String username;
 	private String password;
 	private String name;
-	private String surname;
+	private String lastname;
 	private Integer age;
-	private Integer gender;
-	private String longitude;
-	private String latitude;
+	private String gender;
+	private Double longitude;
+	private Double latitude;
 	private String mail;
-	private UserType userType;
 	private Timestamp createdAt;
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
+
+	private UserType userType;
 }

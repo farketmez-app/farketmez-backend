@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mmhb.farketmez.dto.EventDTO;
 import com.mmhb.farketmez.dto.UserDTO;
-import com.mmhb.farketmez.dto.UserLoginDto;
+import com.mmhb.farketmez.dto.UserLoginDTO;
 import com.mmhb.farketmez.mapper.EventMapper;
 import com.mmhb.farketmez.mapper.UserMapper;
 import com.mmhb.farketmez.model.Event;
@@ -87,7 +87,7 @@ public class UserController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody UserLoginDto userLoginDto) {
+	public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDto) {
 		User authenticatedUser = authenticationService.authenticateUser(userLoginDto.getMail(),
 				userLoginDto.getPassword());
 		if (authenticatedUser != null) {
@@ -120,8 +120,8 @@ public class UserController {
 		User user = userService.getUserById(userId);
 
 		if (user != null && user.getLatitude() != null && user.getLongitude() != null) {
-			Double latitude = Double.parseDouble(user.getLatitude());
-			Double longitude = Double.parseDouble(user.getLongitude());
+			Double latitude = user.getLatitude();
+			Double longitude = user.getLongitude();
 
 			HarvesineDistanceUtil.BoundingBox boundingBox = HarvesineDistanceUtil.calculateBoundingBox(latitude, longitude, 0.5);
 
@@ -132,8 +132,8 @@ public class UserController {
 								c.getLocation().getLongitude() != null)
 						.filter(c -> {
 							try {
-								double eventLatitude = Double.parseDouble(c.getLocation().getLatitude());
-								double eventLongitude = Double.parseDouble(c.getLocation().getLongitude());
+								double eventLatitude = c.getLocation().getLatitude();
+								double eventLongitude = c.getLocation().getLongitude();
 
 								return eventLatitude > boundingBox.getMinLatitude() &&
 										eventLatitude < boundingBox.getMaxLatitude() &&

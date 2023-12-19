@@ -1,17 +1,14 @@
 package com.mmhb.farketmez.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Table(name = "user_interests")
 @Entity
+@NoArgsConstructor
 @AllArgsConstructor
 public class UserInterest {
 
@@ -20,10 +17,12 @@ public class UserInterest {
 	@Column(name = "id")
 	private Long id;
 
-	@Column(name = "user_id")
-	private Long userId;
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 
-	@Column(name = "interest_id")
-	private Long interestId;
+	@ManyToOne
+	@JoinColumn(name = "interest_id")
+	private Interest interest;
 
 }

@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class EventTypeDTO {
 	private Long id;
-	private Integer type;
+	private String type;
 }

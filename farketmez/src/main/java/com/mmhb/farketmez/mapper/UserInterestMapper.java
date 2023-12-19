@@ -9,10 +9,10 @@ public class UserInterestMapper {
 	}
 
 	public static UserInterestDTO toUserInterestDto(UserInterest userInterest) {
-		return new UserInterestDTO(userInterest.getId(), userInterest.getUserId(), userInterest.getInterestId());
+		return new UserInterestDTO(userInterest.getId(), userInterest.getUser(), userInterest.getInterest());
 	}
 
 	public static UserInterest fromUserInterestDto(UserInterestDTO userInterestDto) {
-		return new UserInterest(userInterestDto.getId(), userInterestDto.getUserId(), userInterestDto.getInterestId());
+		return new UserInterest(userInterestDto.getId(), userInterestDto.getUser(), userInterestDto.getInterest());
 	}
 }

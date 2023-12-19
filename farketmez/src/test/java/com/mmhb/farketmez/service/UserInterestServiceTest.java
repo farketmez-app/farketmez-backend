@@ -48,8 +48,8 @@ class UserInterestServiceTest {
 		UserInterest actual = userInterestService.createUserInterest(userInterestToSave);
 
 		assertNotNull(actual);
-		assertEquals(userInterestToSave.getUserId(), actual.getUserId());
-		assertEquals(userInterestToSave.getInterestId(), actual.getInterestId());
+		assertEquals(userInterestToSave.getUser(), actual.getUser());
+		assertEquals(userInterestToSave.getInterest(), actual.getInterest());
 	}
 
 	@Test
@@ -89,16 +89,16 @@ class UserInterestServiceTest {
 		UserInterest actual = userInterestService.updateUserInterest(userInterestToUpdate);
 
 		assertNotNull(actual);
-		assertEquals(userInterestToUpdate.getInterestId(), actual.getInterestId());
+		assertEquals(userInterestToUpdate.getInterest(), actual.getInterest());
 	}
 
 	@Test
 	void findInterestsByUserId_WhenUserExistsAndHasInterests_ShouldReturnInterests() {
-		Long userId = 1L;
+		Long userId = 1L; // FIXME: Burası user olarak @MS
 		Interest interest1 = new Interest(1L, "Interest 1");
 		Interest interest2 = new Interest(2L, "Interest 2");
-		UserInterest userInterest1 = new UserInterest(1L, userId, 1L);
-		UserInterest userInterest2 = new UserInterest(2L, userId, 2L);
+		UserInterest userInterest1 = new UserInterest(1L, userId, interest1);
+		UserInterest userInterest2 = new UserInterest(2L, userId, interest2);
 
 		when(userRepository.existsById(userId)).thenReturn(true);
 		when(userInterestRepository.findByUserId(userId)).thenReturn(Arrays.asList(userInterest1, userInterest2));

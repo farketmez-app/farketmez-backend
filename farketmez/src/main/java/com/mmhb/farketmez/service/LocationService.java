@@ -18,8 +18,7 @@ public class LocationService {
 
 	@Transactional
 	public Location createLocation(Location location) {
-		if (location.getLongitude() == null || location.getLongitude().isEmpty() || location.getLatitude() == null
-				|| location.getLatitude().isEmpty()) {
+		if (location.getLongitude() == null || location.getLatitude() == null) {
 			throw new IllegalArgumentException(
 					"Missing or incorrect location information. Please fill in longitude and latitude.");
 		}
@@ -39,8 +38,7 @@ public class LocationService {
 		if (location.getId() == null || !locationRepository.existsById(location.getId())) {
 			throw new IllegalArgumentException("Location not found with id: " + location.getId());
 		}
-		if (location.getLongitude() == null || location.getLongitude().isEmpty() || location.getLatitude() == null
-				|| location.getLatitude().isEmpty()) {
+		if (location.getLongitude() == null || location.getLatitude() == null) {
 			throw new IllegalArgumentException(
 					"Missing or incorrect location information. Please fill in longitude and latitude.");
 		}

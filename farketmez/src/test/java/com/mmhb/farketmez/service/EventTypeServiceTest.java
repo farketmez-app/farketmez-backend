@@ -35,7 +35,7 @@ class EventTypeServiceTest {
 
 	@Test
 	void whenCreatingEventType_thenShouldReturnSavedEventType() {
-		EventType eventTypeToSave = new EventType(null, 1);
+		EventType eventTypeToSave = new EventType(null, "1");
 		when(eventTypeRepository.save(any(EventType.class))).thenReturn(eventTypeToSave);
 
 		EventType actual = eventTypeService.createEventType(eventTypeToSave);
@@ -46,7 +46,7 @@ class EventTypeServiceTest {
 
 	@Test
 	void whenRetrievingAllEventTypes_thenShouldReturnListOfEventTypes() {
-		List<EventType> eventTypes = Arrays.asList(new EventType(1L, 1), new EventType(2L, 2));
+		List<EventType> eventTypes = Arrays.asList(new EventType(1L, "1"), new EventType(2L, "2"));
 		when(eventTypeRepository.findAll()).thenReturn(eventTypes);
 
 		List<EventType> actual = eventTypeService.getAllEventTypes();
@@ -58,7 +58,7 @@ class EventTypeServiceTest {
 	@Test
 	void givenEventTypeId_whenRetrievingEventType_thenShouldReturnEventType() {
 		Long eventTypeId = 1L;
-		EventType eventType = new EventType(eventTypeId, 1);
+		EventType eventType = new EventType(eventTypeId, "1");
 		when(eventTypeRepository.findById(eventTypeId)).thenReturn(Optional.of(eventType));
 
 		Optional<EventType> actual = eventTypeService.getEventTypeById(eventTypeId);
@@ -70,7 +70,7 @@ class EventTypeServiceTest {
 
 	@Test
 	void givenEventTypeDetails_whenUpdatingEventType_thenShouldReturnUpdatedEventType() {
-		EventType eventTypeToUpdate = new EventType(1L, 2);
+		EventType eventTypeToUpdate = new EventType(1L, "2");
 		when(eventTypeRepository.findById(eventTypeToUpdate.getId())).thenReturn(Optional.of(eventTypeToUpdate));
 		when(eventTypeRepository.save(any(EventType.class))).thenReturn(eventTypeToUpdate);
 

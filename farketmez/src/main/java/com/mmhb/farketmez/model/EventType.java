@@ -17,9 +17,9 @@ public class EventType {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private Integer type;
+	private String type;
 
-	public EventType(Long id, Integer type) {
+	public EventType(Long id, String type) {
 		this.id = id;
 		this.type = type;
 	}
