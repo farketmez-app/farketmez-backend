@@ -3,7 +3,6 @@ package com.mmhb.farketmez.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,11 +40,12 @@ class UserServiceTest {
 
 	@Test
 	void whenCreateUser_thenShouldReturnSavedUser() {
-		User userToSave = new User(null, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
-				"mail@example.com", null, null, null, null);
+		UserType userType = new UserType();
+		User userToSave = new User("username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
+				"mail@example.com", null, null, null, userType);
 		String encodedPassword = "encodedPassword";
-		User savedUser = new User(1L, "username", encodedPassword, "Name", "Surname", 25, 1, "longitude", "latitude",
-				"mail@example.com", null, null, null, null);
+		User savedUser = new User(1L, "username", encodedPassword, "Name", "Surname", 25, "gender", 0.0, 0.0,
+				"mail@example.com", null, null, null, userType);
 
 		when(passwordEncoder.encode(userToSave.getPassword())).thenReturn(encodedPassword);
 		when(userRepository.save(any(User.class))).thenReturn(savedUser);
@@ -60,11 +60,12 @@ class UserServiceTest {
 	@Test
 	void whenRetrievingAllUsers_thenShouldReturnListOfUsers() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
+		UserType userType = new UserType();
 		List<User> users = Arrays.asList(
-				new User(1L, "testuser1", "pass123", "Test1", "User1", 30, 1, "40.7128", "-74.0060", "test1@mail.com",
-						now, null, null, new UserType()),
-				new User(2L, "testuser2", "pass456", "Test2", "User2", 25, 2, "34.0522", "-118.2437", "test2@mail.com",
-						now, null, null, new UserType()));
+				new User("username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0, "mail@example.com", null,
+						null, null, userType),
+				new User("username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0, "mail@example.com", null,
+						null, null, userType));
 		when(userRepository.findAll()).thenReturn(users);
 
 		List<User> actual = userService.getAllUsers();
@@ -77,8 +78,9 @@ class UserServiceTest {
 	void givenUserId_whenRetrievingUser_thenShouldReturnUser() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		Long userId = 1L;
-		User user = new User(userId, "testuser", "pass123", "Test", "User", 30, 1, "40.7128", "-74.0060",
-				"test@mail.com", now, null, null, new UserType());
+		UserType userType = new UserType();
+		User user = new User("username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0, "mail@example.com",
+				null, null, null, userType);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
 		User actual = userService.getUserById(userId);
@@ -90,25 +92,23 @@ class UserServiceTest {
 	@Test
 	void givenUserDetails_whenUpdatingUser_thenShouldReturnUpdatedUser() {
 		Long userId = 1L;
-		User existingUser = new User(userId, "olduser", "oldpass", "OldName", "OldSurname", 30, 1, "40.7128",
-				"-74.0060", "old@mail.com", null, null, null, new UserType());
-		User userToUpdate = new User(userId, "updateduser", "newpass", "Updated", "User", 35, 1, "34.0522", "-118.2437",
-				"update@mail.com", null, null, null, new UserType());
+		UserType userType = new UserType();
+		User existingUser = new User(userId, "olduser", "oldpass", "OldName", "OldSurname", 30, "gender", 40.7128,
+				-74.0060, "old@mail.com", null, null, null, userType);
+		User userToUpdate = new User(userId, "updateduser", "newpass", "Updated", "User", 35, "gender", 34.0522,
+				-118.2437, "update@mail.com", null, null, null, userType);
 		String encodedPassword = "encodedPassword";
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
-		when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> encodedPassword);
-		when(userRepository.existsById(userId)).thenReturn(true);
-
-		User updatedUser = new User(userId, "updateduser", encodedPassword, "Updated", "User", 35, 1, "34.0522",
-				"-118.2437", "update@mail.com", null, null, null, new UserType());
-		when(userRepository.save(any(User.class))).thenReturn(updatedUser);
+		when(passwordEncoder.encode(userToUpdate.getPassword())).thenReturn(encodedPassword);
+		when(userRepository.save(any(User.class))).thenReturn(userToUpdate);
 
 		User actual = userService.updateUser(userToUpdate);
 
 		assertNotNull(actual);
-		assertEquals(updatedUser.getUsername(), actual.getUsername());
-		assertEquals(updatedUser.getMail(), actual.getMail());
+		assertEquals(userToUpdate.getUsername(), actual.getUsername());
+		assertEquals(userToUpdate.getMail(), actual.getMail());
+		assertEquals(encodedPassword, actual.getPassword());
 		assertEquals(encodedPassword, actual.getPassword()); // Kontrol edilen şifre sabitlenmiş "encodedPassword" bu
 																// kısım sabit kalsın diye bu şekilde verilmiştir.
 	}

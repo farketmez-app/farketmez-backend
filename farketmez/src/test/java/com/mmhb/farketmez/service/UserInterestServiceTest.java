@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.mmhb.farketmez.model.Interest;
+import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.model.UserInterest;
 import com.mmhb.farketmez.repository.InterestRepository;
 import com.mmhb.farketmez.repository.UserInterestRepository;
@@ -37,12 +38,17 @@ class UserInterestServiceTest {
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		userInterestService = new UserInterestService(userInterestRepository, userRepository, interestRepository);
+		userInterestService = new UserInterestService(userInterestRepository, userRepository);
 	}
 
 	@Test
 	void whenCreatingUserInterest_thenShouldReturnSavedUserInterest() {
-		UserInterest userInterestToSave = new UserInterest(null, 1L, 2L);
+		User user = new User();
+		user.setId(1L);
+		Interest interest = new Interest();
+		interest.setId(2L);
+
+		UserInterest userInterestToSave = new UserInterest(null, user, interest);
 		when(userInterestRepository.save(any(UserInterest.class))).thenReturn(userInterestToSave);
 
 		UserInterest actual = userInterestService.createUserInterest(userInterestToSave);
@@ -54,7 +60,17 @@ class UserInterestServiceTest {
 
 	@Test
 	void whenRetrievingAllUserInterests_thenShouldReturnListOfUserInterests() {
-		List<UserInterest> userInterests = Arrays.asList(new UserInterest(1L, 1L, 2L), new UserInterest(2L, 2L, 3L));
+		User user1 = new User();
+		user1.setId(1L);
+		User user2 = new User();
+		user2.setId(2L);
+		Interest interest2 = new Interest();
+		interest2.setId(2L);
+		Interest interest3 = new Interest();
+		interest3.setId(3L);
+
+		List<UserInterest> userInterests = Arrays.asList(new UserInterest(1L, user1, interest2),
+				new UserInterest(2L, user2, interest3));
 		when(userInterestRepository.findAll()).thenReturn(userInterests);
 
 		List<UserInterest> actual = userInterestService.findAll();
@@ -66,7 +82,12 @@ class UserInterestServiceTest {
 	@Test
 	void givenUserInterestId_whenRetrievingUserInterest_thenShouldReturnUserInterest() {
 		Long userInterestId = 1L;
-		UserInterest userInterest = new UserInterest(userInterestId, 1L, 2L);
+		User user = new User();
+		user.setId(1L);
+		Interest interest = new Interest();
+		interest.setId(2L);
+
+		UserInterest userInterest = new UserInterest(userInterestId, user, interest);
 		when(userInterestRepository.findById(userInterestId)).thenReturn(Optional.of(userInterest));
 
 		UserInterest actual = userInterestService.findById(userInterestId);
@@ -78,12 +99,18 @@ class UserInterestServiceTest {
 	@Test
 	void givenUserInterestDetails_whenUpdatingUserInterest_thenShouldReturnUpdatedUserInterest() {
 		Long userInterestId = 1L;
-		UserInterest userInterestToUpdate = new UserInterest(userInterestId, 1L, 3L);
+		User user = new User();
+		user.setId(1L);
+		Interest interest2 = new Interest();
+		interest2.setId(2L);
+		Interest interest3 = new Interest();
+		interest3.setId(3L);
+
+		UserInterest userInterestToUpdate = new UserInterest(userInterestId, user, interest3);
 
 		when(userInterestRepository.findById(userInterestId))
-				.thenReturn(Optional.of(new UserInterest(userInterestId, 1L, 2L)));
+				.thenReturn(Optional.of(new UserInterest(userInterestId, user, interest2)));
 
-		when(userInterestRepository.existsById(userInterestId)).thenReturn(true);
 		when(userInterestRepository.save(any(UserInterest.class))).thenReturn(userInterestToUpdate);
 
 		UserInterest actual = userInterestService.updateUserInterest(userInterestToUpdate);
@@ -94,11 +121,13 @@ class UserInterestServiceTest {
 
 	@Test
 	void findInterestsByUserId_WhenUserExistsAndHasInterests_ShouldReturnInterests() {
-		Long userId = 1L; // FIXME: Burası user olarak @MS
+		Long userId = 1L;
+		User user = new User();
+		user.setId(userId);
 		Interest interest1 = new Interest(1L, "Interest 1");
 		Interest interest2 = new Interest(2L, "Interest 2");
-		UserInterest userInterest1 = new UserInterest(1L, userId, interest1);
-		UserInterest userInterest2 = new UserInterest(2L, userId, interest2);
+		UserInterest userInterest1 = new UserInterest(1L, user, interest1);
+		UserInterest userInterest2 = new UserInterest(2L, user, interest2);
 
 		when(userRepository.existsById(userId)).thenReturn(true);
 		when(userInterestRepository.findByUserId(userId)).thenReturn(Arrays.asList(userInterest1, userInterest2));

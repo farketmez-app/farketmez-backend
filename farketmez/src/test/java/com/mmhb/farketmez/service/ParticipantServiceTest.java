@@ -50,12 +50,12 @@ class ParticipantServiceTest {
 	@Test
 	void whenCreatingParticipant_thenShouldReturnSavedParticipant() {
 		UserType userType = new UserType();
-		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
-				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, userType);
+		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
+				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 		EventType eventType = new EventType();
 		Location location = new Location();
 		Long creatorId = 1L;
-		Event testEvent = new Event(2L, eventType, location, creatorId, true, "Test Event", "Description",
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Description",
 				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 		when(eventRepository.findById(2L)).thenReturn(Optional.of(testEvent));
@@ -72,14 +72,16 @@ class ParticipantServiceTest {
 
 	@Test
 	void whenRetrievingAllParticipants_thenShouldReturnListOfParticipants() {
-		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
-				"email@example.com", null, null, null, new UserType());
-		Event event = new Event(1L, new EventType(), new Location(), 1L, true, "Event Title", "Description",
+		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
+				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
+		EventType eventType = new EventType();
+		Location location = new Location();
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Description",
 				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 
 		List<Participant> participants = Arrays.asList(
-				new Participant(1L, testUser, event, new BigDecimal("4.5"), "Great event!"),
-				new Participant(2L, testUser, event, new BigDecimal("3.5"), "Good event"));
+				new Participant(1L, testUser, testEvent, new BigDecimal("4.5"), "Great event!"),
+				new Participant(2L, testUser, testEvent, new BigDecimal("3.5"), "Good event"));
 
 		when(participantRepository.findAll()).thenReturn(participants);
 		List<Participant> actual = participantService.getAllParticipants();
@@ -90,9 +92,11 @@ class ParticipantServiceTest {
 	@Test
 	void givenParticipantId_whenRetrievingParticipant_thenShouldReturnParticipant() {
 		Long participantId = 1L;
-		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
-				"email@example.com", null, null, null, new UserType());
-		Event testEvent = new Event(2L, new EventType(), new Location(), 1L, true, "Test Event", "Description",
+		EventType eventType = new EventType();
+		Location location = new Location();
+		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
+				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Description",
 				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 
 		Participant participantToFind = new Participant(participantId, testUser, testEvent, new BigDecimal("4.5"),
@@ -108,12 +112,14 @@ class ParticipantServiceTest {
 	@Test
 	void givenParticipantDetails_whenUpdatingParticipant_thenShouldReturnUpdatedParticipant() {
 		Long participantId = 1L;
-		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
-				"email@example.com", null, null, null, new UserType());
-		Event event = new Event(2L, new EventType(), new Location(), 1L, true, "Updated Event", "Updated Description",
-				new Timestamp(System.currentTimeMillis()), new BigDecimal("5.0"));
+		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
+				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
+		EventType eventType = new EventType();
+		Location location = new Location();
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Description",
+				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 
-		Participant participantToUpdate = new Participant(participantId, testUser, event, new BigDecimal("5.0"),
+		Participant participantToUpdate = new Participant(participantId, testUser, testEvent, new BigDecimal("5.0"),
 				"Updated Comment");
 		when(participantRepository.existsById(participantId)).thenReturn(true);
 		when(participantRepository.save(any(Participant.class))).thenReturn(participantToUpdate);
@@ -153,23 +159,23 @@ class ParticipantServiceTest {
 	@Test
 	void whenRatingEvent_thenShouldSaveParticipantWithRating() {
 		UserType userType = new UserType();
-		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, 1, "longitude", "latitude",
-				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, userType);
+		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
+				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 
 		EventType eventType = new EventType();
 		Location location = new Location();
-		Event pastEvent = new Event(2L, eventType, location, 1L, true, "Past Event", "Description",
-				new Timestamp(System.currentTimeMillis() - 100000), new BigDecimal("4.5"));
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Description",
+				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 
 		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-		when(eventRepository.findById(2L)).thenReturn(Optional.of(pastEvent));
+		when(eventRepository.findById(2L)).thenReturn(Optional.of(testEvent));
 
 		BigDecimal rating = new BigDecimal("4.5");
 		String comment = "Great event!";
 
 		participantService.rateEvent(1L, 2L, rating, comment);
 
-		Participant expectedParticipant = new Participant(null, testUser, pastEvent, rating, comment);
+		Participant expectedParticipant = new Participant(null, testUser, testEvent, rating, comment);
 		verify(participantRepository).save(expectedParticipant);
 	}
 }

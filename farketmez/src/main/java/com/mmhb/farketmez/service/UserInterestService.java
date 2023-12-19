@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.mmhb.farketmez.model.Interest;
 import com.mmhb.farketmez.model.UserInterest;
-import com.mmhb.farketmez.repository.InterestRepository;
 import com.mmhb.farketmez.repository.UserInterestRepository;
 import com.mmhb.farketmez.repository.UserRepository;
 
@@ -20,10 +19,9 @@ public class UserInterestService {
 
 	private final UserInterestRepository userInterestRepository;
 	private final UserRepository userRepository;
-	private final InterestRepository interestRepository;
 
 	public UserInterest createUserInterest(UserInterest userInterest) {
-		if (userInterest.getUser()== null || userInterest.getInterest() == null) {
+		if (userInterest.getUser() == null || userInterest.getInterest() == null) {
 			throw new IllegalArgumentException("Both User ID and Interest ID must be provided.");
 		}
 		return userInterestRepository.save(userInterest);
