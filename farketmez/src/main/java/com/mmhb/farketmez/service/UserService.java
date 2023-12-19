@@ -22,9 +22,9 @@ public class UserService {
 	public User createUser(User user) {
 		if (user.getUsername() == null || user.getUsername().isEmpty() || user.getPassword() == null
 				|| user.getPassword().isEmpty() || user.getName() == null || user.getName().isEmpty()
-				|| user.getSurname() == null || user.getSurname().isEmpty() || user.getAge() == null
-				|| user.getGender() == null || user.getLongitude() == null || user.getLongitude().isEmpty()
-				|| user.getLatitude() == null || user.getLatitude().isEmpty() || user.getMail() == null
+				|| user.getLastname() == null || user.getLastname().isEmpty() || user.getAge() == null
+				|| user.getGender() == null || user.getLongitude() == null
+				|| user.getLatitude() == null || user.getMail() == null
 				|| user.getMail().isEmpty()) {
 			throw new IllegalArgumentException("Missing or incorrect user information. Please fill in all fields.");
 		}
@@ -51,7 +51,7 @@ public class UserService {
 
 		existingUser.setUsername(user.getUsername());
 		existingUser.setName(user.getName());
-		existingUser.setSurname(user.getSurname());
+		existingUser.setLastname(user.getLastname());
 		existingUser.setAge(user.getAge());
 		existingUser.setGender(user.getGender());
 		existingUser.setLongitude(user.getLongitude());

@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class EventDTO {
 	private Long id;
+	private Long creatorId;
 	private Boolean isActive;
 	private Boolean isPrivate;
 	private String title;
@@ -22,10 +23,9 @@ public class EventDTO {
 	private BigDecimal averageRating;
 	private Timestamp date;
 	private Timestamp createdAt;
-	private Timestamp deletedAt;
 	private Timestamp updatedAt;
+	private Timestamp deletedAt;
 
 	private EventType eventType;
 	private Location location;
-	private Long creatorId;
 }

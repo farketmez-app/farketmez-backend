@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class RateRequest {
+public class RateRequestDTO {
 	private Long userId;
 	private Long eventId;
 	private BigDecimal rate;

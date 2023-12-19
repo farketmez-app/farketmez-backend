@@ -13,6 +13,6 @@ import com.mmhb.farketmez.model.UserInterest;
 public interface UserInterestRepository extends JpaRepository<UserInterest, Long> {
 	List<UserInterest> findByUserId(Long userId);
 
-	@Query("SELECT i FROM Interest i JOIN UserInterest ui ON i.id = ui.interestId WHERE ui.userId = :userId")
+	@Query("SELECT i FROM Interest i JOIN UserInterest ui ON i = ui.interest WHERE ui.user.id = :userId")
 	List<Interest> findInterestsByUserId(Long userId);
 }

@@ -1,5 +1,7 @@
 package com.mmhb.farketmez.dto;
 
+import com.mmhb.farketmez.model.Interest;
+import com.mmhb.farketmez.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class UserInterestDTO {
 	private Long id;
-	private Long userId;
-	private Long interestId;
+
+	private User user;
+	private Interest interest;
 }

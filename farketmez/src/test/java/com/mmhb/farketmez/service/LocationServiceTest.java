@@ -34,7 +34,7 @@ class LocationServiceTest {
 
 	@Test
 	void whenCreatingLocation_thenShouldReturnSavedLocation() {
-		Location locationToSave = new Location(null, "40.7128", "-74.0060");
+		Location locationToSave = new Location(null, 40.7128, -74.0060);
 		when(locationRepository.save(any(Location.class))).thenReturn(locationToSave);
 
 		Location actual = locationService.createLocation(locationToSave);
@@ -46,8 +46,8 @@ class LocationServiceTest {
 
 	@Test
 	void whenRetrievingAllLocations_thenShouldReturnListOfLocations() {
-		List<Location> locations = Arrays.asList(new Location(1L, "40.7128", "-74.0060"),
-				new Location(2L, "34.0522", "-118.2437"));
+		List<Location> locations = Arrays.asList(new Location(1L, 40.7128, -74.0060),
+				new Location(2L, 34.0522, -118.2437));
 		when(locationRepository.findAll()).thenReturn(locations);
 
 		List<Location> actual = locationService.getAllLocations();
@@ -59,7 +59,7 @@ class LocationServiceTest {
 	@Test
 	void givenLocationId_whenRetrievingLocation_thenShouldReturnLocation() {
 		Long locationId = 1L;
-		Optional<Location> location = Optional.of(new Location(locationId, "40.7128", "-74.0060"));
+		Optional<Location> location = Optional.of(new Location(locationId, 40.7128, -74.0060));
 		when(locationRepository.findById(locationId)).thenReturn(location);
 
 		Location actual = locationService.getLocationById(locationId);
@@ -71,7 +71,7 @@ class LocationServiceTest {
 	@Test
 	void givenLocationDetails_whenUpdatingLocation_thenShouldReturnUpdatedLocation() {
 		Long locationId = 1L;
-		Location locationToUpdate = new Location(locationId, "34.0522", "-118.2437");
+		Location locationToUpdate = new Location(locationId, 34.0522, -118.2437);
 		when(locationRepository.existsById(locationId)).thenReturn(true);
 		when(locationRepository.save(any(Location.class))).thenReturn(locationToUpdate);
 

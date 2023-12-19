@@ -12,16 +12,12 @@ public class ParticipantMapper {
 	}
 
 	public static ParticipantDTO toParticipantDTO(Participant participant) {
-		UserDTO userDTO = UserMapper.toUserDto(participant.getUser());
-		EventDTO eventDTO = EventMapper.toEventDto(participant.getEvent());
-		return new ParticipantDTO(participant.getId(), userDTO, participant.getRating(), participant.getComment(),
-				eventDTO);
+		return new ParticipantDTO(participant.getId(), participant.getRating(), participant.getComment(),
+				participant.getUser(), participant.getEvent());
 	}
 
 	public static Participant fromParticipantDTO(ParticipantDTO participantDTO) {
-		User user = UserMapper.fromUserDto(participantDTO.getUser());
-		Event event = EventMapper.fromEventDto(participantDTO.getEvent());
-		return new Participant(participantDTO.getId(), user, event, participantDTO.getRating(),
-				participantDTO.getComment());
+		return new Participant(participantDTO.getId(), participantDTO.getUser(), participantDTO.getEvent(),
+				participantDTO.getRating(), participantDTO.getComment());
 	}
 }

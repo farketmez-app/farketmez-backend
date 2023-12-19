@@ -2,6 +2,8 @@ package com.mmhb.farketmez.dto;
 
 import java.math.BigDecimal;
 
+import com.mmhb.farketmez.model.Event;
+import com.mmhb.farketmez.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,8 +13,9 @@ import lombok.NoArgsConstructor;
 @Data
 public class ParticipantDTO {
 	private Long id;
-	private UserDTO user;
 	private BigDecimal rating;
 	private String comment;
-	private EventDTO event;
+
+	private User user;
+	private Event event;
 }

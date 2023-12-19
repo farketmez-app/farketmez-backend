@@ -9,9 +9,9 @@ public class EventMapper {
 	}
 
 	public static EventDTO toEventDto(Event event) {
-		return new EventDTO(event.getId(), event.getIsActive(), event.getIsPrivate(), event.getTitle(), event.getDescription(),
-				event.getAverageRating(), event.getDate(), event.getCreatedAt(), event.getDeletedAt(),
-				event.getUpdatedAt(), event.getEventType(), event.getLocation(), event.getCreatorId());
+		return new EventDTO(event.getId(), event.getCreatorId(), event.getIsActive(), event.getIsPrivate(), event.getTitle(),
+				event.getDescription(), event.getAverageRating(), event.getDate(), event.getCreatedAt(),
+				event.getUpdatedAt(), event.getDeletedAt(), event.getEventType(), event.getLocation());
 	}
 
 	public static Event fromEventDto(EventDTO eventDto) {

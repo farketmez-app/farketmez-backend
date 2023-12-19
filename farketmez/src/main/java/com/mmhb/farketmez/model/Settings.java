@@ -25,7 +25,7 @@ public class Settings {
     @Column(name = "key", nullable = false, unique = true)
     private String key;
 
-    @Column(name = "value")
+    @Column(name = "value",length = 50)
     private String value;
 
     @Column(name = "create_date")

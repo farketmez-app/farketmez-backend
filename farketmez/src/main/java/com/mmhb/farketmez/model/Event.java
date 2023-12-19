@@ -42,7 +42,7 @@ public class Event {
 	@Column
 	private Timestamp date;
 
-	@Column(name = "average_rating", precision = 1, scale = 1)
+	@Column(name = "average_rating", precision = 2, scale = 1)
 	private BigDecimal averageRating;
 
 	@Column(name = "created_at", insertable = false, updatable = false)
@@ -53,10 +53,6 @@ public class Event {
 
 	@Column(name = "deleted_at")
 	private Timestamp deletedAt;
-
-	@ManyToOne
-	@JoinColumn(name = "user_id", nullable = false)
-	private User user;
 
 	@ManyToOne
 	@JoinColumn(name = "location_id", nullable = false)
