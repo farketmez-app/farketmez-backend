@@ -79,8 +79,8 @@ class UserServiceTest {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		Long userId = 1L;
 		UserType userType = new UserType();
-		User user = new User("username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0, "mail@example.com",
-				null, null, null, userType);
+		User user = new User(userId, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
+				"mail@example.com", now, now, null, userType);
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
 		User actual = userService.getUserById(userId);
@@ -95,12 +95,12 @@ class UserServiceTest {
 		UserType userType = new UserType();
 		User existingUser = new User(userId, "olduser", "oldpass", "OldName", "OldSurname", 30, "gender", 40.7128,
 				-74.0060, "old@mail.com", null, null, null, userType);
-		User userToUpdate = new User(userId, "updateduser", "newpass", "Updated", "User", 35, "gender", 34.0522,
-				-118.2437, "update@mail.com", null, null, null, userType);
 		String encodedPassword = "encodedPassword";
+		User userToUpdate = new User(userId, "updateduser", encodedPassword, "Updated", "User", 35, "gender", 34.0522,
+				-118.2437, "update@mail.com", null, null, null, userType);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
-		when(passwordEncoder.encode(userToUpdate.getPassword())).thenReturn(encodedPassword);
+		when(passwordEncoder.encode("newpass")).thenReturn(encodedPassword);
 		when(userRepository.save(any(User.class))).thenReturn(userToUpdate);
 
 		User actual = userService.updateUser(userToUpdate);
@@ -109,8 +109,6 @@ class UserServiceTest {
 		assertEquals(userToUpdate.getUsername(), actual.getUsername());
 		assertEquals(userToUpdate.getMail(), actual.getMail());
 		assertEquals(encodedPassword, actual.getPassword());
-		assertEquals(encodedPassword, actual.getPassword()); // Kontrol edilen şifre sabitlenmiş "encodedPassword" bu
-																// kısım sabit kalsın diye bu şekilde verilmiştir.
 	}
 
 	@Test
