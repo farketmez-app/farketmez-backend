@@ -3,10 +3,10 @@ package com.mmhb.farketmez.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.mmhb.farketmez.service.EventService;
-import com.mmhb.farketmez.util.HarvesineDistanceUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,14 +24,17 @@ import com.mmhb.farketmez.mapper.UserMapper;
 import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.service.AuthenticationService;
+import com.mmhb.farketmez.service.EventService;
 import com.mmhb.farketmez.service.ParticipantService;
 import com.mmhb.farketmez.service.UserService;
+import com.mmhb.farketmez.util.HarvesineDistanceUtil;
 import com.mmhb.farketmez.util.JwtUtil;
 
 import lombok.AllArgsConstructor;
 
 @RestController
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping(value = "/users")
 public class UserController {
 	private final UserService userService;
@@ -91,16 +94,22 @@ public class UserController {
 		User authenticatedUser = authenticationService.authenticateUser(userLoginDto.getMail(),
 				userLoginDto.getPassword());
 		if (authenticatedUser != null) {
-			String token = jwtUtil.generateToken(authenticatedUser);
-			return ResponseEntity.ok(token);
+			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			boolean isPasswordMatch = passwordEncoder.matches(userLoginDto.getPassword(),
+					authenticatedUser.getPassword());
+
+			if (isPasswordMatch) {
+				String token = jwtUtil.generateToken(authenticatedUser);
+				return ResponseEntity.ok(token);
+			}
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 
 	@GetMapping("/{userId}/all")
-	public ResponseEntity<List<EventDTO>> getAllEventsById(@PathVariable Long userId){
+	public ResponseEntity<List<EventDTO>> getAllEventsById(@PathVariable Long userId) {
 		List<Event> events = eventService.getEventsByCreatorId(userId);
-		if(!events.isEmpty()){
+		if (!events.isEmpty()) {
 			List<EventDTO> eventDTOS = eventService.getAllEvents().stream().map(EventMapper::toEventDto).toList();
 			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
 		}
@@ -115,7 +124,7 @@ public class UserController {
 	}
 
 	@GetMapping("/{userId}/nearme")
-	public ResponseEntity<List<EventDTO>> getNearEvents(@PathVariable Long userId){
+	public ResponseEntity<List<EventDTO>> getNearEvents(@PathVariable Long userId) {
 		List<Event> events = eventService.getPublicEvents();
 		User user = userService.getUserById(userId);
 
@@ -123,30 +132,28 @@ public class UserController {
 			Double latitude = user.getLatitude();
 			Double longitude = user.getLongitude();
 
-			HarvesineDistanceUtil.BoundingBox boundingBox = HarvesineDistanceUtil.calculateBoundingBox(latitude, longitude, 0.5);
+			HarvesineDistanceUtil.BoundingBox boundingBox = HarvesineDistanceUtil.calculateBoundingBox(latitude,
+					longitude, 0.5);
 
 			if (!events.isEmpty()) {
-				List<EventDTO> eventDTOS = events.stream()
-						.filter(c -> c.getIsActive())
-						.filter(c -> c.getLocation() != null && c.getLocation().getLatitude() != null &&
-								c.getLocation().getLongitude() != null)
+				List<EventDTO> eventDTOS = events
+						.stream().filter(c -> c.getIsActive()).filter(c -> c.getLocation() != null
+								&& c.getLocation().getLatitude() != null && c.getLocation().getLongitude() != null)
 						.filter(c -> {
 							try {
 								double eventLatitude = c.getLocation().getLatitude();
 								double eventLongitude = c.getLocation().getLongitude();
 
-								return eventLatitude > boundingBox.getMinLatitude() &&
-										eventLatitude < boundingBox.getMaxLatitude() &&
-										eventLongitude > boundingBox.getMinLongitude() &&
-										eventLongitude < boundingBox.getMaxLongitude();
+								return eventLatitude > boundingBox.getMinLatitude()
+										&& eventLatitude < boundingBox.getMaxLatitude()
+										&& eventLongitude > boundingBox.getMinLongitude()
+										&& eventLongitude < boundingBox.getMaxLongitude();
 							} catch (NumberFormatException e) {
 								return false;
 							}
-						})
-						.map(EventMapper::toEventDto)
-						.toList();
+						}).map(EventMapper::toEventDto).toList();
 
-				if(!eventDTOS.isEmpty()){
+				if (!eventDTOS.isEmpty()) {
 					return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
 				}
 
