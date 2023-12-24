@@ -2,7 +2,16 @@ package com.mmhb.farketmez.service;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.mmhb.farketmez.dto.EventDTO;
+import com.mmhb.farketmez.mapper.EventMapper;
+import com.mmhb.farketmez.model.User;
+import com.mmhb.farketmez.repository.UserRepository;
+import com.mmhb.farketmez.util.HarvesineDistanceUtil;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.mmhb.farketmez.model.Event;
@@ -16,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class EventService {
 
 	private final EventRepository eventRepository;
+	private final UserRepository userRepository;
 
 	@Transactional
 	public Event createEvent(Event event) {
@@ -42,7 +52,40 @@ public class EventService {
 	}
 
 	public List<Event> getPublicEvents(){
-		return eventRepository.findEventsByIsActiveFalse();
+		return eventRepository.findEventsByIsActiveTrue();
+	}
+
+	public List<Event> getNearEvents(Double latitude, Double longitude){
+		List<Event> events = eventRepository.findEventsByIsActiveTrue();
+			HarvesineDistanceUtil.BoundingBox boundingBox = HarvesineDistanceUtil.calculateBoundingBox(latitude,
+					longitude, 0.5);
+
+			if (!events.isEmpty()) {
+				events = events
+						.stream().filter(c -> c.getIsActive()).filter(c -> c.getLocation() != null
+								&& c.getLocation().getLatitude() != null && c.getLocation().getLongitude() != null)
+						.filter(c -> {
+							try {
+								double eventLatitude = c.getLocation().getLatitude();
+								double eventLongitude = c.getLocation().getLongitude();
+
+								return eventLatitude > boundingBox.getMinLatitude()
+										&& eventLatitude < boundingBox.getMaxLatitude()
+										&& eventLongitude > boundingBox.getMinLongitude()
+										&& eventLongitude < boundingBox.getMaxLongitude();
+							} catch (NumberFormatException e) {
+								return false;
+							}
+						}).toList();
+
+				if (!events.isEmpty()) {
+					return events;
+				}
+
+				return null;
+			}
+
+		return null;
 	}
 
 	@Transactional

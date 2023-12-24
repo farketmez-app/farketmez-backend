@@ -5,14 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.mmhb.farketmez.dto.EventDTO;
 import com.mmhb.farketmez.mapper.EventMapper;
@@ -85,5 +78,19 @@ public class EventController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
+	}
+
+	// Request Body: "http://localhost:8080/events/near-events?lat=39.748366&long=30.499565"
+	@GetMapping("/near-events")
+	public ResponseEntity<List<EventDTO>> getNearEvents(@RequestParam(name = "lat") Double latitude, @RequestParam(name = "long") Double longitude) {
+		List<Event> events = eventService.getNearEvents(latitude, longitude);
+		if(events != null){
+			List<EventDTO> eventDTOS = events.stream().map(EventMapper::toEventDto).collect(Collectors.toList());
+			if(!eventDTOS.isEmpty()){
+				return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
+			}
+		}
+
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 }
