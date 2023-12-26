@@ -101,7 +101,7 @@ public class UserController {
 	@GetMapping("/{userId}/all")
 	public ResponseEntity<List<EventDTO>> getAllEventsById(@PathVariable Long userId) {
 		List<Event> events = eventService.getEventsByCreatorId(userId);
-		if (events != null) {
+		if (!events.isEmpty()) {
 			List<EventDTO> eventDTOS = eventService.getAllEvents().stream().map(EventMapper::toEventDto).toList();
 			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
 		}

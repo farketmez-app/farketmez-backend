@@ -47,9 +47,14 @@ public class EventController {
 		}
 	}
 
-	@GetMapping("/public")
-	public ResponseEntity<List<EventDTO>> getPublicEvents(){
-		List<Event> events = eventService.getPublicEvents();
+	// Request Body: "http://localhost:8080/events/public-events?cost=orta&place=dışarıda&priority=all"
+	@GetMapping("/public-events")
+	public ResponseEntity<List<EventDTO>> getPublicEvents(
+			@RequestParam(name = "cost") String cost,
+			@RequestParam(name = "place") String place,
+			@RequestParam(name = "priority") String priority){
+		List<Event> events = eventService.getPublicEvents(cost, place, priority);
+
 		if(!events.isEmpty()){
 			List<EventDTO> eventDTOS = events.stream().map(EventMapper::toEventDto).toList();
 			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);

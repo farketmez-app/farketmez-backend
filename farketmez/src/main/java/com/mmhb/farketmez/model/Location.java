@@ -17,12 +17,12 @@ public class Location {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private Double longitude;
 	private Double latitude;
+	private Double longitude;
 
-	public Location(Long id, Double longitude, Double latitude) {
+	public Location(Long id, Double latitude, Double longitude) {
 		this.id = id;
-		this.longitude = longitude;
 		this.latitude = latitude;
+		this.longitude = longitude;
 	}
 }

@@ -36,6 +36,12 @@ public class Event {
 	@Column(length = 50)
 	private String title;
 
+	@Column(length = 50)
+	private String cost;
+
+	@Column(length = 50)
+	private String place;
+
 	@Column(length = 200)
 	private String description;
 
@@ -63,7 +69,7 @@ public class Event {
 	private EventType eventType;
 
 	public Event(Long id, EventType eventType, Location location, Long creatorId, Boolean isActive, Boolean isPrivate, String title,
-			String description, Timestamp date, BigDecimal averageRating) {
+			String cost, String place, String description, Timestamp date, BigDecimal averageRating) {
 		this.id = id;
 		this.eventType = eventType;
 		this.location = location;
@@ -71,11 +77,14 @@ public class Event {
 		this.isActive = isActive;
 		this.isPrivate = isPrivate;
 		this.title = title;
+		this.cost = cost;
+		this.place = place;
 		this.description = description;
 		this.date = date;
 		this.averageRating = averageRating;
 	}
 
+	@Deprecated
 	public Event(Long id, Boolean isActive, String title, String description, Timestamp date,
 			BigDecimal averageRating) {
 		this.id = id;
