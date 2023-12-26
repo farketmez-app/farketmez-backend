@@ -19,6 +19,8 @@ public class EventDTO {
 	private Boolean isActive;
 	private Boolean isPrivate;
 	private String title;
+	private String cost;
+	private String place;
 	private String description;
 	private BigDecimal averageRating;
 	private Timestamp date;
