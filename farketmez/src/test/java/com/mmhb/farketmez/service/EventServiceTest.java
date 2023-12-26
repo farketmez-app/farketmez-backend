@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import com.mmhb.farketmez.repository.ParticipantRepository;
+import com.mmhb.farketmez.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -28,13 +30,21 @@ class EventServiceTest {
 
 	@Mock
 	private EventRepository eventRepository;
+	@Mock
+	private UserRepository userRepository;
+	@Mock
+	private ParticipantRepository participantRepository;
+
 
 	private EventService eventService;
+	private UserService userService;
+	private ParticipantService participantService;
+
 
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		eventService = new EventService(eventRepository);
+		eventService = new EventService(eventRepository, userRepository, participantRepository);
 	}
 
 	@Test
@@ -42,7 +52,7 @@ class EventServiceTest {
 		Timestamp now = Timestamp.from(Instant.now());
 		EventType eventType = new EventType();
 		Location location = new Location();
-		Event event = new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi",
+		Event event = new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
 				"Sinemada film izleme etkinliği", now, new BigDecimal("4.5"));
 		when(eventRepository.save(any(Event.class))).thenReturn(event);
 
@@ -58,9 +68,9 @@ class EventServiceTest {
 		EventType eventType = new EventType();
 		Location location = new Location();
 		List<Event> events = Arrays.asList(
-				new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi", "Sinemada film izleme etkinliği",
+				new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi", "Sinemada film izleme etkinliği", "ucuz", "dışarıda",
 						Timestamp.from(Instant.now()), new BigDecimal("4.5")),
-				new Event(2L, eventType, location, 2L, true, false, "Kitap Kulübü Toplantısı",
+				new Event(2L, eventType, location, 2L, true, false, "Kitap Kulübü Toplantısı", "ucuz", "dışarıda",
 						"Aylık kitap kulübü toplantısı", Timestamp.from(Instant.now()), new BigDecimal("4.8")));
 		when(eventRepository.findAll()).thenReturn(events);
 
@@ -77,7 +87,7 @@ class EventServiceTest {
 		Location location = new Location();
 		Timestamp now = Timestamp.from(Instant.now());
 		Optional<Event> optionalEvent = Optional.of(new Event(eventId, eventType, location, 1L, true, false,
-				"Sinema Gecesi", "Sinemada film izleme etkinliği", now, new BigDecimal("4.5")));
+				"Sinema Gecesi", "Sinemada film izleme etkinliği", "ucuz", "dışarıda", now, new BigDecimal("4.5")));
 		when(eventRepository.findById(eventId)).thenReturn(optionalEvent);
 
 		Event result = eventService.getEventById(eventId);
@@ -93,7 +103,7 @@ class EventServiceTest {
 		Location location = new Location();
 		Timestamp now = Timestamp.from(Instant.now());
 		Event event = new Event(eventId, eventType, location, 1L, true, false, "Sinema Gecesi Güncellendi",
-				"Güncellenmiş film izleme etkinliği", now, new BigDecimal("4.6"));
+				"Güncellenmiş film izleme etkinliği", "ucuz", "dışarıda", now, new BigDecimal("4.6"));
 		when(eventRepository.existsById(eventId)).thenReturn(true);
 		when(eventRepository.save(any(Event.class))).thenReturn(event);
 

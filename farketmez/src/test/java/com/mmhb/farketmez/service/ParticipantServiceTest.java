@@ -55,7 +55,7 @@ class ParticipantServiceTest {
 		EventType eventType = new EventType();
 		Location location = new Location();
 		Long creatorId = 1L;
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Description",
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "ucuz","dışarıda", "Description",
 				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 		when(eventRepository.findById(2L)).thenReturn(Optional.of(testEvent));
@@ -76,7 +76,7 @@ class ParticipantServiceTest {
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 		EventType eventType = new EventType();
 		Location location = new Location();
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Description",
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Mekanda","Description",
 				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 
 		List<Participant> participants = Arrays.asList(
@@ -96,7 +96,7 @@ class ParticipantServiceTest {
 		Location location = new Location();
 		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Description",
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Dışarıda", "Description",
 				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 
 		Participant participantToFind = new Participant(participantId, testUser, testEvent, new BigDecimal("4.5"),
@@ -116,7 +116,7 @@ class ParticipantServiceTest {
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 		EventType eventType = new EventType();
 		Location location = new Location();
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Description",
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Dışarıda", "Description",
 				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 
 		Participant participantToUpdate = new Participant(participantId, testUser, testEvent, new BigDecimal("5.0"),
@@ -164,7 +164,7 @@ class ParticipantServiceTest {
 
 		EventType eventType = new EventType();
 		Location location = new Location();
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Description",
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event","Ucuz", "Dışarıda", "Description",
 				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 
 		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));

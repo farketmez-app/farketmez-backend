@@ -84,6 +84,7 @@ public class Event {
 		this.averageRating = averageRating;
 	}
 
+	@Deprecated
 	public Event(Long id, Boolean isActive, String title, String description, Timestamp date,
 			BigDecimal averageRating) {
 		this.id = id;

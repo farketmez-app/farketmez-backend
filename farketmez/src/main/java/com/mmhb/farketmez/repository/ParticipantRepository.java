@@ -17,5 +17,6 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
 	Optional<Participant> findByUserIdAndEventId(Long userId, Long eventId);
 
-	List<Participant> findByEventId(Long eventId);
+
+	Integer countByEventId(Long eventId);
 }

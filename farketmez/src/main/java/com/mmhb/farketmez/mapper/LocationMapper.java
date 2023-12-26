@@ -9,11 +9,11 @@ public class LocationMapper {
     }
 
     public static LocationDTO toLocationDto(Location location){
-        return new LocationDTO(location.getId(), location.getLongitude(), location.getLatitude());
+        return new LocationDTO(location.getId(), location.getLatitude(), location.getLongitude());
     }
 
     public static Location fromLocationDto(LocationDTO locationDto){
-        return new Location(locationDto.getId(), locationDto.getLongitude(), locationDto.getLatitude());
+        return new Location(locationDto.getId(), locationDto.getLatitude(), locationDto.getLongitude());
     }
 
 }

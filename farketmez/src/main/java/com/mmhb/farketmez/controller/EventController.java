@@ -47,6 +47,7 @@ public class EventController {
 		}
 	}
 
+	// Request Body: "http://localhost:8080/events/public-events?cost=orta&place=dışarıda&priority=all"
 	@GetMapping("/public-events")
 	public ResponseEntity<List<EventDTO>> getPublicEvents(
 			@RequestParam(name = "cost") String cost,

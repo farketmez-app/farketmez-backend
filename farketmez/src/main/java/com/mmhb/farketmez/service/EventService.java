@@ -1,6 +1,7 @@
 package com.mmhb.farketmez.service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -114,10 +115,10 @@ public class EventService {
 					return events;
 				}
 
-				return null;
+				return new ArrayList<>();
 			}
 
-		return null;
+		return new ArrayList<>();
 	}
 
 	@Transactional
@@ -142,7 +143,6 @@ public class EventService {
 	}
 
 	private int getAttendanceCount(long eventId) {
-		List<Participant> participants = participantRepository.findByEventId(eventId);
-		return participants.size();
+        return participantRepository.countByEventId(eventId);
 	}
 }
