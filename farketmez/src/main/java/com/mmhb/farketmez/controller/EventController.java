@@ -5,21 +5,37 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.mmhb.farketmez.dto.EventDTO;
 import com.mmhb.farketmez.mapper.EventMapper;
 import com.mmhb.farketmez.model.Event;
+import com.mmhb.farketmez.service.AuthenticationService;
 import com.mmhb.farketmez.service.EventService;
+import com.mmhb.farketmez.service.UserService;
+import com.mmhb.farketmez.util.JwtUtil;
 
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping(value = "/events")
 public class EventController {
 
 	private final EventService eventService;
+	private final UserService userService;
+	private final AuthenticationService authenticationService;
+	private final JwtUtil jwtUtil;
 
 	@PostMapping
 	public ResponseEntity<EventDTO> createEvent(@RequestBody EventDTO eventDto) {
@@ -47,15 +63,14 @@ public class EventController {
 		}
 	}
 
-	// Request Body: "http://localhost:8080/events/public-events?cost=orta&place=dışarıda&priority=all"
+	// Request Body:
+	// "http://localhost:8080/events/public-events?cost=orta&place=dışarıda&priority=all"
 	@GetMapping("/public-events")
-	public ResponseEntity<List<EventDTO>> getPublicEvents(
-			@RequestParam(name = "cost") String cost,
-			@RequestParam(name = "place") String place,
-			@RequestParam(name = "priority") String priority){
+	public ResponseEntity<List<EventDTO>> getPublicEvents(@RequestParam(name = "cost") String cost,
+			@RequestParam(name = "place") String place, @RequestParam(name = "priority") String priority) {
 		List<Event> events = eventService.getPublicEvents(cost, place, priority);
 
-		if(!events.isEmpty()){
+		if (!events.isEmpty()) {
 			List<EventDTO> eventDTOS = events.stream().map(EventMapper::toEventDto).toList();
 			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
 		}
@@ -85,13 +100,15 @@ public class EventController {
 		}
 	}
 
-	// Request Body: "http://localhost:8080/events/near-events?lat=39.748366&long=30.499565"
+	// Request Body:
+	// "http://localhost:8080/events/near-events?lat=39.748366&long=30.499565"
 	@GetMapping("/near-events")
-	public ResponseEntity<List<EventDTO>> getNearEvents(@RequestParam(name = "lat") Double latitude, @RequestParam(name = "long") Double longitude) {
+	public ResponseEntity<List<EventDTO>> getNearEvents(@RequestParam(name = "lat") Double latitude,
+			@RequestParam(name = "long") Double longitude) {
 		List<Event> events = eventService.getNearEvents(latitude, longitude);
-		if(events != null){
+		if (events != null) {
 			List<EventDTO> eventDTOS = events.stream().map(EventMapper::toEventDto).collect(Collectors.toList());
-			if(!eventDTOS.isEmpty()){
+			if (!eventDTOS.isEmpty()) {
 				return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
 			}
 		}

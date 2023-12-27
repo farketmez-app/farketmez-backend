@@ -18,10 +18,6 @@ public class InterestService {
 
 	@Transactional
 	public Interest createInterest(Interest interest) {
-		if (interest.getInterestName() == null || interest.getInterestName().isEmpty()) {
-			throw new IllegalArgumentException("Interest name is required.");
-		}
-
 		return interestRepository.save(interest);
 	}
 
@@ -37,10 +33,6 @@ public class InterestService {
 	public Interest updateInterest(Interest interest) {
 		if (interest.getId() == null || !interestRepository.existsById(interest.getId())) {
 			throw new IllegalArgumentException("Interest not found with id: " + interest.getId());
-		}
-
-		if (interest.getInterestName() == null || interest.getInterestName().isEmpty()) {
-			throw new IllegalArgumentException("Interest name is required for update.");
 		}
 
 		Interest existingInterest = interestRepository.findById(interest.getId())
