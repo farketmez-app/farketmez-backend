@@ -66,7 +66,7 @@ public class EventController {
 			@RequestParam(name = "priority") String priority){
 		List<Event> events = eventService.getPublicEvents(cost, place, priority);
 
-		if(!events.isEmpty()){
+		if(events != null && !events.isEmpty()){
 			List<EventDTO> eventDTOS = events.stream().map(EventMapper::toEventDto).toList();
 			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
 		}
