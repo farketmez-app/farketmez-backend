@@ -39,7 +39,6 @@ public class UserController {
 	private final AuthenticationService authenticationService;
 	private final JwtUtil jwtUtil;
 	private final ParticipantService participantService;
-	private final EventService eventService;
 
 	@GetMapping
 	public ResponseEntity<List<UserDTO>> getAllUsers() {
@@ -96,16 +95,6 @@ public class UserController {
 			return ResponseEntity.ok(token);
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-	}
-
-	@GetMapping("/{userId}/all")
-	public ResponseEntity<List<EventDTO>> getAllEventsById(@PathVariable Long userId) {
-		List<Event> events = eventService.getEventsByCreatorId(userId);
-		if (!events.isEmpty()) {
-			List<EventDTO> eventDTOS = eventService.getAllEvents().stream().map(EventMapper::toEventDto).toList();
-			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@GetMapping("/{userId}/events")

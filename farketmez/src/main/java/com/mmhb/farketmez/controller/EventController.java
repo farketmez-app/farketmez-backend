@@ -59,6 +59,17 @@ public class EventController {
 		}
 	}
 
+	// Request Body: "http://localhost:8080/events/user-events?user-id=1"
+	@GetMapping("/user-events")
+	public ResponseEntity<List<EventDTO>> getEventsByCreatorId(@RequestParam(name = "user-id") Long userId) {
+		List<Event> events = eventService.getEventsByCreatorId(userId);
+		if (!events.isEmpty()) {
+			List<EventDTO> eventDTOS = events.stream().map(EventMapper::toEventDto).toList();
+			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+
 	// Request Body:
 	// "http://localhost:8080/events/public-events?cost=orta&place=dışarıda&priority=all"
 	@GetMapping("/public-events")
@@ -66,7 +77,7 @@ public class EventController {
 			@RequestParam(name = "place") String place, @RequestParam(name = "priority") String priority) {
 		List<Event> events = eventService.getPublicEvents(cost, place, priority);
 
-		if (!events.isEmpty()) {
+		if (events != null && !events.isEmpty()) {
 			List<EventDTO> eventDTOS = events.stream().map(EventMapper::toEventDto).toList();
 			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
 		}
