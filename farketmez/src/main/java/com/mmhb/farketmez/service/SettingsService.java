@@ -7,6 +7,7 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mmhb.farketmez.exception.OperationNotAllowedException;
 import com.mmhb.farketmez.model.Settings;
 import com.mmhb.farketmez.repository.SettingsRepository;
 
@@ -22,7 +23,7 @@ public class SettingsService {
 	public Settings getSettings(String key) throws EntityNotFoundException {
 		Settings settings = settingsRepository.findByKey(key);
 		if (settings == null) {
-			throw new EntityNotFoundException("Setting with key " + key + " not found.");
+			throw new OperationNotAllowedException("Setting with key " + key + " not found.");
 		}
 		return settings;
 	}
@@ -31,7 +32,7 @@ public class SettingsService {
 	public Settings updateSettings(String key, Settings settingsUpdate) {
 		Settings settings = settingsRepository.findByKey(key);
 		if (settings == null) {
-			throw new EntityNotFoundException("Setting with key " + key + " not found.");
+			throw new OperationNotAllowedException("Setting with key " + key + " not found.");
 		}
 
 		validateSettingsUpdate(settingsUpdate);
@@ -43,7 +44,7 @@ public class SettingsService {
 
 	private void validateSettingsUpdate(Settings settings) {
 		if (settings.getValue() == null || settings.getValue().isEmpty()) {
-			throw new IllegalArgumentException("Value for settings cannot be null or empty.");
+			throw new OperationNotAllowedException("Value for settings cannot be null or empty.");
 		}
 	}
 }

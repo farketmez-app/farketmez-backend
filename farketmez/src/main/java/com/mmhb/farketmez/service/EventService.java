@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import com.mmhb.farketmez.model.Participant;
+import org.springframework.stereotype.Service;
+
+import com.mmhb.farketmez.exception.UserInputException;
+import com.mmhb.farketmez.model.Event;
+import com.mmhb.farketmez.repository.EventRepository;
 import com.mmhb.farketmez.repository.ParticipantRepository;
 import com.mmhb.farketmez.repository.UserRepository;
 import com.mmhb.farketmez.util.HarvesineDistanceUtil;
-import org.springframework.stereotype.Service;
-
-import com.mmhb.farketmez.model.Event;
-import com.mmhb.farketmez.repository.EventRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +27,13 @@ public class EventService {
 
 	@Transactional
 	public Event createEvent(Event event) {
-		if (event.getTitle() == null || event.getTitle().isEmpty() || event.getDescription() == null
-				|| event.getDescription().isEmpty() || event.getDate() == null) {
-			throw new IllegalArgumentException(
-					"Missing or incorrect event information. Please fill in all required fields.");
+		boolean isTitleEmpty = event.getTitle() == null || event.getTitle().isEmpty();
+		boolean isDescriptionEmpty = event.getDescription() == null || event.getDescription().isEmpty();
+		boolean isDateNull = event.getDate() == null;
+
+		if (isTitleEmpty && isDescriptionEmpty && isDateNull) {
+			throw new UserInputException(
+					"All fields are empty. Cannot create event without title, description, and date.");
 		}
 
 		event.setCreatedAt(new Timestamp(System.currentTimeMillis()));
@@ -52,71 +55,61 @@ public class EventService {
 	public List<Event> getPublicEvents(String cost, String place, String priority) {
 		List<Event> events = eventRepository.findEventsByIsActiveTrueAndIsPrivateFalse();
 
-		if(priority.equals("rating")){
-			events = events.stream()
-					.filter(c -> c.getCost().equals(cost))
-					.filter(c -> c.getPlace().equals(place))
+		if (priority.equals("rating")) {
+			events = events.stream().filter(c -> c.getCost().equals(cost)).filter(c -> c.getPlace().equals(place))
 					.filter(c -> c.getAverageRating().doubleValue() > 2.5)
 					.sorted(Comparator.comparing(Event::getAverageRating).reversed()).toList();
 		}
 
-		if(priority.equals("attedance")){
-			events = events.stream()
-					.filter(c -> c.getCost().equals(cost))
-					.filter(c -> c.getPlace().equals(place))
-					.sorted(Comparator.comparingInt((Event e) -> getAttendanceCount(e.getId())).reversed())
-					.toList();
+		if (priority.equals("attedance")) {
+			events = events.stream().filter(c -> c.getCost().equals(cost)).filter(c -> c.getPlace().equals(place))
+					.sorted(Comparator.comparingInt((Event e) -> getAttendanceCount(e.getId())).reversed()).toList();
 		}
 
 		if (priority.equals("all")) {
-			events = events.stream()
-					.filter(c -> c.getCost().equals(cost))
-					.filter(c -> c.getPlace().equals(place))
+			events = events.stream().filter(c -> c.getCost().equals(cost)).filter(c -> c.getPlace().equals(place))
 					.filter(c -> c.getAverageRating().doubleValue() > 2.5)
 					.sorted(Comparator.comparing(Event::getAverageRating)
-							.thenComparingInt((Event e) -> getAttendanceCount(e.getId()))
-							.reversed())
+							.thenComparingInt((Event e) -> getAttendanceCount(e.getId())).reversed())
 					.toList();
 		}
 
-
-		if(events.isEmpty() || events == null) {
+		if (events.isEmpty() || events == null) {
 			return null;
 		}
-
 
 		return events;
 	}
 
-	public List<Event> getNearEvents(Double latitude, Double longitude){
+	public List<Event> getNearEvents(Double latitude, Double longitude) {
 		List<Event> events = eventRepository.findEventsByIsActiveTrueAndIsPrivateFalse();
-			HarvesineDistanceUtil.BoundingBox boundingBox = HarvesineDistanceUtil.calculateBoundingBox(latitude,
-					longitude, 0.5);
+		HarvesineDistanceUtil.BoundingBox boundingBox = HarvesineDistanceUtil.calculateBoundingBox(latitude, longitude,
+				0.5);
+
+		if (!events.isEmpty()) {
+			events = events
+					.stream().filter(c -> c.getIsActive()).filter(c -> c.getLocation() != null
+							&& c.getLocation().getLatitude() != null && c.getLocation().getLongitude() != null)
+					.filter(c -> {
+						try {
+							double eventLatitude = c.getLocation().getLatitude();
+							double eventLongitude = c.getLocation().getLongitude();
+
+							return eventLatitude > boundingBox.getMinLatitude()
+									&& eventLatitude < boundingBox.getMaxLatitude()
+									&& eventLongitude > boundingBox.getMinLongitude()
+									&& eventLongitude < boundingBox.getMaxLongitude();
+						} catch (NumberFormatException e) {
+							return false;
+						}
+					}).toList();
 
 			if (!events.isEmpty()) {
-				events = events
-						.stream().filter(c -> c.getIsActive()).filter(c -> c.getLocation() != null
-								&& c.getLocation().getLatitude() != null && c.getLocation().getLongitude() != null)
-						.filter(c -> {
-							try {
-								double eventLatitude = c.getLocation().getLatitude();
-								double eventLongitude = c.getLocation().getLongitude();
-
-								return eventLatitude > boundingBox.getMinLatitude()
-										&& eventLatitude < boundingBox.getMaxLatitude()
-										&& eventLongitude > boundingBox.getMinLongitude()
-										&& eventLongitude < boundingBox.getMaxLongitude();
-							} catch (NumberFormatException e) {
-								return false;
-							}
-						}).toList();
-
-				if (!events.isEmpty()) {
-					return events;
-				}
-
-				return new ArrayList<>();
+				return events;
 			}
+
+			return new ArrayList<>();
+		}
 
 		return new ArrayList<>();
 	}
@@ -124,13 +117,16 @@ public class EventService {
 	@Transactional
 	public Event updateEvent(Event event) {
 		if (event.getId() == null || !eventRepository.existsById(event.getId())) {
-			throw new IllegalArgumentException("Event not found with id: " + event.getId());
+			throw new UserInputException("Event not found with id: " + event.getId());
 		}
 
-		if (event.getTitle() == null || event.getTitle().isEmpty() || event.getDescription() == null
-				|| event.getDescription().isEmpty() || event.getDate() == null) {
-			throw new IllegalArgumentException(
-					"Missing or incorrect event information. Please fill in all required fields.");
+		boolean isTitleEmpty = event.getTitle() == null || event.getTitle().isEmpty();
+		boolean isDescriptionEmpty = event.getDescription() == null || event.getDescription().isEmpty();
+		boolean isDateNull = event.getDate() == null;
+
+		if (isTitleEmpty && isDescriptionEmpty && isDateNull) {
+			throw new UserInputException(
+					"All fields are empty. Cannot update event without title, description, and date.");
 		}
 
 		event.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
@@ -143,6 +139,6 @@ public class EventService {
 	}
 
 	private int getAttendanceCount(long eventId) {
-        return participantRepository.countByEventId(eventId);
+		return participantRepository.countByEventId(eventId);
 	}
 }

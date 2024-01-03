@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.mmhb.farketmez.exception.UserInputException;
 import com.mmhb.farketmez.model.Interest;
 import com.mmhb.farketmez.repository.InterestRepository;
 
@@ -32,11 +33,11 @@ public class InterestService {
 	@Transactional
 	public Interest updateInterest(Interest interest) {
 		if (interest.getId() == null || !interestRepository.existsById(interest.getId())) {
-			throw new IllegalArgumentException("Interest not found with id: " + interest.getId());
+			throw new UserInputException("Interest not found with id: " + interest.getId());
 		}
 
 		Interest existingInterest = interestRepository.findById(interest.getId())
-				.orElseThrow(() -> new IllegalArgumentException("Interest not found with id: " + interest.getId()));
+				.orElseThrow(() -> new UserInputException("Interest not found with id: " + interest.getId()));
 
 		existingInterest.setInterestName(interest.getInterestName());
 

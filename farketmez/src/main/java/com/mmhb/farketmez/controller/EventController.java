@@ -19,10 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mmhb.farketmez.dto.EventDTO;
 import com.mmhb.farketmez.mapper.EventMapper;
 import com.mmhb.farketmez.model.Event;
-import com.mmhb.farketmez.service.AuthenticationService;
 import com.mmhb.farketmez.service.EventService;
 import com.mmhb.farketmez.service.UserService;
-import com.mmhb.farketmez.util.JwtUtil;
 
 import lombok.AllArgsConstructor;
 
@@ -34,8 +32,6 @@ public class EventController {
 
 	private final EventService eventService;
 	private final UserService userService;
-	private final AuthenticationService authenticationService;
-	private final JwtUtil jwtUtil;
 
 	@PostMapping
 	public ResponseEntity<EventDTO> createEvent(@RequestBody EventDTO eventDto) {

@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.mmhb.farketmez.exception.OperationNotAllowedException;
+import com.mmhb.farketmez.exception.UserInputException;
 import com.mmhb.farketmez.model.Location;
 import com.mmhb.farketmez.repository.LocationRepository;
 
@@ -19,7 +21,7 @@ public class LocationService {
 	@Transactional
 	public Location createLocation(Location location) {
 		if (location.getLongitude() == null || location.getLatitude() == null) {
-			throw new IllegalArgumentException(
+			throw new OperationNotAllowedException(
 					"Missing or incorrect location information. Please fill in longitude and latitude.");
 		}
 		return locationRepository.save(location);
@@ -36,10 +38,10 @@ public class LocationService {
 	@Transactional
 	public Location updateLocation(Location location) {
 		if (location.getId() == null || !locationRepository.existsById(location.getId())) {
-			throw new IllegalArgumentException("Location not found with id: " + location.getId());
+			throw new UserInputException("Location not found with id: " + location.getId());
 		}
 		if (location.getLongitude() == null || location.getLatitude() == null) {
-			throw new IllegalArgumentException(
+			throw new UserInputException(
 					"Missing or incorrect location information. Please fill in longitude and latitude.");
 		}
 		return locationRepository.save(location);

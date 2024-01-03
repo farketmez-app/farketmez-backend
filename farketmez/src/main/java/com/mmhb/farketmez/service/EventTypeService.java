@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.mmhb.farketmez.exception.UserInputException;
 import com.mmhb.farketmez.model.EventType;
 import com.mmhb.farketmez.repository.EventTypeRepository;
 
@@ -19,7 +20,7 @@ public class EventTypeService {
 
 	public EventType createEventType(EventType eventType) {
 		if (eventType.getType() == null || !StringUtils.hasText(eventType.getType().toString())) {
-			throw new IllegalArgumentException("EventType type is required and cannot be null or empty.");
+			throw new UserInputException("EventType type is required and cannot be null or empty.");
 		}
 		return eventTypeRepository.save(eventType);
 	}
@@ -34,7 +35,7 @@ public class EventTypeService {
 
 	public EventType updateEventType(EventType updatedEventType) {
 		if (updatedEventType.getType() == null || !StringUtils.hasText(updatedEventType.getType().toString())) {
-			throw new IllegalArgumentException("EventType type is required and cannot be null or empty.");
+			throw new UserInputException("EventType type is required and cannot be null or empty.");
 		}
 		return eventTypeRepository.findById(updatedEventType.getId()).map(eventType -> {
 			eventType.setType(updatedEventType.getType());
