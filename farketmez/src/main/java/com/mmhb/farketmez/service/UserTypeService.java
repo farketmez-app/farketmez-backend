@@ -2,10 +2,10 @@ package com.mmhb.farketmez.service;
 
 import java.util.List;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.springframework.stereotype.Service;
 
+import com.mmhb.farketmez.exception.DatabaseOperationException;
+import com.mmhb.farketmez.exception.OperationNotAllowedException;
 import com.mmhb.farketmez.model.UserType;
 import com.mmhb.farketmez.repository.UserTypeRepository;
 
@@ -20,8 +20,8 @@ public class UserTypeService {
 
 	@Transactional
 	public UserType createUserType(UserType userType) {
-		if (userType.getType() == null || userType.getType().isEmpty()) {
-			throw new IllegalArgumentException("User Type must be provided.");
+		if (userType.getType() == null) {
+			throw new OperationNotAllowedException("User Type must be provided.");
 		}
 		return userTypeRepository.save(userType);
 	}
@@ -32,20 +32,20 @@ public class UserTypeService {
 
 	public UserType getUserTypeById(Long id) {
 		return userTypeRepository.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException("UserType not found with id: " + id));
+				.orElseThrow(() -> new DatabaseOperationException("UserType not found with id: " + id));
 	}
 
 	@Transactional
 	public UserType updateUserType(UserType userType) {
 		if (userType.getId() == null) {
-			throw new IllegalArgumentException("User Type ID must be provided for updating.");
+			throw new OperationNotAllowedException("User Type ID must be provided for updating.");
 		}
 
 		UserType existingUserType = userTypeRepository.findById(userType.getId())
-				.orElseThrow(() -> new EntityNotFoundException("UserType not found with id: " + userType.getId()));
+				.orElseThrow(() -> new DatabaseOperationException("UserType not found with id: " + userType.getId()));
 
-		if (userType.getType() == null || userType.getType().isEmpty()) {
-			throw new IllegalArgumentException("User Type must be provided.");
+		if (userType.getType() == null) {
+			throw new OperationNotAllowedException("User Type must be provided.");
 		}
 
 		existingUserType.setType(userType.getType());

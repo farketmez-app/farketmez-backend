@@ -1,6 +1,10 @@
 package com.mmhb.farketmez.model;
 
+import com.mmhb.farketmez.type.UserTypeEnum;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,5 +23,6 @@ public class UserType {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String type;
+	@Enumerated(EnumType.STRING)
+	private UserTypeEnum type;
 }
