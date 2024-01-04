@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.mmhb.farketmez.model.Interest;
 import com.mmhb.farketmez.repository.InterestRepository;
+import com.mmhb.farketmez.type.InterestType;
 
 class InterestServiceTest {
 
@@ -34,7 +35,7 @@ class InterestServiceTest {
 
 	@Test
 	void whenCreatingInterest_thenShouldReturnSavedInterest() {
-		Interest interestToSave = new Interest(null, "Programming");
+		Interest interestToSave = new Interest(null, InterestType.MUSEUM);
 		when(interestRepository.save(any(Interest.class))).thenReturn(interestToSave);
 
 		Interest actual = interestService.createInterest(interestToSave);
@@ -45,7 +46,8 @@ class InterestServiceTest {
 
 	@Test
 	void whenRetrievingAllInterests_thenShouldReturnListOfInterests() {
-		List<Interest> interests = Arrays.asList(new Interest(1L, "Programming"), new Interest(2L, "Music"));
+		List<Interest> interests = Arrays.asList(new Interest(1L, InterestType.MUSEUM),
+				new Interest(2L, InterestType.CLUBS));
 		when(interestRepository.findAll()).thenReturn(interests);
 
 		List<Interest> actual = interestService.getAllInterests();
@@ -57,7 +59,7 @@ class InterestServiceTest {
 	@Test
 	void givenInterestId_whenRetrievingInterest_thenShouldReturnInterest() {
 		Long interestId = 1L;
-		Optional<Interest> interest = Optional.of(new Interest(interestId, "Programming"));
+		Optional<Interest> interest = Optional.of(new Interest(interestId, InterestType.MUSEUM));
 		when(interestRepository.findById(interestId)).thenReturn(interest);
 
 		Interest actual = interestService.getInterestById(interestId);
@@ -69,7 +71,7 @@ class InterestServiceTest {
 	@Test
 	void givenInterestDetails_whenUpdatingInterest_thenShouldReturnUpdatedInterest() {
 		Long interestId = 1L;
-		Interest interestToUpdate = new Interest(interestId, "Gardening");
+		Interest interestToUpdate = new Interest(interestId, InterestType.MUSEUM);
 		when(interestRepository.existsById(interestId)).thenReturn(true);
 		when(interestRepository.findById(interestId)).thenReturn(Optional.of(interestToUpdate));
 		when(interestRepository.save(any(Interest.class))).thenReturn(interestToUpdate);

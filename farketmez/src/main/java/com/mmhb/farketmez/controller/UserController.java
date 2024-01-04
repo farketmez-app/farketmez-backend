@@ -5,8 +5,15 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.mmhb.farketmez.dto.EventDTO;
 import com.mmhb.farketmez.dto.UserDTO;
@@ -19,7 +26,6 @@ import com.mmhb.farketmez.service.AuthenticationService;
 import com.mmhb.farketmez.service.EventService;
 import com.mmhb.farketmez.service.ParticipantService;
 import com.mmhb.farketmez.service.UserService;
-import com.mmhb.farketmez.util.HarvesineDistanceUtil;
 import com.mmhb.farketmez.util.JwtUtil;
 
 import lombok.AllArgsConstructor;
@@ -85,14 +91,8 @@ public class UserController {
 		User authenticatedUser = authenticationService.authenticateUser(userLoginDto.getMail(),
 				userLoginDto.getPassword());
 		if (authenticatedUser != null) {
-			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-			boolean isPasswordMatch = passwordEncoder.matches(userLoginDto.getPassword(),
-					authenticatedUser.getPassword());
-
-			if (isPasswordMatch) {
-				String token = jwtUtil.generateToken(authenticatedUser);
-				return ResponseEntity.ok(token);
-			}
+			String token = jwtUtil.generateToken(authenticatedUser);
+			return ResponseEntity.ok(token);
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}

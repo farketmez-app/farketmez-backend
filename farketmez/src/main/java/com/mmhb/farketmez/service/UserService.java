@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.mmhb.farketmez.exception.DatabaseOperationException;
+import com.mmhb.farketmez.exception.OperationNotAllowedException;
 import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.repository.UserRepository;
 
@@ -20,13 +22,12 @@ public class UserService {
 
 	@Transactional
 	public User createUser(User user) {
-		if (user.getUsername() == null || user.getUsername().isEmpty() || user.getPassword() == null
-				|| user.getPassword().isEmpty() || user.getName() == null || user.getName().isEmpty()
-				|| user.getLastname() == null || user.getLastname().isEmpty() || user.getAge() == null
-				|| user.getGender() == null || user.getLongitude() == null
-				|| user.getLatitude() == null || user.getMail() == null
-				|| user.getMail().isEmpty()) {
-			throw new IllegalArgumentException("Missing or incorrect user information. Please fill in all fields.");
+		if (user.getUsername() == null && user.getUsername().isEmpty() && user.getPassword() == null
+				&& user.getPassword().isEmpty() && user.getName() == null && user.getName().isEmpty()
+				&& user.getLastname() == null && user.getLastname().isEmpty() && user.getAge() == null
+				&& user.getGender() == null && user.getLongitude() == null && user.getLatitude() == null
+				&& user.getMail() == null && user.getMail().isEmpty()) {
+			throw new OperationNotAllowedException("Missing or incorrect user information. Please fill in all fields.");
 		}
 
 		String encodedPassword = passwordEncoder.encode(user.getPassword());
@@ -47,7 +48,7 @@ public class UserService {
 	public User updateUser(User user) {
 		Long id = user.getId();
 		User existingUser = userRepository.findById(id)
-				.orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+				.orElseThrow(() -> new DatabaseOperationException("User not found with id: " + id));
 
 		existingUser.setUsername(user.getUsername());
 		existingUser.setName(user.getName());

@@ -1,7 +1,11 @@
 package com.mmhb.farketmez.model;
 
+import com.mmhb.farketmez.type.InterestType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,10 +24,11 @@ public class Interest {
 	@Column(name = "id")
 	private Long id;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "interest_name")
-	private String interestName;
+	private InterestType interestName;
 
-	public Interest(Long id, String interestName) {
+	public Interest(Long id, InterestType interestName) {
 		this.id = id;
 		this.interestName = interestName;
 	}

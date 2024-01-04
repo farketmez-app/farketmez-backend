@@ -6,6 +6,8 @@ import javax.persistence.EntityNotFoundException;
 
 import org.springframework.stereotype.Service;
 
+import com.mmhb.farketmez.exception.DatabaseOperationException;
+import com.mmhb.farketmez.exception.OperationNotAllowedException;
 import com.mmhb.farketmez.model.Interest;
 import com.mmhb.farketmez.model.UserInterest;
 import com.mmhb.farketmez.repository.UserInterestRepository;
@@ -21,8 +23,8 @@ public class UserInterestService {
 	private final UserRepository userRepository;
 
 	public UserInterest createUserInterest(UserInterest userInterest) {
-		if (userInterest.getUser() == null || userInterest.getInterest() == null) {
-			throw new IllegalArgumentException("Both User ID and Interest ID must be provided.");
+		if (userInterest.getUser() == null && userInterest.getInterest() == null) {
+			throw new OperationNotAllowedException("Both User ID and Interest ID must be provided.");
 		}
 		return userInterestRepository.save(userInterest);
 	}
@@ -37,13 +39,13 @@ public class UserInterestService {
 	}
 
 	public UserInterest updateUserInterest(UserInterest userInterestDetails) {
-		if (userInterestDetails.getId() == null || userInterestDetails.getUser() == null
-				|| userInterestDetails.getInterest() == null) {
-			throw new IllegalArgumentException("ID, User ID, and Interest ID must all be provided.");
+		if (userInterestDetails.getId() == null && userInterestDetails.getUser() == null
+				&& userInterestDetails.getInterest() == null) {
+			throw new OperationNotAllowedException("ID, User ID, and Interest ID must all be provided.");
 		}
 
 		UserInterest existingUserInterest = userInterestRepository.findById(userInterestDetails.getId()).orElseThrow(
-				() -> new EntityNotFoundException("UserInterest not found with id: " + userInterestDetails.getId()));
+				() -> new DatabaseOperationException("UserInterest not found with id: " + userInterestDetails.getId()));
 
 		existingUserInterest.setUser(userInterestDetails.getUser());
 		existingUserInterest.setInterest(userInterestDetails.getInterest());
@@ -58,12 +60,12 @@ public class UserInterestService {
 	public List<Interest> findInterestsByUserId(Long userId) {
 		boolean isUserExists = userRepository.existsById(userId);
 		if (!isUserExists) {
-			throw new EntityNotFoundException("User not found with id: " + userId);
+			throw new DatabaseOperationException("User not found with id: " + userId);
 		}
 
 		List<UserInterest> userInterests = userInterestRepository.findByUserId(userId);
 		if (userInterests.isEmpty()) {
-			throw new EntityNotFoundException("No interests found for user id: " + userId);
+			throw new DatabaseOperationException("No interests found for user id: " + userId);
 		}
 		return userInterestRepository.findInterestsByUserId(userId);
 	}
