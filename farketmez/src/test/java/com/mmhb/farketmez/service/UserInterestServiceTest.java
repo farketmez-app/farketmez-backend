@@ -4,6 +4,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -39,24 +41,28 @@ class UserInterestServiceTest {
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		userInterestService = new UserInterestService(userInterestRepository, userRepository);
+		userInterestService = new UserInterestService(userInterestRepository, userRepository, interestRepository);
 	}
 
 	@Test
 	void whenCreatingUserInterest_thenShouldReturnSavedUserInterest() {
+		Long userId = 1L;
+		InterestType interestType = InterestType.CINEMA;
 		User user = new User();
-		user.setId(1L);
+		user.setId(userId);
 		Interest interest = new Interest();
 		interest.setId(2L);
+		interest.setInterestName(interestType);
 
-		UserInterest userInterestToSave = new UserInterest(null, user, interest);
-		when(userInterestRepository.save(any(UserInterest.class))).thenReturn(userInterestToSave);
+		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+		when(interestRepository.findByInterestName(interestType)).thenReturn(interest);
+		when(userInterestRepository.save(any(UserInterest.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		UserInterest actual = userInterestService.createUserInterest(userInterestToSave);
+		UserInterest actual = userInterestService.createUserInterest(userId, interestType);
 
 		assertNotNull(actual);
-		assertEquals(userInterestToSave.getUser(), actual.getUser());
-		assertEquals(userInterestToSave.getInterest(), actual.getInterest());
+		assertEquals(userId, actual.getUser().getId());
+		assertEquals(interestType, actual.getInterest().getInterestName());
 	}
 
 	@Test
@@ -98,26 +104,29 @@ class UserInterestServiceTest {
 	}
 
 	@Test
-	void givenUserInterestDetails_whenUpdatingUserInterest_thenShouldReturnUpdatedUserInterest() {
-		Long userInterestId = 1L;
+	void givenUserIdAndInterestTypes_whenUpdatingUserInterest_thenShouldUpdateUserInterests() {
+		Long userId = 1L;
+		List<InterestType> newInterestTypes = Arrays.asList(InterestType.CINEMA, InterestType.SPORTS);
 		User user = new User();
-		user.setId(1L);
-		Interest interest2 = new Interest();
-		interest2.setId(2L);
-		Interest interest3 = new Interest();
-		interest3.setId(3L);
+		user.setId(userId);
 
-		UserInterest userInterestToUpdate = new UserInterest(userInterestId, user, interest3);
+		Interest existingInterest = new Interest();
+		existingInterest.setInterestName(InterestType.CINEMA);
+		UserInterest existingUserInterest = new UserInterest(user, existingInterest);
 
-		when(userInterestRepository.findById(userInterestId))
-				.thenReturn(Optional.of(new UserInterest(userInterestId, user, interest2)));
+		Interest newInterest = new Interest();
+		newInterest.setInterestName(InterestType.SPORTS);
 
-		when(userInterestRepository.save(any(UserInterest.class))).thenReturn(userInterestToUpdate);
+		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+		when(userInterestRepository.findByUserId(userId)).thenReturn(Arrays.asList(existingUserInterest));
+		when(interestRepository.findByInterestName(InterestType.SPORTS)).thenReturn(newInterest);
+		when(userInterestRepository.save(any(UserInterest.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		UserInterest actual = userInterestService.updateUserInterest(userInterestToUpdate);
+		userInterestService.updateUserInterest(userId, newInterestTypes);
 
-		assertNotNull(actual);
-		assertEquals(userInterestToUpdate.getInterest(), actual.getInterest());
+		// Verify the interactions and state as needed
+		verify(userInterestRepository, times(1)).delete(existingUserInterest);
+		verify(userInterestRepository, times(1)).save(any(UserInterest.class));
 	}
 
 	@Test

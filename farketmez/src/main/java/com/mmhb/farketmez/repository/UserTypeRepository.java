@@ -7,4 +7,5 @@ import com.mmhb.farketmez.model.UserType;
 
 @Repository
 public interface UserTypeRepository extends JpaRepository<UserType, Long> {
+	UserType findByType(String type);
 }
