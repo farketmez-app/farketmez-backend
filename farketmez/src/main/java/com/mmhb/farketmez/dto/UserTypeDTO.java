@@ -1,5 +1,7 @@
 package com.mmhb.farketmez.dto;
 
+import com.mmhb.farketmez.type.UserTypeEnum;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,5 +11,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class UserTypeDTO {
 	private Long id;
-	private String type;
+	private UserTypeEnum type;
 }

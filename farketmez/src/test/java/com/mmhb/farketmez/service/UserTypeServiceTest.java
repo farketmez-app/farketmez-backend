@@ -18,6 +18,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.mmhb.farketmez.model.UserType;
 import com.mmhb.farketmez.repository.UserTypeRepository;
+import com.mmhb.farketmez.type.UserTypeEnum;
 
 class UserTypeServiceTest {
 
@@ -34,7 +35,7 @@ class UserTypeServiceTest {
 
 	@Test
 	void whenCreatingUserType_thenShouldReturnSavedUserType() {
-		UserType userTypeToSave = new UserType(null, "Admin");
+		UserType userTypeToSave = new UserType(null, UserTypeEnum.ADMIN);
 		when(userTypeRepository.save(any(UserType.class))).thenReturn(userTypeToSave);
 
 		UserType actual = userTypeService.createUserType(userTypeToSave);
@@ -45,7 +46,8 @@ class UserTypeServiceTest {
 
 	@Test
 	void whenRetrievingAllUserTypes_thenShouldReturnListOfUserTypes() {
-		List<UserType> userTypes = Arrays.asList(new UserType(1L, "Admin"), new UserType(2L, "User"));
+		List<UserType> userTypes = Arrays.asList(new UserType(1L, UserTypeEnum.ADMIN),
+				new UserType(2L, UserTypeEnum.USER));
 		when(userTypeRepository.findAll()).thenReturn(userTypes);
 
 		List<UserType> actual = userTypeService.getAllUserTypes();
@@ -57,7 +59,7 @@ class UserTypeServiceTest {
 	@Test
 	void givenUserTypeId_whenRetrievingUserType_thenShouldReturnUserType() {
 		Long userTypeId = 1L;
-		Optional<UserType> userType = Optional.of(new UserType(userTypeId, "Admin"));
+		Optional<UserType> userType = Optional.of(new UserType(userTypeId, UserTypeEnum.ADMIN));
 		when(userTypeRepository.findById(userTypeId)).thenReturn(userType);
 
 		UserType actual = userTypeService.getUserTypeById(userTypeId);
@@ -69,7 +71,7 @@ class UserTypeServiceTest {
 	@Test
 	void givenUserTypeDetails_whenUpdatingUserType_thenShouldReturnUpdatedUserType() {
 		Long userTypeId = 1L;
-		UserType userTypeToUpdate = new UserType(userTypeId, "Updated Type");
+		UserType userTypeToUpdate = new UserType(userTypeId, UserTypeEnum.USER);
 		when(userTypeRepository.findById(userTypeId)).thenReturn(Optional.of(userTypeToUpdate));
 		when(userTypeRepository.save(any(UserType.class))).thenReturn(userTypeToUpdate);
 
