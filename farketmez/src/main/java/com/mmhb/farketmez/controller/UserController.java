@@ -1,6 +1,7 @@
 package com.mmhb.farketmez.controller;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -23,9 +24,9 @@ import com.mmhb.farketmez.mapper.UserMapper;
 import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.service.AuthenticationService;
-import com.mmhb.farketmez.service.EventService;
 import com.mmhb.farketmez.service.ParticipantService;
 import com.mmhb.farketmez.service.UserService;
+import com.mmhb.farketmez.type.InterestType;
 import com.mmhb.farketmez.util.JwtUtil;
 
 import lombok.AllArgsConstructor;
@@ -102,5 +103,16 @@ public class UserController {
 		List<Event> events = participantService.getEventsByUser(userId);
 		List<EventDTO> eventDTOs = events.stream().map(EventMapper::toEventDto).collect(Collectors.toList());
 		return ResponseEntity.ok(eventDTOs);
+	}
+
+	@PutMapping("/{userId}/interests")
+	public ResponseEntity<Void> updateUserInterests(@PathVariable Long userId,
+			@RequestBody Set<InterestType> interestTypes) {
+		try {
+			userService.updateUserInterests(userId, interestTypes);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 }

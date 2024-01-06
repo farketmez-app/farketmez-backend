@@ -2,14 +2,19 @@ package com.mmhb.farketmez.service;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.mmhb.farketmez.exception.DatabaseOperationException;
 import com.mmhb.farketmez.exception.OperationNotAllowedException;
+import com.mmhb.farketmez.model.Interest;
 import com.mmhb.farketmez.model.User;
+import com.mmhb.farketmez.repository.InterestRepository;
 import com.mmhb.farketmez.repository.UserRepository;
+import com.mmhb.farketmez.type.InterestType;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository userRepository;
+	private final InterestRepository interestRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
@@ -66,6 +72,23 @@ public class UserService {
 
 		existingUser.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 		return userRepository.save(existingUser);
+	}
+
+	@Transactional
+	public void updateUserInterests(Long userId, Set<InterestType> interestTypes) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new DatabaseOperationException("User not found with id: " + userId));
+
+		Set<Interest> newInterests = interestTypes.stream().map(interestType -> {
+			Interest interest = interestRepository.findByInterestName(interestType);
+			if (interest == null) {
+				throw new DatabaseOperationException("Interest not found for type: " + interestType.getDisplayName());
+			}
+			return interest;
+		}).collect(Collectors.toSet());
+
+		user.setInterests(newInterests);
+		userRepository.save(user);
 	}
 
 	@Transactional
