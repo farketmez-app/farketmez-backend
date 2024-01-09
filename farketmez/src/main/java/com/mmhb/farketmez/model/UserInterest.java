@@ -1,35 +1,35 @@
 package com.mmhb.farketmez.model;
 
-import com.mmhb.farketmez.type.InterestType;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table(name = "interests")
 @Data
+@Table(name = "user_interests")
 @Entity
 @NoArgsConstructor
-public class Interest {
+@AllArgsConstructor
+public class UserInterest {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Long id;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "interest_name")
-	private InterestType interestName;
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 
-	public Interest(Long id, InterestType interestName) {
-		this.id = id;
-		this.interestName = interestName;
-	}
+	@ManyToOne
+	@JoinColumn(name = "interest_id")
+	private Interest interest;
+
 }

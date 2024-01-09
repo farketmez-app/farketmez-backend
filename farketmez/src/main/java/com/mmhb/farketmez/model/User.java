@@ -1,18 +1,13 @@
 package com.mmhb.farketmez.model;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
-import java.util.Set;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -66,12 +61,8 @@ public class User {
 	@JoinColumn(name = "user_type_id")
 	private UserType userType;
 
-	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-	@JoinTable(name = "user_interests", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "interest_id"))
-	private Set<Interest> interests = new HashSet<>();
-
 	public User(String username, String password, String name, String lastname, Integer age, String gender,
-			Double longitude, Double latitude, String mail, Timestamp createdAt, Timestamp updatedAt,
+				Double longitude, Double latitude, String mail, Timestamp createdAt, Timestamp updatedAt,
 			Timestamp deletedAt, UserType userType) {
 		this.username = username;
 		this.password = password;
@@ -89,7 +80,7 @@ public class User {
 	}
 
 	public User(Long id, String username, String password, String name, String lastname, Integer age, String gender,
-			Double longitude, Double latitude, String mail, Timestamp createdAt, Timestamp updatedAt,
+				Double longitude, Double latitude, String mail, Timestamp createdAt, Timestamp updatedAt,
 			Timestamp deletedAt, UserType userType) {
 		this.id = id;
 		this.username = username;
