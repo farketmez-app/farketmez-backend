@@ -23,7 +23,6 @@ import com.mmhb.farketmez.mapper.UserMapper;
 import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.service.AuthenticationService;
-import com.mmhb.farketmez.service.EventService;
 import com.mmhb.farketmez.service.ParticipantService;
 import com.mmhb.farketmez.service.UserService;
 import com.mmhb.farketmez.util.JwtUtil;
@@ -92,7 +91,9 @@ public class UserController {
 				userLoginDto.getPassword());
 		if (authenticatedUser != null) {
 			String token = jwtUtil.generateToken(authenticatedUser);
-			return ResponseEntity.ok(token);
+			// TODO: Consider returning those with another DTO
+			return ResponseEntity.ok().body("token: " + token + "\n" +
+					"id: " + authenticatedUser.getId());
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
