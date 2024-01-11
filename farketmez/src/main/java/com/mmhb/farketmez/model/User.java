@@ -62,7 +62,7 @@ public class User {
 	private UserType userType;
 
 	public User(String username, String password, String name, String lastname, Integer age, String gender,
-				Double longitude, Double latitude, String mail, Timestamp createdAt, Timestamp updatedAt,
+			Double longitude, Double latitude, String mail, Timestamp createdAt, Timestamp updatedAt,
 			Timestamp deletedAt, UserType userType) {
 		this.username = username;
 		this.password = password;
@@ -80,7 +80,7 @@ public class User {
 	}
 
 	public User(Long id, String username, String password, String name, String lastname, Integer age, String gender,
-				Double longitude, Double latitude, String mail, Timestamp createdAt, Timestamp updatedAt,
+			Double longitude, Double latitude, String mail, Timestamp createdAt, Timestamp updatedAt,
 			Timestamp deletedAt, UserType userType) {
 		this.id = id;
 		this.username = username;

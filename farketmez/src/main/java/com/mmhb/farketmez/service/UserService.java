@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 import com.mmhb.farketmez.exception.DatabaseOperationException;
 import com.mmhb.farketmez.exception.OperationNotAllowedException;
 import com.mmhb.farketmez.model.User;
+import com.mmhb.farketmez.model.UserType;
 import com.mmhb.farketmez.repository.UserRepository;
+import com.mmhb.farketmez.repository.UserTypeRepository;
+import com.mmhb.farketmez.type.UserTypeEnum;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final UserTypeRepository userTypeRepository;
 
 	@Transactional
 	public User createUser(User user) {
@@ -30,10 +34,20 @@ public class UserService {
 			throw new OperationNotAllowedException("Missing or incorrect user information. Please fill in all fields.");
 		}
 
+		UserType userType = userTypeRepository.findByType(UserTypeEnum.USER);
+		if (userType == null) {
+			throw new DatabaseOperationException("User type not found.");
+		}
+		user.setUserType(userType);
+
 		String encodedPassword = passwordEncoder.encode(user.getPassword());
 		user.setPassword(encodedPassword);
-		user = userRepository.save(user);
-		return user;
+
+		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+		user.setCreatedAt(currentTime);
+		user.setUpdatedAt(currentTime);
+
+		return userRepository.save(user);
 	}
 
 	public List<User> getAllUsers() {
