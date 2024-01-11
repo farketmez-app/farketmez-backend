@@ -18,9 +18,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.mmhb.farketmez.dto.UserDTO;
+import com.mmhb.farketmez.mapper.UserMapper;
 import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.model.UserType;
 import com.mmhb.farketmez.repository.UserRepository;
+import com.mmhb.farketmez.repository.UserTypeRepository;
+import com.mmhb.farketmez.type.UserTypeEnum;
 
 class UserServiceTest {
 
@@ -29,13 +33,15 @@ class UserServiceTest {
 
 	@Mock
 	private PasswordEncoder passwordEncoder;
+	@Mock
+	private UserTypeRepository userTypeRepository;
 
 	private UserService userService;
 
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		userService = new UserService(userRepository, passwordEncoder);
+		userService = new UserService(userRepository, passwordEncoder, userTypeRepository);
 	}
 
 	@Test
@@ -92,18 +98,27 @@ class UserServiceTest {
 	@Test
 	void givenUserDetails_whenUpdatingUser_thenShouldReturnUpdatedUser() {
 		Long userId = 1L;
-		UserType userType = new UserType();
+		UserType userType = new UserType(1L, UserTypeEnum.USER);
 		User existingUser = new User(userId, "olduser", "oldpass", "OldName", "OldSurname", 30, "gender", 40.7128,
-				-74.0060, "old@mail.com", null, null, null, userType);
+				-74.0060, "old@mail.com", new Timestamp(System.currentTimeMillis()),
+				new Timestamp(System.currentTimeMillis()), null, userType);
 		String encodedPassword = "encodedPassword";
+		UserDTO userToUpdateDTO = new UserDTO(userId, "updateduser", "newpass", "Updated", "User", 35, "gender",
+				34.0522, -118.2437, "update@mail.com", new Timestamp(System.currentTimeMillis()),
+				new Timestamp(System.currentTimeMillis()), null, userType);
 		User userToUpdate = new User(userId, "updateduser", encodedPassword, "Updated", "User", 35, "gender", 34.0522,
-				-118.2437, "update@mail.com", null, null, null, userType);
+				-118.2437, "update@mail.com", new Timestamp(System.currentTimeMillis()),
+				new Timestamp(System.currentTimeMillis()), null, userType);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
-		when(passwordEncoder.encode("newpass")).thenReturn(encodedPassword);
+		when(passwordEncoder.encode(userToUpdateDTO.getPassword())).thenReturn(encodedPassword);
 		when(userRepository.save(any(User.class))).thenReturn(userToUpdate);
 
-		User actual = userService.updateUser(userToUpdate);
+		// Assume UserMapper.fromUserDto is the method that converts a UserDTO to a User
+		// object
+		when(UserMapper.fromUserDto(userToUpdateDTO)).thenReturn(userToUpdate);
+
+		User actual = userService.updateUser(UserMapper.fromUserDto(userToUpdateDTO));
 
 		assertNotNull(actual);
 		assertEquals(userToUpdate.getUsername(), actual.getUsername());
