@@ -33,7 +33,7 @@ public class UserService {
 				&& user.getMail() == null && user.getMail().isEmpty()) {
 			throw new OperationNotAllowedException("Missing or incorrect user information. Please fill in all fields.");
 		}
-
+		// FIXME:ileride usertypa göre type eklenerek düzenlenmeli
 		UserType userType = userTypeRepository.findByType(UserTypeEnum.USER);
 		if (userType == null) {
 			throw new DatabaseOperationException("User type not found.");
@@ -72,6 +72,12 @@ public class UserService {
 		existingUser.setLongitude(user.getLongitude());
 		existingUser.setLatitude(user.getLatitude());
 		existingUser.setMail(user.getMail());
+		// FIXME:ileride usertypa göre type eklenerek düzenlenmeli
+		UserType userType = userTypeRepository.findByType(UserTypeEnum.USER);
+		if (userType == null) {
+			throw new DatabaseOperationException("User type not found.");
+		}
+		existingUser.setUserType(userType);
 
 		if (user.getPassword() != null && !user.getPassword().isEmpty()) {
 			String encodedPassword = passwordEncoder.encode(user.getPassword());
