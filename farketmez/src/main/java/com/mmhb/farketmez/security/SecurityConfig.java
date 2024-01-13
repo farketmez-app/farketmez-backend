@@ -27,8 +27,10 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable()
-				.authorizeHttpRequests((authz) -> authz.requestMatchers("/users/login", "/users").permitAll()
-						.anyRequest().authenticated())
+				.authorizeHttpRequests((authz) -> authz
+						.requestMatchers("/users/login", "/users", "/userinterests/**", "/interests/**",
+								"/locations/**", "/participants/**", "/event/**", "/settings/**", "/users/**")
+						.permitAll().anyRequest().authenticated())
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
