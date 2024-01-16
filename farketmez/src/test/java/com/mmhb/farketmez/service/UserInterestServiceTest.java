@@ -39,7 +39,7 @@ class UserInterestServiceTest {
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		userInterestService = new UserInterestService(userInterestRepository, userRepository);
+		userInterestService = new UserInterestService(userInterestRepository, userRepository, interestRepository);
 	}
 
 	@Test
@@ -142,4 +142,22 @@ class UserInterestServiceTest {
 		assertTrue(interests.stream().anyMatch(i -> i.getInterestName() == InterestType.RESTAURANT));
 	}
 
+	@Test
+	void givenUserId_whenFindingStringInterests_ShouldReturnInterestNames() {
+		Long userId = 1L;
+		User user = new User();
+		user.setId(userId);
+		Interest interest1 = new Interest(1L, InterestType.CINEMA);
+		Interest interest2 = new Interest(2L, InterestType.RESTAURANT);
+		UserInterest userInterest1 = new UserInterest(1L, user, interest1);
+		UserInterest userInterest2 = new UserInterest(2L, user, interest2);
+
+		when(userRepository.existsById(userId)).thenReturn(true);
+		when(userInterestRepository.findByUserId(userId)).thenReturn(Arrays.asList(userInterest1, userInterest2));
+
+		String interests = userInterestService.findStrInterestsByUserId(userId);
+
+		assertNotNull(interests);
+		assertEquals("CINEMA,RESTAURANT", interests);
+	}
 }

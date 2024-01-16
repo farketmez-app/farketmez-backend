@@ -1,27 +1,28 @@
 package com.mmhb.farketmez.service;
 
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import com.mmhb.farketmez.model.Interest;
-import com.mmhb.farketmez.model.Participant;
-import com.mmhb.farketmez.model.UserInterest;
-import com.mmhb.farketmez.repository.UserInterestRepository;
-import com.mmhb.farketmez.type.InterestType;
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import com.mmhb.farketmez.exception.UserInputException;
 import com.mmhb.farketmez.model.Event;
+import com.mmhb.farketmez.model.Participant;
 import com.mmhb.farketmez.repository.EventRepository;
 import com.mmhb.farketmez.repository.ParticipantRepository;
+import com.mmhb.farketmez.repository.UserInterestRepository;
 import com.mmhb.farketmez.repository.UserRepository;
 import com.mmhb.farketmez.util.HarvesineDistanceUtil;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-
-import javax.persistence.EntityNotFoundException;
 
 @Service
 @RequiredArgsConstructor
@@ -171,11 +172,11 @@ public class EventService {
 		return suggestedEvent;
 	}
 
-	private Event recommendEvent(List<Event> usersOldEvents, Map<Long, Double> oldEventRatings, Map<String, Integer> placeAndCostCounts) {
+	private Event recommendEvent(List<Event> usersOldEvents, Map<Long, Double> oldEventRatings,
+			Map<String, Integer> placeAndCostCounts) {
 		Event suggestedEvent = null;
 		List<Event> activeEvents = eventRepository.findEventsByIsActiveTrueAndIsPrivateFalse();
 		double maxScore = Double.MIN_VALUE;
-
 
 		for (Event activeEvent : activeEvents) {
 			if (!usersOldEvents.contains(activeEvent)) {
@@ -190,17 +191,19 @@ public class EventService {
 		return suggestedEvent;
 	}
 
-	private double calculateScore(Event event, Map<Long, Double> oldEventRatings, Map<String, Integer> placeAndCostCounts) {
+	private double calculateScore(Event event, Map<Long, Double> oldEventRatings,
+			Map<String, Integer> placeAndCostCounts) {
 		double ratingWeight = 0.5;
 
-
-		Pair<Double, Double> placeScoreAndCostScore = calculatePlaceScore(event, placeAndCostCounts, oldEventRatings.size());
+		Pair<Double, Double> placeScoreAndCostScore = calculatePlaceScore(event, placeAndCostCounts,
+				oldEventRatings.size());
 		double ratingScore = oldEventRatings.getOrDefault(event.getId(), 0.0);
 
 		return (ratingScore * ratingWeight) + placeScoreAndCostScore.getFirst() + placeScoreAndCostScore.getSecond();
 	}
 
-	private Pair<Double, Double> calculatePlaceScore(Event activeEvent, Map<String, Integer> placeAndCostCounts, int oldEventSize) {
+	private Pair<Double, Double> calculatePlaceScore(Event activeEvent, Map<String, Integer> placeAndCostCounts,
+			int oldEventSize) {
 		if (activeEvent.getPlace().equalsIgnoreCase("outdoor")) {
 			placeAndCostCounts.put("outdoor", placeAndCostCounts.getOrDefault("outdoor", 0) + 10);
 		} else if (activeEvent.getPlace().equalsIgnoreCase("home")) {
@@ -217,27 +220,37 @@ public class EventService {
 			placeAndCostCounts.put("expensive", placeAndCostCounts.getOrDefault("expensive", 0) + 10);
 		}
 
-
 		double outdoorScore = calculateWeightedScore(placeAndCostCounts.getOrDefault("outdoor", 0), oldEventSize, 0.3);
 		double homeScore = calculateWeightedScore(placeAndCostCounts.getOrDefault("home", 0), oldEventSize, 0.3);
 		double placeScore = calculateWeightedScore(placeAndCostCounts.getOrDefault("place", 0), oldEventSize, 0.4);
-		double totalPlaceScore = Math.max(outdoorScore, Math.max(homeScore, placeScore)) / (outdoorScore + homeScore + placeScore);
-		/*System.out.println("--------------------------------------------------------------");
-		System.out.println(activeEvent.getId() + " : outdoor score " + outdoorScore);
-		System.out.println(activeEvent.getId() + " : home score " + homeScore);
-		System.out.println(activeEvent.getId() + " : place score " + placeScore);
-		System.out.println(activeEvent.getId() + " : Total Place Score is -> " + totalPlaceScore);*/
+		double totalPlaceScore = Math.max(outdoorScore, Math.max(homeScore, placeScore))
+				/ (outdoorScore + homeScore + placeScore);
+		/*
+		 * System.out.println(
+		 * "--------------------------------------------------------------");
+		 * System.out.println(activeEvent.getId() + " : outdoor score " + outdoorScore);
+		 * System.out.println(activeEvent.getId() + " : home score " + homeScore);
+		 * System.out.println(activeEvent.getId() + " : place score " + placeScore);
+		 * System.out.println(activeEvent.getId() + " : Total Place Score is -> " +
+		 * totalPlaceScore);
+		 */
 
 		double cheapScore = calculateWeightedScore(placeAndCostCounts.getOrDefault("cheap", 0), oldEventSize, 0.4);
 		double midScore = calculateWeightedScore(placeAndCostCounts.getOrDefault("mid", 0), oldEventSize, 0.4);
-		double expensiveScore = calculateWeightedScore(placeAndCostCounts.getOrDefault("expensive", 0), oldEventSize, 0.4);
-		double totalCostScore = Math.max(cheapScore, Math.max(midScore, expensiveScore)) / (cheapScore + midScore + expensiveScore);
-		/*System.out.println("--------------------------------------------------------------");
-		System.out.println(activeEvent.getId() + " : Cheap score " + cheapScore);
-		System.out.println(activeEvent.getId() + " : mid score " + midScore);
-		System.out.println(activeEvent.getId() + " : expensive score " + expensiveScore);
-		System.out.println(activeEvent.getId() + " : Total Cost Score is -> " + totalCostScore);
-		System.out.println("--------------------------------------------------------------\n\n\n");*/
+		double expensiveScore = calculateWeightedScore(placeAndCostCounts.getOrDefault("expensive", 0), oldEventSize,
+				0.4);
+		double totalCostScore = Math.max(cheapScore, Math.max(midScore, expensiveScore))
+				/ (cheapScore + midScore + expensiveScore);
+		/*
+		 * System.out.println(
+		 * "--------------------------------------------------------------");
+		 * System.out.println(activeEvent.getId() + " : Cheap score " + cheapScore);
+		 * System.out.println(activeEvent.getId() + " : mid score " + midScore);
+		 * System.out.println(activeEvent.getId() + " : expensive score " +
+		 * expensiveScore); System.out.println(activeEvent.getId() +
+		 * " : Total Cost Score is -> " + totalCostScore); System.out.println(
+		 * "--------------------------------------------------------------\n\n\n");
+		 */
 
 		return Pair.of(totalPlaceScore, totalCostScore);
 	}
@@ -282,17 +295,7 @@ public class EventService {
 		return countsMap;
 	}
 
-
 	private double calculateWeightedScore(int count, int totalEvents, double weight) {
 		return (double) count / totalEvents * weight;
 	}
-
-
-
-
-
-
-
-
-
 }
