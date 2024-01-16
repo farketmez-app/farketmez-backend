@@ -27,7 +27,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping(value = "/userinterests")
+@RequestMapping(value = "/user-interests")
 public class UserInterestController {
 
 	private final UserInterestService userInterestService;
@@ -91,24 +91,24 @@ public class UserInterestController {
 
 	@GetMapping("/{userId}/interests1")
 	public ResponseEntity<String> getUserInterestsStr(@PathVariable Long userId) {
-		try{
+		try {
 			String interests = userInterestService.findStrInterestsByUserId(userId);
 			return new ResponseEntity<>(interests, HttpStatus.OK);
-		}catch (EntityNotFoundException e){
+		} catch (EntityNotFoundException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
 	}
 
 	@PutMapping("/{userId}/setInterests")
-	public ResponseEntity<List<InterestDTO>> setInterests(@PathVariable Long userId, @RequestBody List<Long> interestIds) {
-		try{
+	public ResponseEntity<List<InterestDTO>> setInterests(@PathVariable Long userId,
+			@RequestBody List<Long> interestIds) {
+		try {
 			List<Interest> interests = userInterestService.setInterests(userId, interestIds);
-			List<InterestDTO> interestDTOs = interests.stream()
-					.map(InterestMapper::toInterestDto)
+			List<InterestDTO> interestDTOs = interests.stream().map(InterestMapper::toInterestDto)
 					.collect(Collectors.toList());
 			return new ResponseEntity<>(interestDTOs, HttpStatus.OK);
-		}catch (EntityNotFoundException e){
+		} catch (EntityNotFoundException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 

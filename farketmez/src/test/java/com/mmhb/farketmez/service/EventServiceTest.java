@@ -14,8 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import com.mmhb.farketmez.repository.ParticipantRepository;
-import com.mmhb.farketmez.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -25,6 +23,9 @@ import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.EventType;
 import com.mmhb.farketmez.model.Location;
 import com.mmhb.farketmez.repository.EventRepository;
+import com.mmhb.farketmez.repository.ParticipantRepository;
+import com.mmhb.farketmez.repository.UserInterestRepository;
+import com.mmhb.farketmez.repository.UserRepository;
 
 class EventServiceTest {
 
@@ -34,17 +35,17 @@ class EventServiceTest {
 	private UserRepository userRepository;
 	@Mock
 	private ParticipantRepository participantRepository;
-
+	@Mock
+	private UserInterestRepository userInterestRepository;
 
 	private EventService eventService;
 	private UserService userService;
 	private ParticipantService participantService;
 
-
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		eventService = new EventService(eventRepository, userRepository, participantRepository);
+		eventService = new EventService(eventRepository, userRepository, participantRepository, userInterestRepository);
 	}
 
 	@Test
@@ -68,8 +69,8 @@ class EventServiceTest {
 		EventType eventType = new EventType();
 		Location location = new Location();
 		List<Event> events = Arrays.asList(
-				new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi", "Sinemada film izleme etkinliği", "ucuz", "dışarıda",
-						Timestamp.from(Instant.now()), new BigDecimal("4.5")),
+				new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi", "Sinemada film izleme etkinliği",
+						"ucuz", "dışarıda", Timestamp.from(Instant.now()), new BigDecimal("4.5")),
 				new Event(2L, eventType, location, 2L, true, false, "Kitap Kulübü Toplantısı", "ucuz", "dışarıda",
 						"Aylık kitap kulübü toplantısı", Timestamp.from(Instant.now()), new BigDecimal("4.8")));
 		when(eventRepository.findAll()).thenReturn(events);
