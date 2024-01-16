@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -297,5 +298,15 @@ public class EventService {
 
 	private double calculateWeightedScore(int count, int totalEvents, double weight) {
 		return (double) count / totalEvents * weight;
+	}
+
+	public List<Event> getPastEvents() {
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+		return eventRepository.findAll().stream().filter(e -> e.getDate().before(now)).collect(Collectors.toList());
+	}
+
+	public List<Event> getUpcomingEvents() {
+		Timestamp now = new Timestamp(System.currentTimeMillis());
+		return eventRepository.findAll().stream().filter(e -> e.getDate().after(now)).collect(Collectors.toList());
 	}
 }
