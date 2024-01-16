@@ -122,4 +122,13 @@ public class EventController {
 
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
+
+
+	@GetMapping("/suggestedevent/{userId}")
+	public ResponseEntity<EventDTO> getSuggestEvent(@PathVariable Long userId){
+		Event event = eventService.getSuggestedEvent(userId);
+		EventDTO eventDTO = EventMapper.toEventDto(event);
+
+		return new ResponseEntity<>(eventDTO, HttpStatus.OK);
+	}
 }
