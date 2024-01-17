@@ -10,36 +10,21 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import com.mmhb.farketmez.util.JwtUtil;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-	private final JwtUtil jwtUtil;
-
-	public SecurityConfig(JwtUtil jwtUtil) {
-		this.jwtUtil = jwtUtil;
-	}
-
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable()
 				.authorizeHttpRequests((authz) -> authz
-						.requestMatchers("/users/login", "/users", "/userinterests/**", "/interests/**",
+						.requestMatchers("/users/login", "/users", "/user-interests/**", "/interests/**",
 								"/locations/**", "/participants/**", "/event/**", "/settings/**", "/users/**")
 						.permitAll().anyRequest().authenticated())
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		return http.build();
-	}
-
-	@Bean
-	public JwtAuthenticationFilter jwtAuthenticationFilter() {
-		return new JwtAuthenticationFilter(jwtUtil);
 	}
 
 	@Bean

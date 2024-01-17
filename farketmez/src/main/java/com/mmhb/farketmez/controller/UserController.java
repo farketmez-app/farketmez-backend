@@ -25,8 +25,8 @@ import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.service.AuthenticationService;
 import com.mmhb.farketmez.service.ParticipantService;
 import com.mmhb.farketmez.service.UserService;
-import com.mmhb.farketmez.util.JwtUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 
 @RestController
@@ -36,7 +36,6 @@ import lombok.AllArgsConstructor;
 public class UserController {
 	private final UserService userService;
 	private final AuthenticationService authenticationService;
-	private final JwtUtil jwtUtil;
 	private final ParticipantService participantService;
 
 	@GetMapping
@@ -86,14 +85,13 @@ public class UserController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDto) {
+	public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDto, HttpServletRequest request) {
 		User authenticatedUser = authenticationService.authenticateUser(userLoginDto.getMail(),
 				userLoginDto.getPassword());
 		if (authenticatedUser != null) {
-			String token = jwtUtil.generateToken(authenticatedUser);
-			// TODO: Consider returning those with another DTO
-			return ResponseEntity.ok().body("token: " + token + "\n" +
-					"id: " + authenticatedUser.getId());
+			request.getSession().setAttribute("USER", authenticatedUser);
+			String response = "User ID: " + authenticatedUser.getId() + "\nMail: " + authenticatedUser.getMail();
+			return ResponseEntity.ok(response);
 		}
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
