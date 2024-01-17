@@ -17,7 +17,7 @@ public class JwtUtil {
 	public String generateToken(User user) {
 		long now = System.currentTimeMillis();
 		return Jwts.builder().setSubject(user.getMail()).setIssuedAt(new Date(now))
-				.setExpiration(new Date(now + 900000)).signWith(SignatureAlgorithm.HS512, secret).compact();
+				.setExpiration(new Date(now + 900000000)).signWith(SignatureAlgorithm.HS512, secret).compact();
 	}
 
 	public String getSecretKey() {

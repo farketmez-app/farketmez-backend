@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +25,6 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping(value = "/events")
 public class EventController {
 
@@ -123,12 +121,25 @@ public class EventController {
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
-
 	@GetMapping("/suggestedevent/{userId}")
-	public ResponseEntity<EventDTO> getSuggestEvent(@PathVariable Long userId){
+	public ResponseEntity<EventDTO> getSuggestEvent(@PathVariable Long userId) {
 		Event event = eventService.getSuggestedEvent(userId);
 		EventDTO eventDTO = EventMapper.toEventDto(event);
 
 		return new ResponseEntity<>(eventDTO, HttpStatus.OK);
+	}
+
+	@GetMapping("/past-events")
+	public ResponseEntity<List<EventDTO>> getPastEvents() {
+		List<EventDTO> pastEvents = eventService.getPastEvents().stream().map(EventMapper::toEventDto)
+				.collect(Collectors.toList());
+		return new ResponseEntity<>(pastEvents, HttpStatus.OK);
+	}
+
+	@GetMapping("/upcoming-events")
+	public ResponseEntity<List<EventDTO>> getUpcomingEvents() {
+		List<EventDTO> upcomingEvents = eventService.getUpcomingEvents().stream().map(EventMapper::toEventDto)
+				.collect(Collectors.toList());
+		return new ResponseEntity<>(upcomingEvents, HttpStatus.OK);
 	}
 }
