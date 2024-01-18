@@ -42,6 +42,16 @@ public class ParticipantController {
 		}
 	}
 
+	@GetMapping("/by-user-id/{userId}")
+	public ResponseEntity<Participant> getParticipantsByUserId(@PathVariable Long userId) {
+		List<Participant> participants = participantService.getParticipantsByUserId(userId);
+		if (participants.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} else {
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+	}
+
 	@PostMapping
 	public ResponseEntity<Participant> createParticipant(@RequestBody Participant participant) {
 		Participant createdParticipant = participantService.createParticipant(participant);

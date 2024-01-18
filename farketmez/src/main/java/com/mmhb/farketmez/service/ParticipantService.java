@@ -78,6 +78,8 @@ public class ParticipantService {
 		return participantRepository.findEventsByUserId(userId);
 	}
 
+	public List<Participant> getParticipantsByUserId(Long userId) {return participantRepository.findByUserId(userId);}
+
 	@Transactional
 	public void rateEvent(Long userId, Long eventId, BigDecimal rating, String comment) {
 		User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
