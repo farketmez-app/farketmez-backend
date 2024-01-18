@@ -5,14 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.mmhb.farketmez.dto.InterestDTO;
 import com.mmhb.farketmez.dto.UserInterestDTO;
@@ -28,6 +21,7 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 @RestController
 @RequestMapping(value = "/user-interests")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserInterestController {
 
 	private final UserInterestService userInterestService;
@@ -100,6 +94,10 @@ public class UserInterestController {
 
 	}
 
+	/*
+	request URL: http://localhost:8080/user-interests/1/setInterests
+	request body: [1,2,3]
+	*/
 	@PutMapping("/{userId}/setInterests")
 	public ResponseEntity<List<InterestDTO>> setInterests(@PathVariable Long userId,
 			@RequestBody List<Long> interestIds) {
