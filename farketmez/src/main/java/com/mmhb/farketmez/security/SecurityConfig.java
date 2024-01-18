@@ -28,8 +28,8 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable()
 				.authorizeHttpRequests((authz) -> authz
-						.requestMatchers("/users/login", "/users", "/userinterests/**", "/interests/**",
-								"/locations/**", "/participants/**", "/event/**", "/settings/**", "/users/**")
+						.requestMatchers("/users/login", "/users", "/user-interests/**", "/interests/**",
+								"/locations/**", "/participants/**", "/events/**", "/settings/**", "/users/**")
 						.permitAll().anyRequest().authenticated())
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
 				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
