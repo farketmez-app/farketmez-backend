@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.mmhb.farketmez.dto.RateRequestDTO;
 import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.EventType;
 import com.mmhb.farketmez.model.Location;
@@ -177,5 +178,29 @@ class ParticipantServiceTest {
 		assertNotNull(actualEvents);
 		assertEquals(expectedEvents, actualEvents);
 		verify(participantRepository).findAttendedNotRatedNotExpiredEvents(userId);
+	}
+
+	@Test
+	void whenRatingExistingParticipant_thenShouldUpdateRating() {
+		Long userId = 1L;
+		Long eventId = 2L;
+		User user = new User(userId, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
+				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
+		Event event = new Event(eventId, new EventType(), new Location(), userId, true, false, "Test Event", "Ucuz",
+				"Dışarıda", "Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+		Participant existingParticipant = new Participant(1L, user, event, null, null);
+
+		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+		when(eventRepository.findById(eventId)).thenReturn(Optional.of(event));
+		when(participantRepository.findByUserIdAndEventId(userId, eventId))
+				.thenReturn(Optional.of(existingParticipant));
+		when(participantRepository.save(any(Participant.class))).thenReturn(existingParticipant);
+
+		RateRequestDTO rateRequestDTO = new RateRequestDTO(userId, eventId, new BigDecimal("4.5"), "Great event!");
+		participantService.rateEvent(rateRequestDTO);
+
+		verify(participantRepository).save(existingParticipant);
+		assertEquals(new BigDecimal("4.5"), existingParticipant.getRating());
+		assertEquals("Great event!", existingParticipant.getComment());
 	}
 }
