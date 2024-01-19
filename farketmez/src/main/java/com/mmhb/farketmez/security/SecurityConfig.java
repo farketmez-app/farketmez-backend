@@ -20,7 +20,7 @@ public class SecurityConfig {
 		http.csrf().disable()
 				.authorizeHttpRequests((authz) -> authz
 						.requestMatchers("/users/login", "/users", "/user-interests/**", "/interests/**",
-								"/locations/**", "/participants/**", "/event/**", "/settings/**", "/users/**")
+								"/locations/**", "/participants/**", "/events/**", "/settings/**", "/users/**")
 						.permitAll().anyRequest().authenticated())
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 

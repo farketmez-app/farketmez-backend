@@ -13,9 +13,11 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import com.mmhb.farketmez.exception.OperationNotAllowedException;
 import com.mmhb.farketmez.exception.UserInputException;
 import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.Participant;
+import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.repository.EventRepository;
 import com.mmhb.farketmez.repository.ParticipantRepository;
 import com.mmhb.farketmez.repository.UserInterestRepository;
@@ -308,5 +310,18 @@ public class EventService {
 	public List<Event> getUpcomingEvents() {
 		Timestamp now = new Timestamp(System.currentTimeMillis());
 		return eventRepository.findAll().stream().filter(e -> e.getDate().after(now)).collect(Collectors.toList());
+	}
+
+	public void joinEvent(Long userId, Long eventId) {
+		User user = userRepository.findById(userId)
+				.orElseThrow(() -> new OperationNotAllowedException("User not found"));
+		Event event = eventRepository.findById(eventId)
+				.orElseThrow(() -> new OperationNotAllowedException("Event not found"));
+
+		Participant participant = new Participant();
+		participant.setUser(user);
+		participant.setEvent(event);
+
+		participantRepository.save(participant);
 	}
 }
