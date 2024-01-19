@@ -4,15 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.mmhb.farketmez.dto.RateRequestDTO;
 import com.mmhb.farketmez.model.Event;
@@ -25,6 +17,7 @@ import lombok.AllArgsConstructor;
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping(value = "/participants")
+@CrossOrigin(origins = "http://localhost:3000")
 public class ParticipantController {
 
 	private final ParticipantService participantService;
@@ -46,12 +39,12 @@ public class ParticipantController {
 	}
 
 	@GetMapping("/by-user-id/{userId}")
-	public ResponseEntity<Participant> getParticipantsByUserId(@PathVariable Long userId) {
+	public ResponseEntity<List<Participant>> getParticipantsByUserId(@PathVariable Long userId) {
 		List<Participant> participants = participantService.getParticipantsByUserId(userId);
 		if (participants.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		} else {
-			return new ResponseEntity<>(HttpStatus.OK);
+			return new ResponseEntity<>(participants, HttpStatus.OK);
 		}
 	}
 
