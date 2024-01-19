@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.mmhb.farketmez.dto.RateRequestDTO;
+import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.Participant;
 import com.mmhb.farketmez.service.ParticipantService;
 
@@ -14,6 +15,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping(value = "/participants")
 @CrossOrigin(origins = "http://localhost:3000")
 public class ParticipantController {
@@ -72,18 +74,41 @@ public class ParticipantController {
 		}
 	}
 
-	@PostMapping("/events/rate")
+	@PostMapping("/rate-event")
 	public ResponseEntity<?> rateEvent(@RequestBody RateRequestDTO rateRequestDTO) {
-		participantService.rateEvent(rateRequestDTO.getUserId(), rateRequestDTO.getEventId(), rateRequestDTO.getRate(),
-				rateRequestDTO.getComment());
+		participantService.rateEvent(rateRequestDTO);
 		return ResponseEntity.ok().build();
 	}
 
-	@PutMapping("/events/rate")
+	@PutMapping("/rate-event")
 	public ResponseEntity<?> editEventRate(@RequestBody RateRequestDTO rateRequestDTO) {
-		participantService.editEventRate(rateRequestDTO.getUserId(), rateRequestDTO.getEventId(), rateRequestDTO.getRate(),
-				rateRequestDTO.getComment());
+		participantService.editEventRate(rateRequestDTO.getUserId(), rateRequestDTO.getEventId(),
+				rateRequestDTO.getRate(), rateRequestDTO.getComment());
 		return ResponseEntity.ok().build();
+	}
+
+	// Request: GET
+	// http://localhost:8080/participants/attended-rated-expired-events/{userId}
+	@GetMapping("/attended-rated-expired-events/{userId}")
+	public ResponseEntity<List<Event>> getAttendedRatedExpiredEvents(@PathVariable Long userId) {
+		List<Event> events = participantService.getAttendedRatedExpiredEvents(userId);
+		return new ResponseEntity<>(events, HttpStatus.OK);
+	}
+
+	// Request: GET
+	// http://localhost:8080/participants/attended-not-rated-expired-events/{userId}
+	@GetMapping("/attended-not-rated-expired-events/{userId}")
+	public ResponseEntity<List<Event>> getAttendedNotRatedExpiredEvents(@PathVariable Long userId) {
+		List<Event> events = participantService.getAttendedNotRatedExpiredEvents(userId);
+		return new ResponseEntity<>(events, HttpStatus.OK);
+	}
+
+	// Request: GET
+	// http://localhost:8080/participants/attended-not-rated-not-expired-events/{userId}
+	@GetMapping("/attended-not-rated-not-expired-events/{userId}")
+	public ResponseEntity<List<Event>> getAttendedNotRatedNotExpiredEvents(@PathVariable Long userId) {
+		List<Event> events = participantService.getAttendedNotRatedNotExpiredEvents(userId);
+		return new ResponseEntity<>(events, HttpStatus.OK);
 	}
 
 }
