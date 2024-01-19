@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.mmhb.farketmez.dto.RateRequestDTO;
 import com.mmhb.farketmez.exception.CustomOperationException;
 import com.mmhb.farketmez.exception.DatabaseOperationException;
 import com.mmhb.farketmez.exception.OperationNotAllowedException;
@@ -83,19 +84,19 @@ public class ParticipantService {
 	}
 
 	@Transactional
-	public void rateEvent(Long userId, Long eventId, BigDecimal rating, String comment) {
-		User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-		Event event = eventRepository.findById(eventId)
+	public void rateEvent(RateRequestDTO rateRequestDTO) {
+		User user = userRepository.findById(rateRequestDTO.getUserId())
+				.orElseThrow(() -> new IllegalArgumentException("User not found"));
+		Event event = eventRepository.findById(rateRequestDTO.getEventId())
 				.orElseThrow(() -> new DatabaseOperationException("Event not found"));
-		// Etkinliği oylayabilmek için bitmesi şartı aranmaktadır.
 		if (event.getDate().after(new Timestamp(System.currentTimeMillis()))) {
 			throw new CustomOperationException("Cannot rate an ongoing event.");
 		}
 		Participant participant = new Participant();
 		participant.setUser(user);
 		participant.setEvent(event);
-		participant.setRating(rating);
-		participant.setComment(comment);
+		participant.setRating(rateRequestDTO.getRate());
+		participant.setComment(rateRequestDTO.getComment());
 
 		participantRepository.save(participant);
 	}
@@ -119,12 +120,16 @@ public class ParticipantService {
 		participantRepository.save(participant);
 	}
 
-	public List<Event> getEventsUserAttendedButDidntRate(Long userId) {
-		return participantRepository.findEventsUserAttendedButDidntRate(userId);
+	public List<Event> getAttendedRatedExpiredEvents(Long userId) {
+		return participantRepository.findAttendedRatedExpiredEvents(userId);
 	}
 
-	public List<Event> getEventsUserAttendedAndRated(Long userId) {
-		return participantRepository.findEventsUserAttendedAndRated(userId);
+	public List<Event> getAttendedNotRatedExpiredEvents(Long userId) {
+		return participantRepository.findAttendedNotRatedExpiredEvents(userId);
+	}
+
+	public List<Event> getAttendedNotRatedNotExpiredEvents(Long userId) {
+		return participantRepository.findAttendedNotRatedNotExpiredEvents(userId);
 	}
 
 }

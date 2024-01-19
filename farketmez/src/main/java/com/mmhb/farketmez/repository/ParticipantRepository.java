@@ -21,9 +21,12 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
 	Integer countByEventId(Long eventId);
 
-	@Query("SELECT p.event FROM Participant p WHERE p.user.id = ?1 AND p.rating IS NULL")
-	List<Event> findEventsUserAttendedButDidntRate(Long userId);
+	@Query("SELECT p.event FROM Participant p WHERE p.user.id = ?1 AND p.rating IS NOT NULL AND p.event.date < CURRENT_TIMESTAMP")
+	List<Event> findAttendedRatedExpiredEvents(Long userId);
 
-	@Query("SELECT p.event FROM Participant p WHERE p.user.id = ?1 AND p.rating IS NOT NULL")
-	List<Event> findEventsUserAttendedAndRated(Long userId);
+	@Query("SELECT p.event FROM Participant p WHERE p.user.id = ?1 AND p.rating IS NULL AND p.event.date < CURRENT_TIMESTAMP")
+	List<Event> findAttendedNotRatedExpiredEvents(Long userId);
+
+	@Query("SELECT p.event FROM Participant p WHERE p.user.id = ?1 AND p.rating IS NULL AND p.event.date > CURRENT_TIMESTAMP")
+	List<Event> findAttendedNotRatedNotExpiredEvents(Long userId);
 }
