@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mmhb.farketmez.dto.RateRequestDTO;
+import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.Participant;
 import com.mmhb.farketmez.service.ParticipantService;
 
@@ -87,9 +88,34 @@ public class ParticipantController {
 
 	@PutMapping("/events/rate")
 	public ResponseEntity<?> editEventRate(@RequestBody RateRequestDTO rateRequestDTO) {
-		participantService.editEventRate(rateRequestDTO.getUserId(), rateRequestDTO.getEventId(), rateRequestDTO.getRate(),
-				rateRequestDTO.getComment());
+		participantService.editEventRate(rateRequestDTO.getUserId(), rateRequestDTO.getEventId(),
+				rateRequestDTO.getRate(), rateRequestDTO.getComment());
 		return ResponseEntity.ok().build();
+	}
+
+	// Request
+	// Body:http://localhost:8080/participants/events-list-user-attended-and-didnt-rate/{userid}
+
+	@GetMapping("/events-list-user-attended-and-didnt-rate/{userId}")
+	public ResponseEntity<List<Event>> getEventsUserAttendedButDidntRate(@PathVariable Long userId) {
+		List<Event> events = participantService.getEventsUserAttendedButDidntRate(userId);
+		if (events.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} else {
+			return new ResponseEntity<>(events, HttpStatus.OK);
+		}
+	}
+
+	// Request
+	// Body:http://localhost:8080/participants/events-list-user-attended-rated/{userId}
+	@GetMapping("/events-list-user-attended-rated/{userId}")
+	public ResponseEntity<List<Event>> getEventsUserAttendedAndRated(@PathVariable Long userId) {
+		List<Event> events = participantService.getEventsUserAttendedAndRated(userId);
+		if (events.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} else {
+			return new ResponseEntity<>(events, HttpStatus.OK);
+		}
 	}
 
 }

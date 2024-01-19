@@ -78,7 +78,9 @@ public class ParticipantService {
 		return participantRepository.findEventsByUserId(userId);
 	}
 
-	public List<Participant> getParticipantsByUserId(Long userId) {return participantRepository.findByUserId(userId);}
+	public List<Participant> getParticipantsByUserId(Long userId) {
+		return participantRepository.findByUserId(userId);
+	}
 
 	@Transactional
 	public void rateEvent(Long userId, Long eventId, BigDecimal rating, String comment) {
@@ -115,6 +117,14 @@ public class ParticipantService {
 		participant.setComment(comment);
 
 		participantRepository.save(participant);
+	}
+
+	public List<Event> getEventsUserAttendedButDidntRate(Long userId) {
+		return participantRepository.findEventsUserAttendedButDidntRate(userId);
+	}
+
+	public List<Event> getEventsUserAttendedAndRated(Long userId) {
+		return participantRepository.findEventsUserAttendedAndRated(userId);
 	}
 
 }
