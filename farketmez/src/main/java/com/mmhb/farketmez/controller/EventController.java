@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mmhb.farketmez.dto.EventDTO;
+import com.mmhb.farketmez.exception.OperationNotAllowedException;
 import com.mmhb.farketmez.mapper.EventMapper;
 import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.service.EventService;
@@ -141,5 +142,20 @@ public class EventController {
 		List<EventDTO> upcomingEvents = eventService.getUpcomingEvents().stream().map(EventMapper::toEventDto)
 				.collect(Collectors.toList());
 		return new ResponseEntity<>(upcomingEvents, HttpStatus.OK);
+	}
+
+	// Request Body:
+	// http://localhost:8080/events/join?userId=1&eventId=4
+	@PostMapping("/join")
+	public ResponseEntity<String> joinEvent(@RequestParam(name = "userId") Long userId,
+			@RequestParam(name = "eventId") Long eventId) {
+		try {
+			eventService.joinEvent(userId, eventId);
+			return new ResponseEntity<>("User successfully joined the event", HttpStatus.CREATED);
+		} catch (OperationNotAllowedException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		} catch (Exception e) {
+			return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }
