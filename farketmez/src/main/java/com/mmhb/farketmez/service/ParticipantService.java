@@ -3,6 +3,7 @@ package com.mmhb.farketmez.service;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -89,10 +90,15 @@ public class ParticipantService {
 				.orElseThrow(() -> new IllegalArgumentException("User not found"));
 		Event event = eventRepository.findById(rateRequestDTO.getEventId())
 				.orElseThrow(() -> new DatabaseOperationException("Event not found"));
+
 		if (event.getDate().after(new Timestamp(System.currentTimeMillis()))) {
 			throw new CustomOperationException("Cannot rate an ongoing event.");
 		}
-		Participant participant = new Participant();
+
+		Optional<Participant> existingParticipant = participantRepository.findByUserIdAndEventId(user.getId(),
+				event.getId());
+
+		Participant participant = existingParticipant.orElse(new Participant());
 		participant.setUser(user);
 		participant.setEvent(event);
 		participant.setRating(rateRequestDTO.getRate());
