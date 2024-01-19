@@ -35,6 +35,7 @@ public class EventService {
 	private final UserRepository userRepository;
 	private final ParticipantRepository participantRepository;
 	private final UserInterestRepository userInterestRepository;
+	private final MapsService mapsService;
 
 	@Transactional
 	public Event createEvent(Event event) {
@@ -45,6 +46,13 @@ public class EventService {
 		if (isTitleEmpty && isDescriptionEmpty && isDateNull) {
 			throw new UserInputException(
 					"All fields are empty. Cannot create event without title, description, and date.");
+		}
+
+		try {
+			String photoUrl = mapsService.getPhotoUrlForLocation(event.getPlace());
+			event.setPhotoUrl(photoUrl);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		event.setCreatedAt(new Timestamp(System.currentTimeMillis()));
@@ -135,9 +143,15 @@ public class EventService {
 		boolean isDescriptionEmpty = event.getDescription() == null || event.getDescription().isEmpty();
 		boolean isDateNull = event.getDate() == null;
 
-		if (isTitleEmpty && isDescriptionEmpty && isDateNull) {
-			throw new UserInputException(
-					"All fields are empty. Cannot update event without title, description, and date.");
+		if (isTitleEmpty || isDescriptionEmpty || isDateNull) {
+			throw new UserInputException("Cannot update event with empty title, description, or date.");
+		}
+
+		try {
+			String photoUrl = mapsService.getPhotoUrlForLocation(event.getPlace());
+			event.setPhotoUrl(photoUrl);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		event.setUpdatedAt(new Timestamp(System.currentTimeMillis()));

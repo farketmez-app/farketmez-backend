@@ -27,6 +27,7 @@ public class EventDTO {
 	private Timestamp createdAt;
 	private Timestamp updatedAt;
 	private Timestamp deletedAt;
+	private String photoUrl;
 
 	private EventType eventType;
 	private Location location;

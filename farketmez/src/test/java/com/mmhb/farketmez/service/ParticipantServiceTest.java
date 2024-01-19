@@ -52,13 +52,15 @@ class ParticipantServiceTest {
 	@Test
 	void whenCreatingParticipant_thenShouldReturnSavedParticipant() {
 		UserType userType = new UserType();
+		String photoUrl = "testPhotoUrl";
 		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 		EventType eventType = new EventType();
 		Location location = new Location();
 		Long creatorId = 1L;
 		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "ucuz", "dışarıda",
-				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"), photoUrl);
+		when(eventRepository.findById(2L)).thenReturn(Optional.of(testEvent));
 		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 		when(eventRepository.findById(2L)).thenReturn(Optional.of(testEvent));
 		Participant participantToSave = new Participant(null, testUser, testEvent, new BigDecimal("4.5"),
@@ -78,8 +80,9 @@ class ParticipantServiceTest {
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 		EventType eventType = new EventType();
 		Location location = new Location();
+		String photoUrl = "testPhotoUrl";
 		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Mekanda",
-				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"), photoUrl);
 
 		List<Participant> participants = Arrays.asList(
 				new Participant(1L, testUser, testEvent, new BigDecimal("4.5"), "Great event!"),
@@ -96,10 +99,11 @@ class ParticipantServiceTest {
 		Long participantId = 1L;
 		EventType eventType = new EventType();
 		Location location = new Location();
+		String photoUrl = "testPhotoUrl";
 		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Dışarıda",
-				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"), photoUrl);
 
 		Participant participantToFind = new Participant(participantId, testUser, testEvent, new BigDecimal("4.5"),
 				"Great event!");
@@ -114,12 +118,13 @@ class ParticipantServiceTest {
 	@Test
 	void givenParticipantDetails_whenUpdatingParticipant_thenShouldReturnUpdatedParticipant() {
 		Long participantId = 1L;
+		String photoUrl = "testPhotoUrl";
 		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 		EventType eventType = new EventType();
 		Location location = new Location();
 		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Dışarıda",
-				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"), photoUrl);
 
 		Participant participantToUpdate = new Participant(participantId, testUser, testEvent, new BigDecimal("5.0"),
 				"Updated Comment");
@@ -184,10 +189,11 @@ class ParticipantServiceTest {
 	void whenRatingExistingParticipant_thenShouldUpdateRating() {
 		Long userId = 1L;
 		Long eventId = 2L;
+		String photoUrl = "testPhotoUrl";
 		User user = new User(userId, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 		Event event = new Event(eventId, new EventType(), new Location(), userId, true, false, "Test Event", "Ucuz",
-				"Dışarıda", "Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+				"Dışarıda", "Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"), photoUrl);
 		Participant existingParticipant = new Participant(1L, user, event, null, null);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));
