@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -55,8 +56,8 @@ class ParticipantServiceTest {
 		EventType eventType = new EventType();
 		Location location = new Location();
 		Long creatorId = 1L;
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "ucuz","dışarıda", "Description",
-				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "ucuz", "dışarıda",
+				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 		when(eventRepository.findById(2L)).thenReturn(Optional.of(testEvent));
 		Participant participantToSave = new Participant(null, testUser, testEvent, new BigDecimal("4.5"),
@@ -76,8 +77,8 @@ class ParticipantServiceTest {
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 		EventType eventType = new EventType();
 		Location location = new Location();
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Mekanda","Description",
-				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Mekanda",
+				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 
 		List<Participant> participants = Arrays.asList(
 				new Participant(1L, testUser, testEvent, new BigDecimal("4.5"), "Great event!"),
@@ -96,8 +97,8 @@ class ParticipantServiceTest {
 		Location location = new Location();
 		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Dışarıda", "Description",
-				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Dışarıda",
+				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 
 		Participant participantToFind = new Participant(participantId, testUser, testEvent, new BigDecimal("4.5"),
 				"Great event!");
@@ -116,8 +117,8 @@ class ParticipantServiceTest {
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 		EventType eventType = new EventType();
 		Location location = new Location();
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Dışarıda", "Description",
-				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Dışarıda",
+				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
 
 		Participant participantToUpdate = new Participant(participantId, testUser, testEvent, new BigDecimal("5.0"),
 				"Updated Comment");
@@ -140,42 +141,41 @@ class ParticipantServiceTest {
 	}
 
 	@Test
-	void whenGetEventsByUser_thenShouldReturnListOfEvents() {
+	void whenGettingAttendedRatedExpiredEvents_thenShouldReturnEvents() {
 		Long userId = 1L;
-		Timestamp now = new Timestamp(System.currentTimeMillis());
-		Event event1 = new Event(1L, true, "Sinemaya Gitmek", "Film izlemek için sinemaya gitmek.", now,
-				new BigDecimal("4.2"));
-		Event event2 = new Event(2L, true, "Kitap Okuma Kulübü", "Kitap okuma etkinliği.", now, new BigDecimal("4.8"));
+		List<Event> expectedEvents = mock(List.class);
+		when(participantRepository.findAttendedRatedExpiredEvents(userId)).thenReturn(expectedEvents);
 
-		List<Event> expectedEvents = Arrays.asList(event1, event2);
-		when(participantRepository.findEventsByUserId(userId)).thenReturn(expectedEvents);
+		List<Event> actualEvents = participantService.getAttendedRatedExpiredEvents(userId);
 
-		List<Event> actualEvents = participantService.getEventsByUser(userId);
-
-		assertEquals(expectedEvents.size(), actualEvents.size());
+		assertNotNull(actualEvents);
 		assertEquals(expectedEvents, actualEvents);
+		verify(participantRepository).findAttendedRatedExpiredEvents(userId);
 	}
 
 	@Test
-	void whenRatingEvent_thenShouldSaveParticipantWithRating() {
-		UserType userType = new UserType();
-		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
-				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
+	void whenGettingAttendedNotRatedExpiredEvents_thenShouldReturnEvents() {
+		Long userId = 1L;
+		List<Event> expectedEvents = mock(List.class);
+		when(participantRepository.findAttendedNotRatedExpiredEvents(userId)).thenReturn(expectedEvents);
 
-		EventType eventType = new EventType();
-		Location location = new Location();
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event","Ucuz", "Dışarıda", "Description",
-				new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"));
+		List<Event> actualEvents = participantService.getAttendedNotRatedExpiredEvents(userId);
 
-		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-		when(eventRepository.findById(2L)).thenReturn(Optional.of(testEvent));
+		assertNotNull(actualEvents);
+		assertEquals(expectedEvents, actualEvents);
+		verify(participantRepository).findAttendedNotRatedExpiredEvents(userId);
+	}
 
-		BigDecimal rating = new BigDecimal("4.5");
-		String comment = "Great event!";
+	@Test
+	void whenGettingAttendedNotRatedNotExpiredEvents_thenShouldReturnEvents() {
+		Long userId = 1L;
+		List<Event> expectedEvents = mock(List.class);
+		when(participantRepository.findAttendedNotRatedNotExpiredEvents(userId)).thenReturn(expectedEvents);
 
-		participantService.rateEvent(1L, 2L, rating, comment);
+		List<Event> actualEvents = participantService.getAttendedNotRatedNotExpiredEvents(userId);
 
-		Participant expectedParticipant = new Participant(null, testUser, testEvent, rating, comment);
-		verify(participantRepository).save(expectedParticipant);
+		assertNotNull(actualEvents);
+		assertEquals(expectedEvents, actualEvents);
+		verify(participantRepository).findAttendedNotRatedNotExpiredEvents(userId);
 	}
 }
