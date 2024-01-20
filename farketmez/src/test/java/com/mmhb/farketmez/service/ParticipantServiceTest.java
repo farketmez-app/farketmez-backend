@@ -54,13 +54,14 @@ class ParticipantServiceTest {
 		UserType userType = new UserType();
 		String photoUrl = "testPhotoUrl";
 		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
-				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
+				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, userType);
 		EventType eventType = new EventType();
 		Location location = new Location();
 		Long creatorId = 1L;
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "ucuz", "dışarıda",
-				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"), photoUrl);
-		when(eventRepository.findById(2L)).thenReturn(Optional.of(testEvent));
+		String accessKey = "accessKey123";
+		Event testEvent = new Event(2L, new EventType(), new Location(), 1L, true, false, "Test Event", "ucuz",
+				"dışarıda", "Description", "accessKey123", new Timestamp(System.currentTimeMillis()),
+				new BigDecimal("4.5"), "testPhotoUrl");
 		when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
 		when(eventRepository.findById(2L)).thenReturn(Optional.of(testEvent));
 		Participant participantToSave = new Participant(null, testUser, testEvent, new BigDecimal("4.5"),
@@ -81,8 +82,11 @@ class ParticipantServiceTest {
 		EventType eventType = new EventType();
 		Location location = new Location();
 		String photoUrl = "testPhotoUrl";
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Mekanda",
-				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"), photoUrl);
+		Long creatorId = 1L;
+		String accessKey = "accessKey123";
+		Event testEvent = new Event(2L, new EventType(), new Location(), 1L, true, false, "Test Event", "ucuz",
+				"dışarıda", "Description", "accessKey123", new Timestamp(System.currentTimeMillis()),
+				new BigDecimal("4.5"), "testPhotoUrl");
 
 		List<Participant> participants = Arrays.asList(
 				new Participant(1L, testUser, testEvent, new BigDecimal("4.5"), "Great event!"),
@@ -102,8 +106,11 @@ class ParticipantServiceTest {
 		String photoUrl = "testPhotoUrl";
 		User testUser = new User(1L, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Dışarıda",
-				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"), photoUrl);
+		String accessKey = "accessKey123";
+		Long creatorId = 1L;
+		Event testEvent = new Event(2L, new EventType(), new Location(), 1L, true, false, "Test Event", "ucuz",
+				"dışarıda", "Description", "accessKey123", new Timestamp(System.currentTimeMillis()),
+				new BigDecimal("4.5"), "testPhotoUrl");
 
 		Participant participantToFind = new Participant(participantId, testUser, testEvent, new BigDecimal("4.5"),
 				"Great event!");
@@ -123,8 +130,11 @@ class ParticipantServiceTest {
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
 		EventType eventType = new EventType();
 		Location location = new Location();
-		Event testEvent = new Event(2L, eventType, location, 1L, true, false, "Test Event", "Ucuz", "Dışarıda",
-				"Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"), photoUrl);
+		String accessKey = "accessKey123";
+		Long creatorId = 1L;
+		Event testEvent = new Event(2L, new EventType(), new Location(), 1L, true, false, "Test Event", "ucuz",
+				"dışarıda", "Description", "accessKey123", new Timestamp(System.currentTimeMillis()),
+				new BigDecimal("4.5"), "testPhotoUrl");
 
 		Participant participantToUpdate = new Participant(participantId, testUser, testEvent, new BigDecimal("5.0"),
 				"Updated Comment");
@@ -192,8 +202,10 @@ class ParticipantServiceTest {
 		String photoUrl = "testPhotoUrl";
 		User user = new User(userId, "username", "password", "Name", "Surname", 25, "gender", 0.0, 0.0,
 				"email@example.com", new Timestamp(System.currentTimeMillis()), null, null, new UserType());
-		Event event = new Event(eventId, new EventType(), new Location(), userId, true, false, "Test Event", "Ucuz",
-				"Dışarıda", "Description", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"), photoUrl);
+		String accessKey = "accessKey123";
+		Event event = new Event(2L, new EventType(), new Location(), 1L, true, false, "Test Event", "Ucuz", "Dışarıda",
+				"Description", "accessKey123", new Timestamp(System.currentTimeMillis()), new BigDecimal("4.5"),
+				"testPhotoUrl");
 		Participant existingParticipant = new Participant(1L, user, event, null, null);
 
 		when(userRepository.findById(userId)).thenReturn(Optional.of(user));

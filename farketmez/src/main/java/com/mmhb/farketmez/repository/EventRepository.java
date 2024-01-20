@@ -7,9 +7,12 @@ import org.springframework.stereotype.Repository;
 import com.mmhb.farketmez.model.Event;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findEventsByCreatorId(Long creatorId);
     List<Event> findEventsByIsActiveTrueAndIsPrivateFalse();
+
+    Optional<Event> findEventByAccessKey(String accessKey);
 }

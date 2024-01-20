@@ -55,8 +55,9 @@ class EventServiceTest {
 		Timestamp now = Timestamp.from(Instant.now());
 		EventType eventType = new EventType();
 		Location location = new Location();
-		Event event = new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
-				"Sinemada film izleme etkinliği", now, new BigDecimal("4.5"), null);
+		String accessKey = "access123";
+		Event event = new Event(null, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
+				"Sinemada film izleme etkinliği", accessKey, now, new BigDecimal("4.5"), null);
 
 		when(mapsService.getPhotoUrlForLocation(anyString())).thenReturn("https://example.com/photo.jpg");
 		when(eventRepository.save(any(Event.class))).thenReturn(event);
@@ -75,11 +76,11 @@ class EventServiceTest {
 		Location location = new Location();
 		List<Event> events = Arrays.asList(
 				new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
-						"Sinemada film izleme etkinliği", Timestamp.from(Instant.now()), new BigDecimal("4.5"),
-						"photoUrl1"),
+						"Sinemada film izleme etkinliği", "accessKey1", Timestamp.from(Instant.now()),
+						new BigDecimal("4.5"), "photoUrl1"),
 				new Event(2L, eventType, location, 2L, true, false, "Kitap Kulübü Toplantısı", "ucuz", "dışarıda",
-						"Aylık kitap kulübü toplantısı", Timestamp.from(Instant.now()), new BigDecimal("4.8"),
-						"photoUrl2"));
+						"Aylık kitap kulübü toplantısı", "accessKey2", Timestamp.from(Instant.now()),
+						new BigDecimal("4.8"), "photoUrl2"));
 		when(eventRepository.findAll()).thenReturn(events);
 
 		List<Event> result = eventService.getAllEvents();
@@ -94,9 +95,11 @@ class EventServiceTest {
 		EventType eventType = new EventType();
 		Location location = new Location();
 		Timestamp now = Timestamp.from(Instant.now());
+		String accessKey = "someAccessKey";
 		Optional<Event> optionalEvent = Optional
-				.of(new Event(eventId, eventType, location, 1L, true, false, "Sinema Gecesi",
-						"Sinemada film izleme etkinliği", "ucuz", "dışarıda", now, new BigDecimal("4.5"), "photoUrl"));
+				.of(new Event(eventId, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
+						"Sinemada film izleme etkinliği", accessKey, now, new BigDecimal("4.5"), "photoUrl"));
+
 		when(eventRepository.findById(eventId)).thenReturn(optionalEvent);
 
 		Event result = eventService.getEventById(eventId);
@@ -112,8 +115,9 @@ class EventServiceTest {
 		EventType eventType = new EventType();
 		Location location = new Location();
 		Timestamp now = Timestamp.from(Instant.now());
-		Event event = new Event(eventId, eventType, location, 1L, true, false, "Sinema Gecesi Güncellendi",
-				"Güncellenmiş film izleme etkinliği", "ucuz", "dışarıda", now, new BigDecimal("4.6"), null);
+		String accessKey = "updatedAccessKey";
+		Event event = new Event(eventId, eventType, location, 1L, true, false, "Sinema Gecesi Güncellendi", "ucuz",
+				"dışarıda", "Güncellenmiş film izleme etkinliği", accessKey, now, new BigDecimal("4.6"), null);
 
 		when(eventRepository.existsById(eventId)).thenReturn(true);
 		when(mapsService.getPhotoUrlForLocation(any())).thenReturn("https://example.com/photo.jpg");
