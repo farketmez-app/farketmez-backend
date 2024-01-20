@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
-import com.mmhb.farketmez.util.RandomStringUtil;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +23,7 @@ import com.mmhb.farketmez.repository.ParticipantRepository;
 import com.mmhb.farketmez.repository.UserInterestRepository;
 import com.mmhb.farketmez.repository.UserRepository;
 import com.mmhb.farketmez.util.HarvesineDistanceUtil;
+import com.mmhb.farketmez.util.RandomStringUtil;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +48,7 @@ public class EventService {
 					"All fields are empty. Cannot create event without title, description, and date.");
 		}
 
-		if(event.getIsPrivate()){
+		if (event.getIsPrivate()) {
 			event.setAccessKey(RandomStringUtil.generateRandomString(10));
 		}
 
@@ -172,7 +172,7 @@ public class EventService {
 		}
 
 		if (usersOldEvents.isEmpty()) {
-			throw new EntityNotFoundException("User has no past events");
+			throw new OperationNotAllowedException("User has no past events");
 		}
 
 		Event suggestedEvent = recommendEvent(usersOldEvents, oldEventRatings, placeAndCostCounts);
@@ -330,14 +330,14 @@ public class EventService {
 		participantRepository.save(participant);
 	}
 
-	public Event joinPrivateEvent(String accessKey, Long userId){
+	public Event joinPrivateEvent(String accessKey, Long userId) {
 		Event event = eventRepository.findEventByAccessKey(accessKey).orElse(null);
-		if(event == null){
+		if (event == null) {
 			throw new EntityNotFoundException("Event not found with this access key");
 		}
 
 		User user = userRepository.findById(userId).orElse(null);
-		if(user == null){
+		if (user == null) {
 			throw new EntityNotFoundException("User not found with this id");
 		}
 
