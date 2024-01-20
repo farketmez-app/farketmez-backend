@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
 
+import com.mmhb.farketmez.util.RandomStringUtil;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +46,10 @@ public class EventService {
 		if (isTitleEmpty && isDescriptionEmpty && isDateNull) {
 			throw new UserInputException(
 					"All fields are empty. Cannot create event without title, description, and date.");
+		}
+
+		if(event.getIsPrivate()){
+			event.setAccessKey(RandomStringUtil.generateRandomString(10));
 		}
 
 		event.setCreatedAt(new Timestamp(System.currentTimeMillis()));
@@ -323,5 +328,24 @@ public class EventService {
 		participant.setEvent(event);
 
 		participantRepository.save(participant);
+	}
+
+	public Event joinPrivateEvent(String accessKey, Long userId){
+		Event event = eventRepository.findEventByAccessKey(accessKey).orElse(null);
+		if(event == null){
+			throw new EntityNotFoundException("Event not found with this access key");
+		}
+
+		User user = userRepository.findById(userId).orElse(null);
+		if(user == null){
+			throw new EntityNotFoundException("User not found with this id");
+		}
+
+		Participant participant = new Participant();
+		participant.setEvent(event);
+		participant.setUser(user);
+		participantRepository.save(participant);
+
+		return event;
 	}
 }

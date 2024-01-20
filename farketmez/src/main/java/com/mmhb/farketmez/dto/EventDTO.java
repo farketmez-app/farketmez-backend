@@ -22,6 +22,7 @@ public class EventDTO {
 	private String cost;
 	private String place;
 	private String description;
+	private String accessKey;
 	private BigDecimal averageRating;
 	private Timestamp date;
 	private Timestamp createdAt;
