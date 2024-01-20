@@ -45,6 +45,9 @@ public class Event {
 	@Column(length = 200)
 	private String description;
 
+	@Column(name = "access_key", length = 10)
+	private String accessKey;
+
 	@Column
 	private Timestamp date;
 
@@ -69,7 +72,7 @@ public class Event {
 	private EventType eventType;
 
 	public Event(Long id, EventType eventType, Location location, Long creatorId, Boolean isActive, Boolean isPrivate, String title,
-			String cost, String place, String description, Timestamp date, BigDecimal averageRating) {
+			String cost, String place, String description, String accessKey, Timestamp date, BigDecimal averageRating) {
 		this.id = id;
 		this.eventType = eventType;
 		this.location = location;
@@ -82,6 +85,7 @@ public class Event {
 		this.description = description;
 		this.date = date;
 		this.averageRating = averageRating;
+		this.accessKey = accessKey;
 	}
 
 	@Deprecated

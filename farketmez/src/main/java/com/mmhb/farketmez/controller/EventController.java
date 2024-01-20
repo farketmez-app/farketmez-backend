@@ -168,4 +168,15 @@ public class EventController {
 			return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@GetMapping("/private/join/{accessKey}")
+	public ResponseEntity<EventDTO> joinPrivateEvent(@PathVariable String accessKey, @RequestParam(name = "id") Long userId){
+		try{
+			Event event = eventService.joinPrivateEvent(accessKey, userId);
+			EventDTO eventDTO = EventMapper.toEventDto(event);
+			return new ResponseEntity<>(eventDTO, HttpStatus.OK);
+		}catch (Exception e){
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+	}
 }

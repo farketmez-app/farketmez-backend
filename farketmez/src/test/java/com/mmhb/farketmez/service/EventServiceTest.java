@@ -39,8 +39,6 @@ class EventServiceTest {
 	private UserInterestRepository userInterestRepository;
 
 	private EventService eventService;
-	private UserService userService;
-	private ParticipantService participantService;
 
 	@BeforeEach
 	void setUp() {
@@ -50,11 +48,11 @@ class EventServiceTest {
 
 	@Test
 	void whenCreateEvent_thenShouldReturnSavedEvent() {
-		Timestamp now = Timestamp.from(Instant.now());
 		EventType eventType = new EventType();
 		Location location = new Location();
-		Event event = new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
-				"Sinemada film izleme etkinliği", now, new BigDecimal("4.5"));
+		Event event = new Event(null, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
+				"Sinemada film izleme etkinliği", "access123", Timestamp.from(Instant.now()), new BigDecimal("4.5"));
+
 		when(eventRepository.save(any(Event.class))).thenReturn(event);
 
 		Event result = eventService.createEvent(event);
@@ -69,10 +67,12 @@ class EventServiceTest {
 		EventType eventType = new EventType();
 		Location location = new Location();
 		List<Event> events = Arrays.asList(
-				new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi", "Sinemada film izleme etkinliği",
-						"ucuz", "dışarıda", Timestamp.from(Instant.now()), new BigDecimal("4.5")),
+				new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
+						"Sinemada film izleme etkinliği", "accessKey1", Timestamp.from(Instant.now()),
+						new BigDecimal("4.5")),
 				new Event(2L, eventType, location, 2L, true, false, "Kitap Kulübü Toplantısı", "ucuz", "dışarıda",
-						"Aylık kitap kulübü toplantısı", Timestamp.from(Instant.now()), new BigDecimal("4.8")));
+						"Aylık kitap kulübü toplantısı", "accessKey2", Timestamp.from(Instant.now()),
+						new BigDecimal("4.8")));
 		when(eventRepository.findAll()).thenReturn(events);
 
 		List<Event> result = eventService.getAllEvents();
@@ -87,8 +87,12 @@ class EventServiceTest {
 		EventType eventType = new EventType();
 		Location location = new Location();
 		Timestamp now = Timestamp.from(Instant.now());
-		Optional<Event> optionalEvent = Optional.of(new Event(eventId, eventType, location, 1L, true, false,
-				"Sinema Gecesi", "Sinemada film izleme etkinliği", "ucuz", "dışarıda", now, new BigDecimal("4.5")));
+		String accessKey = "someAccessKey";
+
+		Optional<Event> optionalEvent = Optional
+				.of(new Event(eventId, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
+						"Sinemada film izleme etkinliği", accessKey, now, new BigDecimal("4.5")));
+
 		when(eventRepository.findById(eventId)).thenReturn(optionalEvent);
 
 		Event result = eventService.getEventById(eventId);
@@ -103,8 +107,11 @@ class EventServiceTest {
 		EventType eventType = new EventType();
 		Location location = new Location();
 		Timestamp now = Timestamp.from(Instant.now());
-		Event event = new Event(eventId, eventType, location, 1L, true, false, "Sinema Gecesi Güncellendi",
-				"Güncellenmiş film izleme etkinliği", "ucuz", "dışarıda", now, new BigDecimal("4.6"));
+		String accessKey = "updatedAccessKey";
+
+		Event event = new Event(eventId, eventType, location, 1L, true, false, "Sinema Gecesi Güncellendi", "ucuz",
+				"dışarıda", "Güncellenmiş film izleme etkinliği", accessKey, now, new BigDecimal("4.6"));
+
 		when(eventRepository.existsById(eventId)).thenReturn(true);
 		when(eventRepository.save(any(Event.class))).thenReturn(event);
 
