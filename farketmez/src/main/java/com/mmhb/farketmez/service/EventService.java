@@ -49,20 +49,22 @@ public class EventService {
 
 		if (isTitleEmpty && isDescriptionEmpty && isDateNull) {
 			throw new UserInputException(
-					"All fields are empty. Cannot create event without title, description, and date.");
+					"All fields are empty. Cannot create an event without title, description, and date.");
 		}
 
 		if (isLocationIdNull) {
 			Double latitude = event.getLocation().getLatitude();
 			Double longitude = event.getLocation().getLongitude();
-			if (latitude == null || longitude == null) {
+			String googleMapsUrl = event.getLocation().getGoogleMapsUrl();
+			if (latitude == null || longitude == null || googleMapsUrl == null) {
 				throw new UserInputException(
-						"Location ID is not provided. Latitude and longitude are required to create a location.");
+						"Location ID is not provided. Latitude, longitude, and Google Maps URL are required to create a location.");
 			}
 
 			Location location = new Location();
 			location.setLatitude(latitude);
 			location.setLongitude(longitude);
+			location.setGoogleMapsUrl(googleMapsUrl);
 			location = locationRepository.save(location);
 			event.setLocation(location);
 		}
