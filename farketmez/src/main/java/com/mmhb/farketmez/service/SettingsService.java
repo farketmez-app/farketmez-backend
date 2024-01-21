@@ -2,8 +2,6 @@ package com.mmhb.farketmez.service;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +18,7 @@ public class SettingsService {
 	private final SettingsRepository settingsRepository;
 
 	@Transactional(readOnly = true)
-	public Settings getSettings(String key) throws EntityNotFoundException {
+	public Settings getSettings(String key) throws OperationNotAllowedException {
 		Settings settings = settingsRepository.findByKey(key);
 		if (settings == null) {
 			throw new OperationNotAllowedException("Setting with key " + key + " not found.");
@@ -46,5 +44,13 @@ public class SettingsService {
 		if (settings.getValue() == null || settings.getValue().isEmpty()) {
 			throw new OperationNotAllowedException("Value for settings cannot be null or empty.");
 		}
+	}
+
+	public String findValueByKey(String key) {
+		Settings setting = settingsRepository.findByKey(key);
+		if (setting == null) {
+			throw new OperationNotAllowedException("Setting with " + key + " not found!");
+		}
+		return setting.getValue();
 	}
 }

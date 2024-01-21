@@ -123,23 +123,23 @@ class UserInterestServiceTest {
 	@Test
 	void findInterestsByUserId_WhenUserExistsAndHasInterests_ShouldReturnInterests() {
 		Long userId = 1L;
-		User user = new User();
-		user.setId(userId);
 		Interest interest1 = new Interest(1L, InterestType.CINEMA);
 		Interest interest2 = new Interest(2L, InterestType.RESTAURANT);
+		User user = new User();
+		user.setId(userId);
 		UserInterest userInterest1 = new UserInterest(1L, user, interest1);
 		UserInterest userInterest2 = new UserInterest(2L, user, interest2);
 
 		when(userRepository.existsById(userId)).thenReturn(true);
 		when(userInterestRepository.findByUserId(userId)).thenReturn(Arrays.asList(userInterest1, userInterest2));
-		when(interestRepository.findAllById(Arrays.asList(1L, 2L))).thenReturn(Arrays.asList(interest1, interest2));
+		when(userInterestRepository.findInterestsByUserId(userId)).thenReturn(Arrays.asList(interest1, interest2));
 
 		List<Interest> interests = userInterestService.findInterestsByUserId(userId);
 
 		assertNotNull(interests);
 		assertEquals(2, interests.size());
-		assertTrue(interests.stream().anyMatch(i -> i.getInterestName() == InterestType.CINEMA));
-		assertTrue(interests.stream().anyMatch(i -> i.getInterestName() == InterestType.RESTAURANT));
+		assertTrue(interests.contains(interest1));
+		assertTrue(interests.contains(interest2));
 	}
 
 	@Test
