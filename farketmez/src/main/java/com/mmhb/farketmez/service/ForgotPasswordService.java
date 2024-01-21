@@ -45,7 +45,7 @@ public class ForgotPasswordService {
 		System.out.println("SMTP Username: " + settingService.findValueByKey("mail_username"));
 		messageHelper.setSubject(subject);
 		messageHelper.setText(mailText, true);
-
+		messageHelper.setTo(emailReceiver.getMail());
 		mailSender.send(message);
 	}
 
