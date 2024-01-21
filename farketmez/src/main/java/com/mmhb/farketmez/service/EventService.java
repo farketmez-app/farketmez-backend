@@ -56,15 +56,18 @@ public class EventService {
 			Double latitude = event.getLocation().getLatitude();
 			Double longitude = event.getLocation().getLongitude();
 			String googleMapsUrl = event.getLocation().getGoogleMapsUrl();
-			if (latitude == null || longitude == null || googleMapsUrl == null) {
+
+			if (latitude == null || longitude == null) {
 				throw new UserInputException(
-						"Location ID is not provided. Latitude, longitude, and Google Maps URL are required to create a location.");
+						"Location ID is not provided. Latitude and longitude are required to create a location.");
 			}
 
 			Location location = new Location();
 			location.setLatitude(latitude);
 			location.setLongitude(longitude);
+
 			location.setGoogleMapsUrl(googleMapsUrl);
+
 			location = locationRepository.save(location);
 			event.setLocation(location);
 		}
