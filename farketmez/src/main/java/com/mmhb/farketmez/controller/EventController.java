@@ -1,6 +1,9 @@
 package com.mmhb.farketmez.controller;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.AbstractMap;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -178,5 +181,25 @@ public class EventController {
 		}catch (Exception e){
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
+	}
+
+	// Usage:
+	// http://localhost:8080/events/suggestedevent-withparams?place=home&cost=cheap&date=15.01.2024&time=&pool=my-events&id=1
+	@GetMapping("/suggestedevent-withparams")
+	public ResponseEntity<EventDTO> findEvent(@RequestParam(name = "place") String place,
+										   @RequestParam(name = "cost") String cost,
+										   @RequestParam(name = "date") String date,
+										   @RequestParam(name = "time") String time,
+										   @RequestParam(name = "pool") List<String> pool,
+										   @RequestParam(name = "id") Long userId){
+
+		try{
+			Event event = eventService.findEventWithParams(place, cost, date, time, pool, userId);
+			EventDTO eventDTO = EventMapper.toEventDto(event);
+			return new ResponseEntity<>(eventDTO, HttpStatus.OK);
+		}catch (Exception e){
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+
 	}
 }
