@@ -1,5 +1,4 @@
 # farketmez-backend
-# internship-management-system
 
 This project contains a Java application that performs internship management functions.
 
