@@ -55,7 +55,7 @@ To import dummy data into the PostgreSQL database, follow these steps:
 
 ### Running the Application
 
-1. There should be a Java class representing the entry point of the application under `src/main/java/tr.edu.ogu.ceng.InternshipManagementSystemApplication` class.
+1. There should be a Java class representing the entry point of the application under `src/main/java/com.mmhb.farketmez.FarketmezApplication` class.
 2. To run the application, follow these steps:
    - Locate the entry point class and right-click on it.
    - From the context menu, select **Run As**, and then click on **Java Application**.
