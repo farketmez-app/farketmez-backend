@@ -23,6 +23,7 @@ import com.mmhb.farketmez.model.Event;
 import com.mmhb.farketmez.model.EventType;
 import com.mmhb.farketmez.model.Location;
 import com.mmhb.farketmez.repository.EventRepository;
+import com.mmhb.farketmez.repository.LocationRepository;
 import com.mmhb.farketmez.repository.ParticipantRepository;
 import com.mmhb.farketmez.repository.UserInterestRepository;
 import com.mmhb.farketmez.repository.UserRepository;
@@ -37,13 +38,16 @@ class EventServiceTest {
 	private ParticipantRepository participantRepository;
 	@Mock
 	private UserInterestRepository userInterestRepository;
+	@Mock
+	private LocationRepository locationRepository;
 
 	private EventService eventService;
 
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		eventService = new EventService(eventRepository, userRepository, participantRepository, userInterestRepository);
+		eventService = new EventService(eventRepository, userRepository, participantRepository, userInterestRepository,
+				locationRepository);
 	}
 
 	@Test

@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 import com.mmhb.farketmez.exception.OperationNotAllowedException;
 import com.mmhb.farketmez.exception.UserInputException;
 import com.mmhb.farketmez.model.Event;
+import com.mmhb.farketmez.model.Location;
 import com.mmhb.farketmez.model.Participant;
 import com.mmhb.farketmez.model.User;
 import com.mmhb.farketmez.repository.EventRepository;
+import com.mmhb.farketmez.repository.LocationRepository;
 import com.mmhb.farketmez.repository.ParticipantRepository;
 import com.mmhb.farketmez.repository.UserInterestRepository;
 import com.mmhb.farketmez.repository.UserRepository;
@@ -36,16 +38,33 @@ public class EventService {
 	private final UserRepository userRepository;
 	private final ParticipantRepository participantRepository;
 	private final UserInterestRepository userInterestRepository;
+	private final LocationRepository locationRepository;
 
 	@Transactional
 	public Event createEvent(Event event) {
 		boolean isTitleEmpty = event.getTitle() == null || event.getTitle().isEmpty();
 		boolean isDescriptionEmpty = event.getDescription() == null || event.getDescription().isEmpty();
 		boolean isDateNull = event.getDate() == null;
+		boolean isLocationIdNull = event.getLocation().getId() == null;
 
 		if (isTitleEmpty && isDescriptionEmpty && isDateNull) {
 			throw new UserInputException(
 					"All fields are empty. Cannot create event without title, description, and date.");
+		}
+
+		if (isLocationIdNull) {
+			Double latitude = event.getLocation().getLatitude();
+			Double longitude = event.getLocation().getLongitude();
+			if (latitude == null || longitude == null) {
+				throw new UserInputException(
+						"Location ID is not provided. Latitude and longitude are required to create a location.");
+			}
+
+			Location location = new Location();
+			location.setLatitude(latitude);
+			location.setLongitude(longitude);
+			location = locationRepository.save(location);
+			event.setLocation(location);
 		}
 
 		if (event.getIsPrivate()) {

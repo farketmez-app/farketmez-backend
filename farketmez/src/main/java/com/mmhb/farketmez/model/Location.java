@@ -19,10 +19,12 @@ public class Location {
 
 	private Double latitude;
 	private Double longitude;
+	private String googleMapsUrl;
 
-	public Location(Long id, Double latitude, Double longitude) {
+	public Location(Long id, Double latitude, Double longitude, String googleMapsUrl) {
 		this.id = id;
 		this.latitude = latitude;
 		this.longitude = longitude;
+		this.googleMapsUrl = googleMapsUrl;
 	}
 }
