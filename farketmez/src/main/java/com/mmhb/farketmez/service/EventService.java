@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -357,12 +355,12 @@ public class EventService {
 	public Event joinPrivateEvent(String accessKey, Long userId) {
 		Event event = eventRepository.findEventByAccessKey(accessKey).orElse(null);
 		if (event == null) {
-			throw new EntityNotFoundException("Event not found with this access key");
+			throw new UserInputException("Event not found with this access key");
 		}
 
 		User user = userRepository.findById(userId).orElse(null);
 		if (user == null) {
-			throw new EntityNotFoundException("User not found with this id");
+			throw new UserInputException("User not found with this id");
 		}
 
 		Participant participant = new Participant();

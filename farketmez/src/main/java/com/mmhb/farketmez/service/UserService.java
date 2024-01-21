@@ -92,4 +92,8 @@ public class UserService {
 	public void deleteUser(Long id) {
 		userRepository.deleteById(id);
 	}
+
+	public User findByMail(String mail) {
+		return userRepository.findByMail(mail);
+	}
 }

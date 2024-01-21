@@ -17,12 +17,11 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf().disable()
-				.authorizeHttpRequests((authz) -> authz
-						.requestMatchers("/users/login", "/users", "/user-interests/**", "/interests/**",
-								"/locations/**", "/participants/**", "/events/**", "/settings/**", "/users/**")
-						.permitAll().anyRequest().authenticated())
-				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		http.csrf().disable().authorizeHttpRequests((authz) -> authz
+				.requestMatchers("/users/login", "/users", "/user-interests/**", "/interests/**", "/locations/**",
+						"/participants/**", "/events/**", "/settings/**", "/users/**", "/forgot-password/**")
+				.permitAll().anyRequest().authenticated()).sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		return http.build();
 	}
