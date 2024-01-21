@@ -3,6 +3,7 @@ package com.mmhb.farketmez.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,27 +38,34 @@ class EventServiceTest {
 	private ParticipantRepository participantRepository;
 	@Mock
 	private UserInterestRepository userInterestRepository;
+	@Mock
+	private MapsService mapsService;
 
 	private EventService eventService;
 
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
-		eventService = new EventService(eventRepository, userRepository, participantRepository, userInterestRepository);
+		eventService = new EventService(eventRepository, userRepository, participantRepository, userInterestRepository,
+				mapsService);
 	}
 
 	@Test
-	void whenCreateEvent_thenShouldReturnSavedEvent() {
+	void whenCreateEvent_thenShouldReturnSavedEvent() throws Exception {
+		Timestamp now = Timestamp.from(Instant.now());
 		EventType eventType = new EventType();
 		Location location = new Location();
+		String accessKey = "access123";
 		Event event = new Event(null, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
-				"Sinemada film izleme etkinliği", "access123", Timestamp.from(Instant.now()), new BigDecimal("4.5"));
+				"Sinemada film izleme etkinliği", accessKey, now, new BigDecimal("4.5"), null);
 
+		when(mapsService.getPhotoUrlForLocation(anyString())).thenReturn("https://example.com/photo.jpg");
 		when(eventRepository.save(any(Event.class))).thenReturn(event);
 
 		Event result = eventService.createEvent(event);
 
 		assertNotNull(result);
+		assertEquals("https://example.com/photo.jpg", result.getPhotoUrl());
 		assertEquals(event.getTitle(), result.getTitle());
 		assertNotNull(result.getCreatedAt());
 	}
@@ -69,10 +77,10 @@ class EventServiceTest {
 		List<Event> events = Arrays.asList(
 				new Event(1L, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
 						"Sinemada film izleme etkinliği", "accessKey1", Timestamp.from(Instant.now()),
-						new BigDecimal("4.5")),
+						new BigDecimal("4.5"), "photoUrl1"),
 				new Event(2L, eventType, location, 2L, true, false, "Kitap Kulübü Toplantısı", "ucuz", "dışarıda",
 						"Aylık kitap kulübü toplantısı", "accessKey2", Timestamp.from(Instant.now()),
-						new BigDecimal("4.8")));
+						new BigDecimal("4.8"), "photoUrl2"));
 		when(eventRepository.findAll()).thenReturn(events);
 
 		List<Event> result = eventService.getAllEvents();
@@ -88,10 +96,9 @@ class EventServiceTest {
 		Location location = new Location();
 		Timestamp now = Timestamp.from(Instant.now());
 		String accessKey = "someAccessKey";
-
 		Optional<Event> optionalEvent = Optional
 				.of(new Event(eventId, eventType, location, 1L, true, false, "Sinema Gecesi", "ucuz", "dışarıda",
-						"Sinemada film izleme etkinliği", accessKey, now, new BigDecimal("4.5")));
+						"Sinemada film izleme etkinliği", accessKey, now, new BigDecimal("4.5"), "photoUrl"));
 
 		when(eventRepository.findById(eventId)).thenReturn(optionalEvent);
 
@@ -99,26 +106,28 @@ class EventServiceTest {
 
 		assertNotNull(result);
 		assertEquals("Sinema Gecesi", result.getTitle());
+		assertEquals("photoUrl", result.getPhotoUrl());
 	}
 
 	@Test
-	void whenUpdateEvent_thenShouldReturnUpdatedEvent() {
+	void whenUpdateEvent_thenShouldReturnUpdatedEvent() throws Exception {
 		Long eventId = 1L;
 		EventType eventType = new EventType();
 		Location location = new Location();
 		Timestamp now = Timestamp.from(Instant.now());
 		String accessKey = "updatedAccessKey";
-
 		Event event = new Event(eventId, eventType, location, 1L, true, false, "Sinema Gecesi Güncellendi", "ucuz",
-				"dışarıda", "Güncellenmiş film izleme etkinliği", accessKey, now, new BigDecimal("4.6"));
+				"dışarıda", "Güncellenmiş film izleme etkinliği", accessKey, now, new BigDecimal("4.6"), null);
 
 		when(eventRepository.existsById(eventId)).thenReturn(true);
+		when(mapsService.getPhotoUrlForLocation(any())).thenReturn("https://example.com/photo.jpg");
 		when(eventRepository.save(any(Event.class))).thenReturn(event);
 
 		Event result = eventService.updateEvent(event);
 
 		assertNotNull(result);
 		assertEquals("Sinema Gecesi Güncellendi", result.getTitle());
+		assertEquals("https://example.com/photo.jpg", result.getPhotoUrl());
 	}
 
 	@Test

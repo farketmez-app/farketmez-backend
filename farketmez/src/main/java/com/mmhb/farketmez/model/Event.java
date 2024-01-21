@@ -63,6 +63,9 @@ public class Event {
 	@Column(name = "deleted_at")
 	private Timestamp deletedAt;
 
+	@Column(name = "photo_url")
+	private String photoUrl;
+
 	@ManyToOne
 	@JoinColumn(name = "location_id", nullable = false)
 	private Location location;
@@ -71,8 +74,9 @@ public class Event {
 	@JoinColumn(name = "event_type_id", nullable = false)
 	private EventType eventType;
 
-	public Event(Long id, EventType eventType, Location location, Long creatorId, Boolean isActive, Boolean isPrivate, String title,
-			String cost, String place, String description, String accessKey, Timestamp date, BigDecimal averageRating) {
+	public Event(Long id, EventType eventType, Location location, Long creatorId, Boolean isActive, Boolean isPrivate,
+			String title, String cost, String place, String description, String accessKey, Timestamp date,
+			BigDecimal averageRating, String photoUrl) {
 		this.id = id;
 		this.eventType = eventType;
 		this.location = location;
@@ -85,6 +89,7 @@ public class Event {
 		this.description = description;
 		this.date = date;
 		this.averageRating = averageRating;
+		this.photoUrl = photoUrl;
 		this.accessKey = accessKey;
 	}
 
