@@ -4,16 +4,24 @@ import com.mmhb.farketmez.dto.LocationDTO;
 import com.mmhb.farketmez.model.Location;
 
 public class LocationMapper {
-    private LocationMapper() {
+	private LocationMapper() {
+	}
 
-    }
+	public static LocationDTO toLocationDto(Location location) {
+		LocationDTO locationDTO = new LocationDTO();
+		locationDTO.setId(location.getId());
+		locationDTO.setLatitude(location.getLatitude());
+		locationDTO.setLongitude(location.getLongitude());
+		locationDTO.setGoogleMapsUrl(location.getGoogleMapsUrl());
+		return locationDTO;
+	}
 
-    public static LocationDTO toLocationDto(Location location){
-        return new LocationDTO(location.getId(), location.getLatitude(), location.getLongitude());
-    }
-
-    public static Location fromLocationDto(LocationDTO locationDto){
-        return new Location(locationDto.getId(), locationDto.getLatitude(), locationDto.getLongitude());
-    }
-
+	public static Location fromLocationDto(LocationDTO locationDTO) {
+		Location location = new Location();
+		location.setId(locationDTO.getId());
+		location.setLatitude(locationDTO.getLatitude());
+		location.setLongitude(locationDTO.getLongitude());
+		location.setGoogleMapsUrl(locationDTO.getGoogleMapsUrl());
+		return location;
+	}
 }
