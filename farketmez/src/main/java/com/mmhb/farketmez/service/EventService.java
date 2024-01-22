@@ -2,12 +2,13 @@ package com.mmhb.farketmez.service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.ObjectNotFoundException;
@@ -379,5 +380,64 @@ public class EventService {
 		participantRepository.save(participant);
 
 		return event;
+	}
+
+	public Event findEventWithParams(String place, String cost, String date, String time, List<String> pool, Long userId){
+		if(place == null || cost == null || date == null || pool == null || userId == null){
+			throw new UserInputException("Fields are not filled correctly.");
+		}
+
+		List<Event> events;
+
+		if (pool.size() < 2) {
+			if (pool.contains("public-events")) {
+				events = eventRepository.findEventsByIsPrivateFalse();
+			} else if (pool.contains("my-events")) {
+				events = eventRepository.findEventsByCreatorId(userId);
+			} else {
+				events = Collections.emptyList();
+			}
+		} else {
+			events = eventRepository.findEventsByIsPrivateFalse().stream().filter(c -> !c.getCreatorId().equals(userId)).collect(Collectors.toList());
+			List<Event> userEvents = eventRepository.findEventsByCreatorId(userId);
+			events.addAll(userEvents);
+		}
+
+
+		if(events.isEmpty()){
+			throw new EntityNotFoundException("No events were found");
+		}
+
+		if(!place.equalsIgnoreCase("all")){
+			events = events.stream().filter(c -> c.getPlace().equalsIgnoreCase(place)).collect(Collectors.toList());
+		}
+
+		if(!cost.equalsIgnoreCase("all")){
+			events = events.stream().filter(c -> c.getCost().equalsIgnoreCase(cost)).collect(Collectors.toList());
+		}
+
+		if(time == null || time.equalsIgnoreCase("")){
+			time = "00:00";
+		}
+
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+		LocalDateTime dateTime = LocalDateTime.parse(date.trim() + " " + time.trim(), formatter);
+		LocalDateTime nextDay = dateTime.plusDays(1);
+
+
+
+		events = events.stream()
+				.filter(c -> c.getDate().after(Timestamp.valueOf(dateTime)) && c.getDate().before(Timestamp.valueOf(nextDay)))
+				.collect(Collectors.toList());
+
+		if(events.isEmpty()){
+			throw new EntityNotFoundException("No events were found");
+		}
+
+		int randomIndex = ThreadLocalRandom.current().nextInt(events.size());
+
+
+        return events.get(randomIndex);
 	}
 }

@@ -14,5 +14,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findEventsByCreatorId(Long creatorId);
     List<Event> findEventsByIsActiveTrueAndIsPrivateFalse();
 
+    List<Event> findEventsByIsPrivateFalse();
+
     Optional<Event> findEventByAccessKey(String accessKey);
 }
