@@ -2,6 +2,7 @@ package com.mmhb.farketmez.service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -416,19 +417,30 @@ public class EventService {
 			events = events.stream().filter(c -> c.getCost().equalsIgnoreCase(cost)).collect(Collectors.toList());
 		}
 
-		if(time == null || time.equalsIgnoreCase("")){
-			time = "00:00";
+		if(time == null || time.trim().isEmpty()){
+			time = "00-23";
 		}
 
+		String[] timeRange = time.split("-");
+		if(timeRange.length != 2){
+			throw new IllegalArgumentException("Invalid time format.");
+		}
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-		LocalDateTime dateTime = LocalDateTime.parse(date.trim() + " " + time.trim(), formatter);
-		LocalDateTime nextDay = dateTime.plusDays(1);
+		LocalTime startTime = LocalTime.parse(timeRange[0].trim() + ":00:00", DateTimeFormatter.ofPattern("HH:mm:ss"));
+		LocalTime endTime = LocalTime.parse(timeRange[1].trim() + ":59:00", DateTimeFormatter.ofPattern("HH:mm:ss"));
+		LocalDate localDate = LocalDate.parse(date.trim(), DateTimeFormatter.ofPattern("dd.MM.yyyy"));
 
+
+		LocalDateTime startDate = LocalDateTime.of(localDate, startTime);
+		LocalDateTime endDate = LocalDateTime.of(localDate, endTime);
+
+		DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		String startDateStr = startDate.format(customFormatter);
+		String endDateStr = endDate.format(customFormatter);
 
 
 		events = events.stream()
-				.filter(c -> c.getDate().after(Timestamp.valueOf(dateTime)) && c.getDate().before(Timestamp.valueOf(nextDay)))
+				.filter(c -> c.getDate().after(Timestamp.valueOf(startDateStr)) && c.getDate().before(Timestamp.valueOf(endDateStr)))
 				.collect(Collectors.toList());
 
 		if(events.isEmpty()){
