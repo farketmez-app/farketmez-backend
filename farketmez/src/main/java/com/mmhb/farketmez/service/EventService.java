@@ -1,5 +1,6 @@
 package com.mmhb.farketmez.service;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.ObjectNotFoundException;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -189,8 +192,11 @@ public class EventService {
 
 		for (Participant participant : userParticipant) {
 			Long eventId = participant.getEvent().getId();
-			Double rating = participant.getRating().doubleValue();
-			oldEventRatings.put(eventId, rating);
+			BigDecimal rating = participant.getRating();
+			if(rating == null){
+				rating = BigDecimal.valueOf(0);
+			}
+			oldEventRatings.put(eventId, rating.doubleValue());
 		}
 
 		if (usersOldEvents.isEmpty()) {
@@ -198,6 +204,10 @@ public class EventService {
 		}
 
 		Event suggestedEvent = recommendEvent(usersOldEvents, oldEventRatings, placeAndCostCounts);
+
+		if(suggestedEvent == null){
+			throw new EntityNotFoundException("No events found with those variables.");
+		}
 
 		return suggestedEvent;
 	}

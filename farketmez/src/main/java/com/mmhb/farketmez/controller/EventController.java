@@ -134,10 +134,13 @@ public class EventController {
 
 	@GetMapping("/suggestedevent/{userId}")
 	public ResponseEntity<EventDTO> getSuggestEvent(@PathVariable Long userId) {
-		Event event = eventService.getSuggestedEvent(userId);
-		EventDTO eventDTO = EventMapper.toEventDto(event);
-
-		return new ResponseEntity<>(eventDTO, HttpStatus.OK);
+		//try{
+			Event event = eventService.getSuggestedEvent(userId);
+			EventDTO eventDTO = EventMapper.toEventDto(event);
+			return new ResponseEntity<>(eventDTO, HttpStatus.OK);
+		//}catch (Exception e){
+			//return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		//}
 	}
 
 	@GetMapping("/past-events")
