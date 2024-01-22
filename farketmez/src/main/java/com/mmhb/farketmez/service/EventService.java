@@ -127,7 +127,7 @@ public class EventService {
 	public List<Event> getNearEvents(Double latitude, Double longitude) {
 		List<Event> events = eventRepository.findEventsByIsActiveTrueAndIsPrivateFalse();
 		HarvesineDistanceUtil.BoundingBox boundingBox = HarvesineDistanceUtil.calculateBoundingBox(latitude, longitude,
-				0.5);
+				1.0);
 
 		if (!events.isEmpty()) {
 			events = events
