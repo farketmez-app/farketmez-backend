@@ -3,6 +3,7 @@ package com.mmhb.farketmez.service;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -95,5 +96,21 @@ public class UserService {
 
 	public User findByMail(String mail) {
 		return userRepository.findByMail(mail);
+	}
+
+	public String encodeUserPassword(String rawPass) {
+		return passwordEncoder.encode(rawPass);
+	}
+
+	@Scheduled(fixedDelay = 3000000, initialDelay = 1)
+	public void encodeAllSavedPasswords() {
+		List<User> userList = userRepository.findAll();
+		for (User user : userList) {
+			if (user.getPassword().length() > 59 && user.getPassword().startsWith("$")) {
+				continue;
+			}
+			user.setPassword(encodeUserPassword(user.getPassword()));
+		}
+		userRepository.saveAll(userList);
 	}
 }
