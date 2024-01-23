@@ -63,7 +63,7 @@ public class ForgotPasswordService {
 			throw new OperationNotAllowedException("User not found.");
 		}
 
-		user.setPassword(resetPasswordDto.getPassword());
+		user.setPassword(userService.encodeUserPassword(resetPasswordDto.getPassword()));
 		userService.updateUser(user);
 		resetRequests.remove(hash);
 	}

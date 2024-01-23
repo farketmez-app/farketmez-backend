@@ -36,8 +36,6 @@ public class ParticipantService {
 			throw new OperationNotAllowedException(
 					"Missing required fields. User, Rating, and Event must be provided.");
 		}
-		// FIXME: Puanlama için rating değeri 0 ile 5 aralığında olarak kabul edilmiştir
-		// ileride ihtiyaca göre değiştirilmelidir.
 		if (participant.getRating().compareTo(BigDecimal.ZERO) < 0
 				|| participant.getRating().compareTo(new BigDecimal("5")) > 0) {
 			throw new UserInputException("Rating must be between 0 and 5.");
@@ -62,8 +60,6 @@ public class ParticipantService {
 		if (participant.getUser() == null && participant.getRating() == null && participant.getEvent() == null) {
 			throw new UserInputException("Missing required fields. User ID, Rating, and Event must be provided.");
 		}
-		// FIXME: Puanlama için rating değeri 0 ile 5 aralığında olarka kabul edilmiştir
-		// ileride ihtiyaca göre değiştirilmelidir.
 		if (participant.getRating().compareTo(BigDecimal.ZERO) < 0
 				|| participant.getRating().compareTo(new BigDecimal("5")) > 0) {
 			throw new UserInputException("Rating must be between 0 and 5.");
@@ -98,13 +94,22 @@ public class ParticipantService {
 		Optional<Participant> existingParticipant = participantRepository.findByUserIdAndEventId(user.getId(),
 				event.getId());
 
-		Participant participant = existingParticipant.orElse(new Participant());
-		participant.setUser(user);
-		participant.setEvent(event);
-		participant.setRating(rateRequestDTO.getRate());
-		participant.setComment(rateRequestDTO.getComment());
-
-		participantRepository.save(participant);
+		Participant participant;
+		if (existingParticipant.isPresent()) {
+			// Var olan katılımcıyı güncelle
+			participant = existingParticipant.get();
+			participant.setRating(rateRequestDTO.getRate());
+			participant.setComment(rateRequestDTO.getComment());
+			updateParticipant(participant);
+		} else {
+			// Yeni katılımcı oluştur
+			participant = new Participant();
+			participant.setUser(user);
+			participant.setEvent(event);
+			participant.setRating(rateRequestDTO.getRate());
+			participant.setComment(rateRequestDTO.getComment());
+			createParticipant(participant);
+		}
 	}
 
 	@Transactional
@@ -138,4 +143,7 @@ public class ParticipantService {
 		return participantRepository.findAttendedNotRatedNotExpiredEvents(userId);
 	}
 
+	public Optional<Participant> getParticipantByEventAndUser(Long eventId, Long userId) {
+		return participantRepository.findByUserIdAndEventId(userId, eventId);
+	}
 }
