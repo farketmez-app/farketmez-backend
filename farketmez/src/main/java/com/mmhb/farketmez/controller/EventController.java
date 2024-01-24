@@ -216,4 +216,18 @@ public class EventController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+
+	@GetMapping("/filter")
+	public ResponseEntity<List<EventDTO>> getFilteredEvents(@RequestParam(required = false) String cost,
+			@RequestParam(required = false) String place, @RequestParam(required = false) String priority) {
+
+		try {
+			List<Event> filteredEvents = eventService.getFilteredEvents(cost, place, priority);
+			List<EventDTO> eventDTOS = filteredEvents.stream().map(EventMapper::toEventDto)
+					.collect(Collectors.toList());
+			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
