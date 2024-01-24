@@ -6,13 +6,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import jakarta.persistence.EntityNotFoundException;
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,7 @@ import com.mmhb.farketmez.repository.UserRepository;
 import com.mmhb.farketmez.util.HarvesineDistanceUtil;
 import com.mmhb.farketmez.util.RandomStringUtil;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -195,7 +198,7 @@ public class EventService {
 		for (Participant participant : userParticipant) {
 			Long eventId = participant.getEvent().getId();
 			BigDecimal rating = participant.getRating();
-			if(rating == null){
+			if (rating == null) {
 				rating = BigDecimal.valueOf(0);
 			}
 			oldEventRatings.put(eventId, rating.doubleValue());
@@ -207,7 +210,7 @@ public class EventService {
 
 		Event suggestedEvent = recommendEvent(usersOldEvents, oldEventRatings, placeAndCostCounts);
 
-		if(suggestedEvent == null){
+		if (suggestedEvent == null) {
 			throw new EntityNotFoundException("No events found with those variables.");
 		}
 
@@ -383,8 +386,9 @@ public class EventService {
 		return event;
 	}
 
-	public Event findEventWithParams(String place, String cost, String date, String time, List<String> pool, Long userId){
-		if(place == null || cost == null || date == null || pool == null || userId == null){
+	public Event findEventWithParams(String place, String cost, String date, String time, List<String> pool,
+			Long userId) {
+		if (place == null || cost == null || date == null || pool == null || userId == null) {
 			throw new UserInputException("Fields are not filled correctly.");
 		}
 
@@ -399,37 +403,36 @@ public class EventService {
 				events = Collections.emptyList();
 			}
 		} else {
-			events = eventRepository.findEventsByIsPrivateFalse().stream().filter(c -> !c.getCreatorId().equals(userId)).collect(Collectors.toList());
+			events = eventRepository.findEventsByIsPrivateFalse().stream().filter(c -> !c.getCreatorId().equals(userId))
+					.collect(Collectors.toList());
 			List<Event> userEvents = eventRepository.findEventsByCreatorId(userId);
 			events.addAll(userEvents);
 		}
 
-
-		if(events.isEmpty()){
+		if (events.isEmpty()) {
 			throw new EntityNotFoundException("No events were found");
 		}
 
-		if(!place.equalsIgnoreCase("all")){
+		if (!place.equalsIgnoreCase("all")) {
 			events = events.stream().filter(c -> c.getPlace().equalsIgnoreCase(place)).collect(Collectors.toList());
 		}
 
-		if(!cost.equalsIgnoreCase("all")){
+		if (!cost.equalsIgnoreCase("all")) {
 			events = events.stream().filter(c -> c.getCost().equalsIgnoreCase(cost)).collect(Collectors.toList());
 		}
 
-		if(time == null || time.trim().isEmpty()){
+		if (time == null || time.trim().isEmpty()) {
 			time = "00-23";
 		}
 
 		String[] timeRange = time.split("-");
-		if(timeRange.length != 2){
+		if (timeRange.length != 2) {
 			throw new IllegalArgumentException("Invalid time format.");
 		}
 
 		LocalTime startTime = LocalTime.parse(timeRange[0].trim() + ":00:00", DateTimeFormatter.ofPattern("HH:mm:ss"));
 		LocalTime endTime = LocalTime.parse(timeRange[1].trim() + ":59:00", DateTimeFormatter.ofPattern("HH:mm:ss"));
 		LocalDate localDate = LocalDate.parse(date.trim(), DateTimeFormatter.ofPattern("dd.MM.yyyy"));
-
 
 		LocalDateTime startDate = LocalDateTime.of(localDate, startTime);
 		LocalDateTime endDate = LocalDateTime.of(localDate, endTime);
@@ -438,18 +441,28 @@ public class EventService {
 		String startDateStr = startDate.format(customFormatter);
 		String endDateStr = endDate.format(customFormatter);
 
+		events = events.stream().filter(c -> c.getDate().after(Timestamp.valueOf(startDateStr))
+				&& c.getDate().before(Timestamp.valueOf(endDateStr))).collect(Collectors.toList());
 
-		events = events.stream()
-				.filter(c -> c.getDate().after(Timestamp.valueOf(startDateStr)) && c.getDate().before(Timestamp.valueOf(endDateStr)))
-				.collect(Collectors.toList());
-
-		if(events.isEmpty()){
+		if (events.isEmpty()) {
 			throw new EntityNotFoundException("No events were found");
 		}
 
 		int randomIndex = ThreadLocalRandom.current().nextInt(events.size());
 
+		return events.get(randomIndex);
+	}
 
-        return events.get(randomIndex);
+	public List<Event> searchEvents(String searchQuery) {
+		if (searchQuery == null || searchQuery.trim().isEmpty()) {
+			return getAllEvents();
+		}
+
+		return eventRepository.findAll().stream()
+				.filter(event -> event.getTitle().toLowerCase().contains(searchQuery.toLowerCase())
+						|| event.getDescription().toLowerCase().contains(searchQuery.toLowerCase())
+						|| event.getCost().toLowerCase().contains(searchQuery.toLowerCase())
+						|| event.getPlace().toLowerCase().contains(searchQuery.toLowerCase()))
+				.collect(Collectors.toList());
 	}
 }
