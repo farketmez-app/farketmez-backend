@@ -201,4 +201,19 @@ public class EventController {
 		}
 
 	}
+
+//Request Body:http://localhost:8080/events/search?query={}
+	@GetMapping("/search")
+	public ResponseEntity<List<EventDTO>> searchEvents(@RequestParam String query) {
+		try {
+			List<Event> events = eventService.searchEvents(query);
+			if (events.isEmpty()) {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+			List<EventDTO> eventDTOS = events.stream().map(EventMapper::toEventDto).collect(Collectors.toList());
+			return new ResponseEntity<>(eventDTOS, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 }
