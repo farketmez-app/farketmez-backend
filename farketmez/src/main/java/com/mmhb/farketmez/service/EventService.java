@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -464,5 +465,33 @@ public class EventService {
 						|| event.getCost().toLowerCase().contains(searchQuery.toLowerCase())
 						|| event.getPlace().toLowerCase().contains(searchQuery.toLowerCase()))
 				.collect(Collectors.toList());
+	}
+//Example request:http://localhost:8080/events/filter?cost=ucuz&place=mekanda&priority=rating
+
+	public List<Event> getFilteredEvents(String cost, String place, String priority) {
+		Stream<Event> eventsStream = eventRepository.findEventsByIsActiveTrueAndIsPrivateFalse().stream();
+
+		if (cost != null && !cost.isEmpty() && !cost.equalsIgnoreCase("all")) {
+			eventsStream = eventsStream.filter(event -> event.getCost().equalsIgnoreCase(cost));
+		}
+		if (place != null && !place.isEmpty() && !place.equalsIgnoreCase("all")) {
+			eventsStream = eventsStream.filter(event -> event.getPlace().equalsIgnoreCase(place));
+		}
+
+		if ("rating".equals(priority)) {
+			eventsStream = eventsStream
+					.filter(event -> event.getAverageRating() != null && event.getAverageRating().doubleValue() > 2.5)
+					.sorted(Comparator.comparing(Event::getAverageRating).reversed());
+		} else if ("attendance".equals(priority)) {
+			eventsStream = eventsStream
+					.sorted(Comparator.comparingInt((Event e) -> getAttendanceCount(e.getId())).reversed());
+		} else if ("all".equals(priority)) {
+			eventsStream = eventsStream
+					.filter(event -> event.getAverageRating() != null && event.getAverageRating().doubleValue() > 2.5)
+					.sorted(Comparator.comparing(Event::getAverageRating)
+							.thenComparingInt((Event e) -> getAttendanceCount(e.getId())).reversed());
+		}
+
+		return eventsStream.collect(Collectors.toList());
 	}
 }
