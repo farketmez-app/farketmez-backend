@@ -211,7 +211,7 @@ public class EventService {
 		Event suggestedEvent = recommendEvent(usersOldEvents, oldEventRatings, placeAndCostCounts);
 
 		if (suggestedEvent == null) {
-			throw new EntityNotFoundException("No events found with those variables.");
+			throw new UserInputException("No events found with those variables.");
 		}
 
 		return suggestedEvent;
