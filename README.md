@@ -1,6 +1,6 @@
 # farketmez-backend
 
-This project contains a Java application that performs internship management functions.
+This project contains a Java application that performs fark etmez functions. Our application, which is an event planning website, was made within the scope of a computer engineering graduation project.
 
 ## Prerequisites
 
