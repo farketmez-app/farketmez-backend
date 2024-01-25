@@ -49,7 +49,7 @@ To import dummy data into the PostgreSQL database, follow these steps:
 
 1. Open a SQL client tool.
 2. Connect to your PostgreSQL database server.
-3. Open the **Internship Management System** database.
+3. Open the **farketmez** database.
 4. Open the `dummy_data.sql` file located in the project's root directory.
 5. Execute the SQL statements in the `dummy_data.sql` file to populate the database with dummy data.
 
